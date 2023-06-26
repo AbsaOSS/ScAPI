@@ -1,0 +1,9 @@
+{
+  "constants": {
+    "server": "localhost",
+    "port": "8080"
+  },
+  "properties": {
+    "url": "http://{{ server}}:{{ errPort }}/restcontroller"
+  }
+}

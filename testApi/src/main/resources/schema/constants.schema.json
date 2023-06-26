@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "https://africa.absa/schemas/suiteConstants",
+  "$ref": "#/definitions/suiteConstants",
+
+  "definitions": {
+    "suiteConstants": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "constants": {
+          "$ref": "#/definitions/SuiteConstants"
+        }
+      },
+      "required": [
+        "constants"
+      ],
+      "title": "SuiteConstants"
+    },
+    "SuiteConstants": {
+      "type": "object",
+      "additionalProperties": true,
+      "patternProperties": {
+        "(?:)": {
+          "type": "string"
+        }
+      },
+      "title": "SuiteConstants"
+    }
+  }
+}

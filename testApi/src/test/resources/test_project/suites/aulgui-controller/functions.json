@@ -1,0 +1,49 @@
+[
+  {
+    "name" : "getSurname",
+    "inputs" : ["in_user_id"],
+    "outputs" : ["out_surname"],
+    "actions" : [
+      {
+        "name" : "getUserDetail",
+        "given" : [
+          {
+            "name": "headers",
+            "value": [
+              "Authorization",
+              "Bearer {{ env.bearerToken }}",
+              "Content-Type",
+              "application/json"
+            ]
+          }
+        ],
+        "when": [
+          {
+            "name": "get",
+            "value": "{{ env.url }}/AULGUI/user#{{ inputs.in_user_id }}"
+          }
+        ],
+        "then": [
+          {
+            "name": "statusCode",
+            "value": 200
+          }
+        ],
+        "extract" : [
+          {
+            "response" : [
+              {
+                "body" : [
+                  {
+                    "get" : "surname"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+    ]
+  }
+]

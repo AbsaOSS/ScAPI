@@ -1,0 +1,13 @@
+{
+  "constants": {
+    "server": "localhost",
+    "port": 8080,
+    "notUsed": "never used"
+  },
+  "properties": {
+    "url": "http://{{ server}}:{{ port }}/restcontroller",
+    "obj": {
+      "problem": "this is not allowed"
+    }
+  }
+}

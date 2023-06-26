@@ -1,0 +1,39 @@
+{
+  "endpoint" : "deleteQuestion",
+  "tests": [
+    {
+      "name" : "test-name-1",
+      "categories": ["SMOKE"],
+      "arranges" : [
+        {
+          "name": "headers",
+          "value": "{{ constants.header_auth }}"
+        },
+        {
+          "name": "headers",
+          "value": "{{ constants.header_bearer_token }}"
+        },
+        {
+          "name": "contentType",
+          "value": "{{ constants.content_type }}"
+        },
+        {
+          "name": "accept",
+          "value": "true"
+        }
+      ],
+      "actions": [
+        {
+          "name": "delete",
+          "value": "{{ env.url }}/TBD/question"
+        }
+      ],
+      "assertions": [
+        {
+          "name": "statusCode",
+          "value": "200"
+        }
+      ]
+    }
+  ]
+}

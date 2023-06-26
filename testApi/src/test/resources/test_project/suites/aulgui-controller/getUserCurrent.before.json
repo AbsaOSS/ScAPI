@@ -1,0 +1,36 @@
+[
+  {
+    "name" : "before.name.1",
+    "actions" : [
+      {
+        "name" : "action-name-1",
+        "given" : [
+          {
+            "name": "headers",
+            "value": ["{{ this.headers }}"]
+          },
+          {
+            "name": "accept",
+            "value": "{{ this.unique-key-name-2 }}"
+          }
+        ],
+        "when": [
+          {
+            "name": "get",
+            "value": "{{ env.url }}/AULGUI/user"
+          }
+        ],
+        "then": [
+          {
+            "name": "statusCode",
+            "value": 200
+          }
+        ],
+        "extract" : []
+      },
+      {
+        "@" : "functions.getSurname"
+      }
+    ]
+  }
+]

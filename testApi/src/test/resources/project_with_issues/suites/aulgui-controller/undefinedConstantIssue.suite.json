@@ -1,0 +1,31 @@
+{
+  "endpoint" : "getUserCurrent",
+  "tests": [
+    {
+      "name" : "test-name-1",
+      "categories": ["SMOKE"],
+      "arranges" : [
+        {
+          "name": "headers",
+          "value": "{{ constants.no_provided }}"
+        },
+        {
+          "name": "accept",
+          "value": "true"
+        }
+      ],
+      "actions": [
+        {
+          "name": "get",
+          "value": "{{ env.url }}/AULGUI/user"
+        }
+      ],
+      "assertions": [
+        {
+          "name": "statusCode",
+          "value": "200"
+        }
+      ]
+    }
+  ]
+}
