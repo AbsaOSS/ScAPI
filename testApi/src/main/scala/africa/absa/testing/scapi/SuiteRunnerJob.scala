@@ -16,28 +16,39 @@
 
 package africa.absa.testing.scapi
 
-import io.restassured.RestAssured.`given`
-import io.restassured.http.ContentType
-import io.restassured.module.scala.RestAssuredSupport.AddThenToResponse
+import africa.absa.testing.scapi.logging.functions.Scribe
 
 object SuiteRunnerJob {
+  implicit val loggingFunctions: Scribe = Scribe(this.getClass)
 
-  def runSuites(suites: Set[Suite]): Unit = {
-    // Note: this is initial example logic to in touch with target library - Rest Assured
-    given()
-      .headers(
-        "Authorization",
-        "Bearer " + "bearerToken",
-        "Content-Type",
-        ContentType.JSON
-      )
-      .accept("")
-    .when()
-//      .get("http://localhost:8080/restcontroller/AULGUI/user")
-      .get("http://google.com")
-    .Then()
-      .statusCode(200)
-      .extract()
-      .response().body()
+  def runSuites(suites: Set[Suite], environment: Environment): Unit = {
+    for (suite <- suites;
+         test <- suite.tests) {
+      loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")
+
+      // TODO - will be solved in #3
+      //  in json there are actions as set - but used is only one to do get, put, post or delete
+      //  decide if it is correct in time of designing before/after logic which has same data format - maybe define two formats
+
+      try {
+        val response: Response = RestClient.sendRequest(
+          method = test.actions.head.name,
+          url = test.actions.head.value,
+          body = None, // TODO - missing concept how to insert a body
+          headers = RequestHeaders.buildHeaders(test.headers),
+          verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
+        )
+
+        ResponseAssertions.performAssertions(
+          response = response,
+          assertions = test.assertions
+        )
+
+        loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.status}'")
+      } catch {
+        case e: Exception =>
+          loggingFunctions.error(s"Exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+      }
+    }
   }
 }

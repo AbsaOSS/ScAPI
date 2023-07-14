@@ -128,23 +128,22 @@ case class SuiteConstants private(constants: Map[String, String]) extends Refere
 }
 
 /**
- * Case class that represents Arrange.
- * This class is used to hold test arrangements.
+ * Case class that represents one Header option.
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
- * @constructor create a new Arrange with a name and value.
- * @param name the name of the arrangement.
- * @param value the value of the arrangement.
+ * @constructor create a new Header with a name and value.
+ * @param name the name of the header option.
+ * @param value the value of the header option.
  */
-case class Arrange private(name: String, value: String) extends ReferenceResolver {
+case class Header private(name: String, value: String) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
    *
    * @param references the map of references that may be used to resolve references in the value.
-   * @return a new Arrange instance with resolved references.
+   * @return a new Header option instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Arrange = this.copy(value = getResolved(value, references))
+  def resolveReferences(references: Map[String, String]): Header = this.copy(value = getResolved(value, references))
 }
 
 /**

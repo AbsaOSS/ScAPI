@@ -89,13 +89,13 @@ object SuiteFactory {
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
     val suiteConstants: SuiteConstants = loadJsonSuiteConstants(suiteFilePath, suiteName, environmentMap)
-    // TODO - code proposal - will be solved in #11
+    // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
-    // TODO - code proposal - will be solved in #10
+    // TODO - code proposal - will be solved in #3
     // val beforeActions: Map[String, String] = loadJsonSuiteBeforeActions(suiteFilePath, propertiesSum)
     // val afterActions: Map[String, String] = loadJsonSuiteAfterActions(suiteFilePath, propertiesSum)
 
-    JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE.getPath)
+    JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE)
     val jsonString: String = JsonUtils.stringFromPath(suitePath)
     val notResolvedSuite: Suite = parseToSuite(jsonString)
     notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
@@ -114,7 +114,7 @@ object SuiteFactory {
     if (!Files.exists(constantsFilePath)) {
       SuiteConstants(Map.empty[String, String])
     } else {
-      JsonSchemaValidator.validate(constantsFilePath.toString, ScAPIJsonSchema.SUITE_CONSTANTS.getPath)
+      JsonSchemaValidator.validate(constantsFilePath.toString, ScAPIJsonSchema.SUITE_CONSTANTS)
       val jsonString: String = JsonUtils.stringFromPath(constantsFilePath.toString)
       val notResolvedConstants: SuiteConstants = parseToSuiteConstant(jsonString)
       notResolvedConstants.resolveReferences(properties)
@@ -148,7 +148,7 @@ object SuiteFactory {
  * Object that provides implicit JSON format for various Suite related classes.
  */
 object SuiteJsonProtocol extends DefaultJsonProtocol {
-  implicit val preparationFormat: RootJsonFormat[Arrange] = jsonFormat2(Arrange)
+  implicit val preparationFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat2(Action)
   implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat2(Assertion)
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat5(SuiteTestScenario)

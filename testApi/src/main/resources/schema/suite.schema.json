@@ -36,7 +36,7 @@
             "type": "string"
           }
         },
-        "arranges": {
+        "headers": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Action"
@@ -58,7 +58,7 @@
       "required": [
         "name",
         "categories",
-        "arranges",
+        "headers",
         "actions",
         "assertions"
       ],

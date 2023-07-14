@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.utils
 
+import java.net.URL
 import scala.io.Source
 import scala.util.Using
 
@@ -30,6 +31,12 @@ object JsonUtils {
    * @param path The file path as a String.
    * @return The file contents as a String.
    */
+  def stringFromPath(path: URL): String = {
+    Using.resource(Source.fromInputStream(path.openStream())) { source =>
+      source.getLines().mkString
+    }
+  }
+
   def stringFromPath(path: String): String = {
     Using.resource(Source.fromFile(path)) { source =>
       source.getLines().mkString

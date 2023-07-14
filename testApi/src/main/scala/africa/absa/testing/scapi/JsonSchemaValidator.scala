@@ -20,6 +20,8 @@ import africa.absa.testing.scapi.utils.JsonUtils
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.networknt.schema.{JsonSchema, JsonSchemaFactory, SpecVersion}
 
+import java.net.URL
+
 /**
  * Class that represents a JSON Schema Validator. This validator takes a JSON schema file
  * and a JSON file and provides a functionality to validate the JSON file against the schema.
@@ -27,7 +29,7 @@ import com.networknt.schema.{JsonSchema, JsonSchemaFactory, SpecVersion}
  * @param jsonPath Path to the JSON file to be validated.
  * @param schemaPath Path to the JSON Schema file.
  */
-case class JsonSchemaValidator(jsonPath: String, schemaPath: String) {
+case class JsonSchemaValidator(jsonPath: String, schemaPath: URL) {
   protected val mapper: ObjectMapper = new ObjectMapper()
 
   /**
@@ -73,7 +75,7 @@ object JsonSchemaValidator {
    * @param jsonPath   The path to the JSON file to be validated.
    * @param schemaPath The path to the JSON schema file.
    */
-  def validate(jsonPath: String, schemaPath: String): Unit = {
+  def validate(jsonPath: String, schemaPath: URL): Unit = {
     new JsonSchemaValidator(jsonPath, schemaPath).validate()
   }
 }

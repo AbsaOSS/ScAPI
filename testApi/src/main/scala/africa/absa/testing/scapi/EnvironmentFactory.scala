@@ -19,6 +19,8 @@ package africa.absa.testing.scapi
 import africa.absa.testing.scapi.utils.JsonUtils
 import spray.json._
 
+import java.net.URL
+
 /**
  * EnvironmentFactory object is used to create Environment objects.
  */
@@ -31,7 +33,7 @@ object EnvironmentFactory {
    * @return Returns an environment object constructed from the JSON file.
    */
   def fromFile(path: String): Environment = {
-    JsonSchemaValidator.validate(path, ScAPIJsonSchema.ENVIRONMENT.getPath)
+    JsonSchemaValidator.validate(path, ScAPIJsonSchema.ENVIRONMENT)
     val jsonString: String = readJsonFile(path)
     val environment: Environment = parseToEnvironment(jsonString)
     environment.resolveReferences
@@ -43,6 +45,7 @@ object EnvironmentFactory {
    * @param path This is the path to the JSON file.
    * @return Returns the JSON file content as a String.
    */
+  private def readJsonFile(path: URL): String = JsonUtils.stringFromPath(path)
   private def readJsonFile(path: String): String = JsonUtils.stringFromPath(path)
 
   /**

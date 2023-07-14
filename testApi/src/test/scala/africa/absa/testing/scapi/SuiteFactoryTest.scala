@@ -48,7 +48,7 @@ class SuiteFactoryTest extends FunSuite {
     }
 
     assert(caught.isInstanceOf[ProjectLoadFailed])
-    assert(testLoggingFunctions.logs.head.contains("Undefined constant(s): 'constants.no_provided' in ''Arrange' action."))
+    assert(testLoggingFunctions.logs.head.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
     assert(testLoggingFunctions.logs(1).contains("Not all suites loaded. Failed suites:"))
   }
 
@@ -62,7 +62,7 @@ class SuiteFactoryTest extends FunSuite {
     loadJsonSuiteConstants
    */
   test("loadJsonSuite - constants loaded") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map("env.bearerToken" -> "token#value")
     val expected: Map[String, String] = Map(
@@ -78,7 +78,7 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - no constants file exist") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "notExist"
     val properties: Map[String, String] = Map.empty
     val expected: Map[String, String] = Map.empty
@@ -89,7 +89,7 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - not all references resolved") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map.empty
 

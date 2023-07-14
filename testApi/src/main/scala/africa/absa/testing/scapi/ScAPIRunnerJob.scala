@@ -52,7 +52,7 @@ object ScAPIRunnerJob {
 
         // NOTE
         // start tests
-        SuiteRunnerJob.runSuites(suites)
+        SuiteRunnerJob.runSuites(suites, environment)
 
         // NOTE
         // generate result report
