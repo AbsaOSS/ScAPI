@@ -1,5 +1,5 @@
 {
-  "endpoint" : "getUserCurrent",
+  "endpoint" : "deleteQuestion",
   "tests": [
     {
       "name" : "test-name-1",
@@ -24,8 +24,8 @@
       ],
       "actions": [
         {
-          "name": "get",
-          "value": "{{ env.url }}/AULGUI/user"
+          "name": "post",
+          "value": "{{ env.url }}/path/question"
         }
       ],
       "assertions": [

@@ -1,16 +1,12 @@
 {
-  "endpoint" : "deleteQuestion",
+  "endpoint" : "getUserCurrent",
   "tests": [
     {
-      "name" : "test-name-1",
+      "name" : "get current user",
       "categories": ["SMOKE"],
-      "arranges" : [
+      "headers" : [
         {
-          "name": "headers",
-          "value": "{{ constants.header_auth }}"
-        },
-        {
-          "name": "headers",
+          "name": "authorization",
           "value": "{{ constants.header_bearer_token }}"
         },
         {
@@ -24,8 +20,8 @@
       ],
       "actions": [
         {
-          "name": "delete",
-          "value": "{{ env.url }}/TBD/question"
+          "name": "get",
+          "value": "{{ env.url }}/GUI/user"
         }
       ],
       "assertions": [

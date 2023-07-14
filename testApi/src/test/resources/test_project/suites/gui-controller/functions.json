@@ -20,7 +20,7 @@
         "when": [
           {
             "name": "get",
-            "value": "{{ env.url }}/AULGUI/user#{{ inputs.in_user_id }}"
+            "value": "{{ env.url }}/GUI/user#{{ inputs.in_user_id }}"
           }
         ],
         "then": [

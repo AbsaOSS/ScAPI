@@ -25,7 +25,7 @@
       "actions": [
         {
           "name": "put",
-          "value": "{{ env.url }}/TBD/question"
+          "value": "{{ env.url }}/path/question"
         }
       ],
       "assertions": [

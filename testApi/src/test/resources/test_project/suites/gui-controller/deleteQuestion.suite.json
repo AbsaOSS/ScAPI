@@ -24,8 +24,8 @@
       ],
       "actions": [
         {
-          "name": "post",
-          "value": "{{ env.url }}/TBD/question"
+          "name": "delete",
+          "value": "{{ env.url }}/path/question"
         }
       ],
       "assertions": [
