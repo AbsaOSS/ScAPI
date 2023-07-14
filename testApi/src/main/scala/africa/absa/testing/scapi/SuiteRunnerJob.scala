@@ -32,9 +32,9 @@ object SuiteRunnerJob {
 
       try {
         val response: Response = RestClient.sendRequest(
-          method = test.actions.head.name,
-          url = test.actions.head.value,
-          body = None, // TODO - missing concept how to insert a body
+          method = test.actions.head.methodName,
+          url = test.actions.head.url,
+          body = RequestBody.buildBody(test.actions.head.body),
           headers = RequestHeaders.buildHeaders(test.headers),
           verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
         )

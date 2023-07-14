@@ -21,16 +21,15 @@ import africa.absa.testing.scapi.logging.functions.Scribe
 object RestClient {
   implicit val loggingFunctions: Scribe = Scribe(this.getClass)
 
-  def sendRequest(method: String, url: String, body: Option[String], headers: Map[String, String], verifySslCerts: Boolean = false): Response = {
+  def sendRequest(method: String, url: String, body: String, headers: Map[String, String], verifySslCerts: Boolean = false): Response = {
     loggingFunctions.debug(s"RestClient:sendRequest url: '$url', body: '$body', headers: '$headers', verifySslCerts: '$verifySslCerts'")
-
-    // TODO - commented part will require :" import ujson._
 
     val response = method.toLowerCase match {
       case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts)
+      case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body)
 //      case "put" => requests.put(url, data = body.map(ujson.Str).getOrElse(ujson.Obj()), headers = headers)
 //      case "delete" => requests.delete(url)
-      case _ => throw new IllegalArgumentException("Invalid action method")
+      case _ => throw new IllegalArgumentException("RestClient:sendRequest - unexpected action method called")
     }
     Response(response.statusCode, response.text(), response.headers.toMap)
   }

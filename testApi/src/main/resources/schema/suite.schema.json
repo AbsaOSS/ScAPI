@@ -39,7 +39,7 @@
         "headers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Action"
+            "$ref": "#/definitions/Header"
           }
         },
         "actions": {
@@ -51,7 +51,7 @@
         "assertions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Action"
+            "$ref": "#/definitions/Assertion"
           }
         }
       },
@@ -64,7 +64,45 @@
       ],
       "title": "Test"
     },
+    "Header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Action"
+    },
     "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "methodName": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "methodName",
+        "url",
+        "body"
+      ],
+      "title": "Action"
+    },
+    "Assertion": {
       "type": "object",
       "additionalProperties": false,
       "properties": {

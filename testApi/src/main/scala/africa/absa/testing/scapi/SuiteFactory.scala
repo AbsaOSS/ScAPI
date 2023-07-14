@@ -149,7 +149,7 @@ object SuiteFactory {
  */
 object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val preparationFormat: RootJsonFormat[Header] = jsonFormat2(Header)
-  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat2(Action)
+  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat3(Action)
   implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat2(Assertion)
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat5(SuiteTestScenario)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
