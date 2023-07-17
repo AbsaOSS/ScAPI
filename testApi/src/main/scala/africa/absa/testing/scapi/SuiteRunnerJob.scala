@@ -21,34 +21,53 @@ import africa.absa.testing.scapi.logging.functions.Scribe
 object SuiteRunnerJob {
   implicit val loggingFunctions: Scribe = Scribe(this.getClass)
 
-  def runSuites(suites: Set[Suite], environment: Environment): Unit = {
-    for (suite <- suites;
-         test <- suite.tests) {
-      loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")
+  def runSuites(suites: Set[Suite], environment: Environment): Set[TestResults] = {
+    suites.flatMap(suite => {
+      suite.tests.map(test => {
+        loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")
+        val testStartTime: Long = System.currentTimeMillis()
 
-      // TODO - will be solved in #3
-      //  in json there are actions as set - but used is only one to do get, put, post or delete
-      //  decide if it is correct in time of designing before/after logic which has same data format - maybe define two formats
+        try {
+          val response: Response = RestClient.sendRequest(
+            method = test.actions.head.methodName,
+            url = test.actions.head.url,
+            headers = RequestHeaders.buildHeaders(test.headers),
+            body = RequestBody.buildBody(test.actions.head.body),
+            verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
+          )
 
-      try {
-        val response: Response = RestClient.sendRequest(
-          method = test.actions.head.methodName,
-          url = test.actions.head.url,
-          body = RequestBody.buildBody(test.actions.head.body),
-          headers = RequestHeaders.buildHeaders(test.headers),
-          verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
-        )
+          ResponseAssertions.performAssertions(
+            response = response,
+            assertions = test.assertions
+          )
 
-        ResponseAssertions.performAssertions(
-          response = response,
-          assertions = test.assertions
-        )
+          val testEndTime: Long = System.currentTimeMillis()
+          loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.status}'")
+          TestResults.success(
+            suiteName = suite.endpoint,
+            testName = test.name,
+            duration = Some(testEndTime - testStartTime))
 
-        loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.status}'")
-      } catch {
-        case e: Exception =>
-          loggingFunctions.error(s"Exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
-      }
-    }
+        } catch {
+          case e: AssertionError =>
+            val testEndTime = System.currentTimeMillis()
+            loggingFunctions.error(s"Assertion error while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            TestResults.failure(
+              suiteName = suite.endpoint,
+              testName = test.name,
+              errorMessage = e.getMessage,
+              duration = Some(testEndTime - testStartTime))
+
+          case e: Exception =>
+            val testEndTime = System.currentTimeMillis()
+            loggingFunctions.error(s"Exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            TestResults.failure(
+              suiteName = suite.endpoint,
+              testName = test.name,
+              errorMessage = e.getMessage,
+              duration = Some(testEndTime - testStartTime))
+        }
+      })
+    })
   }
 }

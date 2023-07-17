@@ -20,8 +20,10 @@ import spray.json._
 
 object RequestBody {
 
-  def buildBody(jsonBody: String): String = {
-    if (jsonBody.trim.isEmpty) return "{}"
-    jsonBody.parseJson.toString()
+  def buildBody(jsonBody: Option[String]): String = {
+    jsonBody match {
+      case Some(body) if body.trim.nonEmpty => body.parseJson.toString()
+      case _ => "{}"
+    }
   }
 }

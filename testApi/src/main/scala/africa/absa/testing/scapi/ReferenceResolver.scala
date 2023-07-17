@@ -156,7 +156,7 @@ case class Header private(name: String, value: String) extends ReferenceResolver
  * @param url the value of the action.
  * @param body the body of the action - optional.
  */
-case class Action private(methodName: String, url: String, body: String) extends ReferenceResolver {
+case class Action private(methodName: String, url: String, body: Option[String]) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -164,7 +164,9 @@ case class Action private(methodName: String, url: String, body: String) extends
    * @param references the map of references that may be used to resolve references in the value.
    * @return a new Action instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Action = this.copy(url = getResolved(url, references), body = getResolved(body, references))
+  def resolveReferences(references: Map[String, String]): Action = this.copy(
+    url = getResolved(url, references),
+    body = body.flatMap(b => Option(getResolved(b, references))))
 }
 
 /**

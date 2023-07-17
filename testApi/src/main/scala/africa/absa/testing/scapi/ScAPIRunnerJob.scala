@@ -46,20 +46,12 @@ object ScAPIRunnerJob {
     val suites: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
 
     // run tests and result reporting - use categories for test filtering
-    val testResult = cmd.validateOnly match {
-      case false => {
-        loggingFunctions.info("Running tests")
-
-        // NOTE
-        // start tests
-        SuiteRunnerJob.runSuites(suites, environment)
-
-        // NOTE
-        // generate result report
-
-      }
-      case _ => loggingFunctions.info("Validate only => end run.")
+    if (cmd.validateOnly) {
+      loggingFunctions.info("Validate only => end run.")
+    } else {
+      loggingFunctions.info("Running tests")
+      val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suites, environment)
+      TxtReporter.printReport(testResults)
     }
   }
-
 }

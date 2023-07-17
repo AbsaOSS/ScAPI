@@ -92,7 +92,7 @@
           "type": "string"
         },
         "body": {
-          "type": "string"
+          "type": ["string", "null"]
         }
       },
       "required": [
