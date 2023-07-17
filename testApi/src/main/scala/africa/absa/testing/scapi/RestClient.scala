@@ -27,7 +27,7 @@ object RestClient {
     val response = method.toLowerCase match {
       case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts)
       case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body)
-//      case "put" => requests.put(url, data = body.map(ujson.Str).getOrElse(ujson.Obj()), headers = headers)
+      case "put" => requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body)
 //      case "delete" => requests.delete(url)
       case _ => throw new IllegalArgumentException("RestClient:sendRequest - unexpected action method called")
     }
