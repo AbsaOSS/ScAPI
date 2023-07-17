@@ -79,7 +79,7 @@
         "name",
         "value"
       ],
-      "title": "Action"
+      "title": "Header"
     },
     "Action": {
       "type": "object",
@@ -93,12 +93,19 @@
         },
         "body": {
           "type": ["string", "null"]
+        },
+        "params": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/definitions/Param"
+          }
         }
       },
       "required": [
         "methodName",
         "url",
-        "body"
+        "body",
+        "params"
       ],
       "title": "Action"
     },
@@ -118,6 +125,23 @@
         "value"
       ],
       "title": "Action"
+    },
+    "Param": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Param"
     }
   }
 }

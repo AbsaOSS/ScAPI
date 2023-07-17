@@ -33,6 +33,7 @@ object SuiteRunnerJob {
             url = test.actions.head.url,
             headers = RequestHeaders.buildHeaders(test.headers),
             body = RequestBody.buildBody(test.actions.head.body),
+            params = RequestParams.buildParams(test.actions.head.params),
             verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
           )
 
@@ -46,7 +47,9 @@ object SuiteRunnerJob {
           TestResults.success(
             suiteName = suite.endpoint,
             testName = test.name,
-            duration = Some(testEndTime - testStartTime))
+            duration = Some(testEndTime - testStartTime),
+            category = test.categories.mkString(",")
+          )
 
         } catch {
           case e: AssertionError =>
@@ -56,16 +59,30 @@ object SuiteRunnerJob {
               suiteName = suite.endpoint,
               testName = test.name,
               errorMessage = e.getMessage,
-              duration = Some(testEndTime - testStartTime))
+              duration = Some(testEndTime - testStartTime),
+              categories = test.categories.mkString(",")
+            )
 
           case e: Exception =>
             val testEndTime = System.currentTimeMillis()
-            loggingFunctions.error(s"Exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            loggingFunctions.error(s"Request exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
             TestResults.failure(
               suiteName = suite.endpoint,
               testName = test.name,
               errorMessage = e.getMessage,
-              duration = Some(testEndTime - testStartTime))
+              duration = Some(testEndTime - testStartTime),
+              categories = test.categories.mkString(",")
+            )
+
+          case e: Exception =>
+            val testEndTime = System.currentTimeMillis()
+            loggingFunctions.error(s"Unexpected exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            TestResults.failure(
+              suiteName = suite.endpoint,
+              testName = test.name,
+              errorMessage = e.getMessage,
+              duration = Some(testEndTime - testStartTime),
+              categories = test.categories.mkString(","))
         }
       })
     })

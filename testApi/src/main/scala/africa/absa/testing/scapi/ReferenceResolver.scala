@@ -156,7 +156,7 @@ case class Header private(name: String, value: String) extends ReferenceResolver
  * @param url the value of the action.
  * @param body the body of the action - optional.
  */
-case class Action private(methodName: String, url: String, body: Option[String]) extends ReferenceResolver {
+case class Action private(methodName: String, url: String, body: Option[String], params: Option[Set[Param]]) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -166,7 +166,9 @@ case class Action private(methodName: String, url: String, body: Option[String])
    */
   def resolveReferences(references: Map[String, String]): Action = this.copy(
     url = getResolved(url, references),
-    body = body.flatMap(b => Option(getResolved(b, references))))
+    body = body.flatMap(b => Option(getResolved(b, references))),
+    params = params
+  )
 }
 
 /**
@@ -187,5 +189,24 @@ case class Assertion private(name: String, value: String) extends ReferenceResol
    * @return a new Assertion instance with resolved references.
    */
   def resolveReferences(references: Map[String, String]): Assertion = this.copy(value = getResolved(value, references))
+}
+
+/**
+ * Case class that represents one Header option.
+ * It implements the `ReferenceResolver` trait to support resolution of reference constants.
+ *
+ * @constructor create a new Header with a name and value.
+ * @param name the name of the header option.
+ * @param value the value of the header option.
+ */
+case class Param private(name: String, value: String) extends ReferenceResolver {
+
+  /**
+   * Method to resolve references.
+   *
+   * @param references the map of params that may be used to resolve references in the value.
+   * @return a new Param option instance with resolved references.
+   */
+  def resolveReferences(references: Map[String, String]): Param = this.copy(value = getResolved(value, references))
 }
 

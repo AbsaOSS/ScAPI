@@ -21,14 +21,16 @@ import africa.absa.testing.scapi.logging.functions.Scribe
 object RestClient {
   implicit val loggingFunctions: Scribe = Scribe(this.getClass)
 
-  def sendRequest(method: String, url: String, body: String, headers: Map[String, String], verifySslCerts: Boolean = false): Response = {
-    loggingFunctions.debug(s"RestClient:sendRequest url: '$url', body: '$body', headers: '$headers', verifySslCerts: '$verifySslCerts'")
+  def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {
+    loggingFunctions.debug(s"RestClient:sendRequest url: '$url', body: '$body', headers: '$headers', params: '$params' verifySslCerts: '$verifySslCerts'")
+
+    // TODO - how to send correct object instead of empty body json string
 
     val response = method.toLowerCase match {
-      case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts)
-      case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body)
-      case "put" => requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body)
-//      case "delete" => requests.delete(url)
+      case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "put" => requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "delete" => requests.delete(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
       case _ => throw new IllegalArgumentException("RestClient:sendRequest - unexpected action method called")
     }
     Response(response.statusCode, response.text(), response.headers.toMap)
