@@ -43,6 +43,7 @@ case class ScAPIRunnerConfig(envPath: String = "",
                              threadCount: Int = DefaultThreadCount,
                              fileFormat: String = DefaultFileFormat,
                              report: String = DefaultReport,
+                             debug: Boolean = false,
                              validateOnly: Boolean = false) {
   /**
    * Method to log configuration information
@@ -58,6 +59,7 @@ case class ScAPIRunnerConfig(envPath: String = "",
     loggingFunctions.info(s"report: $report")
     loggingFunctions.info(s"fileFormat: $fileFormat")
     loggingFunctions.info(s"threadCount: $threadCount")
+    loggingFunctions.info(s"debug: $debug")
     loggingFunctions.info(s"validate only: $validateOnly")
   }
 }
@@ -135,10 +137,15 @@ object ScAPIRunnerConfig {
       .action((value, config) => { config.copy(report = value) })
       .text("Path to a report output directory.")
 
-    opt[Boolean]("validate-only")
+    opt[Unit]("debug")
       .optional()
-      .action((value, config) => { config.copy(validateOnly = value) })
-      .text("Validate input definitions only. Default is 'false'")
+      .action((_, config) => { config.copy(debug = true) })
+      .text("Activate debug regime.")
+
+    opt[Unit]("validate-only")
+      .optional()
+      .action((_, config) => { config.copy(validateOnly = true) })
+      .text("Activate validation of input definitions only.")
 
     help("help").text("prints this usage text")
   }

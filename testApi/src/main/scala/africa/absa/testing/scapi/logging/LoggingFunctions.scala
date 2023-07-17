@@ -17,6 +17,8 @@
 package africa.absa.testing.scapi.logging
 
 trait LoggingFunctions {
+  val INFO: String = "Info"
+
   def debug(m: String, t: Throwable = None.orNull): Unit
   def info(m: String, t: Throwable = None.orNull): Unit
   def warning(m: String, t: Throwable = None.orNull): Unit

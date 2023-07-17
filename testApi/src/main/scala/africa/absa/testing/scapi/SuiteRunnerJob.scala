@@ -19,9 +19,8 @@ package africa.absa.testing.scapi
 import africa.absa.testing.scapi.logging.functions.Scribe
 
 object SuiteRunnerJob {
-  implicit val loggingFunctions: Scribe = Scribe(this.getClass)
-
-  def runSuites(suites: Set[Suite], environment: Environment): Set[TestResults] = {
+  def runSuites(suites: Set[Suite], environment: Environment)
+               (implicit loggingFunctions: Scribe): Set[TestResults] = {
     suites.flatMap(suite => {
       suite.tests.map(test => {
         loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")

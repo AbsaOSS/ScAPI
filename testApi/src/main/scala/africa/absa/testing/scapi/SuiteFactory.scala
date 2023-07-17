@@ -27,8 +27,6 @@ import scala.util.{Failure, Success, Try}
  * Object that creates a set of Suite instances from the given test root path.
  */
 object SuiteFactory {
-  implicit val loggingFunctions: Scribe = Scribe(this.getClass)
-
   /**
    * Method to create a set of Suite instances from the given test root path.
    *

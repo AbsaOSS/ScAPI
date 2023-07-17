@@ -16,14 +16,8 @@
 
 package africa.absa.testing.scapi
 
-import africa.absa.testing.scapi.logging.functions.Scribe
-
 object RestClient {
-  implicit val loggingFunctions: Scribe = Scribe(this.getClass)
-
   def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {
-    loggingFunctions.debug(s"RestClient:sendRequest url: '$url', body: '$body', headers: '$headers', params: '$params' verifySslCerts: '$verifySslCerts'")
-
     // TODO - how to send correct object instead of empty body json string
 
     val response = method.toLowerCase match {

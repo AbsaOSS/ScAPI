@@ -36,14 +36,15 @@ object ScAPIRunnerJob {
       case Success(value) => value
       case Failure(exception) => throw exception
     }
-    implicit val loggingFunctions: Scribe = Scribe(this.getClass)
+    val logLevel = if (cmd.debug) Scribe.DEBUG else Scribe.INFO
+    implicit val loggingFunctions: Scribe = Scribe(this.getClass, logLevel)
     cmd.logConfigInfo
 
     if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailed("'suites' directory have to exist in project root.")
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suites: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
+    val suites: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, logLevel))
 
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {
