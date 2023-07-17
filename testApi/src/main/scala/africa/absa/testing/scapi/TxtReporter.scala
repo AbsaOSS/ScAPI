@@ -18,6 +18,11 @@ object TxtReporter {
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
     def printFormattedLineHeader(): Unit = println(createFormattedLine(maxChars = maxChars))
     def printFormattedLineNoHeader(): Unit = println(createFormattedLine(repeatChar = '-', maxChars = maxChars))
+    def printHeader(title: String): Unit = {
+      printFormattedLineHeader()
+      println(createFormattedLine(Some(title), maxChars = maxChars))
+      printFormattedLineHeader()
+    }
     def printInnerHeader(title: String): Unit = {
       println()
       printFormattedLineNoHeader()
@@ -25,9 +30,7 @@ object TxtReporter {
       printFormattedLineNoHeader()
     }
 
-    printFormattedLineHeader()
-    println(createFormattedLine(Some("Simple Text Report"), maxChars = maxChars))
-    printFormattedLineHeader()
+    printHeader("Simple Text Report")
 
     val successCount = testResults.count(_.status == TestResults.Success)
     val failureCount = testResults.size - successCount
@@ -69,5 +72,7 @@ object TxtReporter {
         println()
       }
     }
+
+    printHeader("End Report")
   }
 }
