@@ -54,7 +54,7 @@ object SuiteFactory {
         case Success(suite) => suite
       }.toSet
 
-      onlyOrAll(suites)
+      filterOnlyOrAll(suites)
 
     } else {
       val failedSuites: Map[String, String] = suiteResults.collect {
@@ -69,8 +69,8 @@ object SuiteFactory {
     }
   }
 
-  private def onlyOrAll(suites: Set[Suite])
-                       (implicit loggingFunctions: Scribe): Set[Suite] = {
+  def filterOnlyOrAll(suites: Set[Suite])
+                     (implicit loggingFunctions: Scribe): Set[Suite] = {
     val suitesWithOnlyTest: Set[Suite] = suites.filter(suite => suite.tests.exists(_.only.getOrElse(false)))
 
     val updatedSuites = if (suitesWithOnlyTest.isEmpty) {
