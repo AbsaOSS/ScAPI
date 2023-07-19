@@ -18,6 +18,8 @@ package africa.absa.testing.scapi
 
 import munit.FunSuite
 
+import java.net.URL
+
 class EnvironmentFactoryTest extends FunSuite {
 
   val correctJsonString: String =
@@ -67,7 +69,7 @@ class EnvironmentFactoryTest extends FunSuite {
     json file validation
    */
   test("env json schema valid") {
-    val envSchemaPath: String = ScAPIJsonSchema.ENVIRONMENT.getPath
+    val envSchemaPath: URL = ScAPIJsonSchema.ENVIRONMENT
     val envPath: String = getClass.getResource("/test_project/localhost.env.json").getPath
 
     JsonSchemaValidator.validate(envPath, envSchemaPath)
@@ -76,7 +78,7 @@ class EnvironmentFactoryTest extends FunSuite {
   def validateEnvJson(name: String, resourcePath: String): Unit = {
     test(name) {
       intercept[JsonInvalidSchema] {
-        val envSchemaPath: String = ScAPIJsonSchema.ENVIRONMENT.getPath
+        val envSchemaPath: URL = ScAPIJsonSchema.ENVIRONMENT
         val envPath: String = getClass.getResource(resourcePath).getPath
 
         JsonSchemaValidator.validate(envPath, envSchemaPath)

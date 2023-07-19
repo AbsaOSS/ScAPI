@@ -64,8 +64,9 @@ class ScAPIRunnerConfigTest extends FunSuite {
       "--categories", "SMOKE,ANOTHER",
       "--thread-count", "4",
       "--file-format", "txt",
-      "--validate-only", "true",
-      "--report", "/some/report/path"
+      "--validate-only",
+      "--report", "/some/report/path",
+      "--debug"
     )) match {
       case Success(value) => value
       case Failure(exception) => fail("Command line parsing passed but shouldn't", exception)

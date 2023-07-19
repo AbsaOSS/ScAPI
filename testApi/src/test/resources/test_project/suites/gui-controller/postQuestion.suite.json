@@ -4,17 +4,13 @@
     {
       "name" : "test-name-1",
       "categories": ["SMOKE"],
-      "arranges" : [
+      "headers" : [
         {
-          "name": "headers",
+          "name": "authorization",
           "value": "{{ constants.header_auth }}"
         },
         {
-          "name": "headers",
-          "value": "{{ constants.header_bearer_token }}"
-        },
-        {
-          "name": "contentType",
+          "name": "content-type",
           "value": "{{ constants.content_type }}"
         },
         {
@@ -24,13 +20,13 @@
       ],
       "actions": [
         {
-          "name": "post",
-          "value": "{{ env.url }}/path/question"
+          "methodName": "post",
+          "url": "{{ env.url }}/path/question"
         }
       ],
       "assertions": [
         {
-          "name": "statusCode",
+          "name": "status-code",
           "value": "200"
         }
       ]

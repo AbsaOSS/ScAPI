@@ -4,9 +4,9 @@
     {
       "name" : "test-name-1",
       "categories": ["SMOKE"],
-      "arranges" : [
+      "headers" : [
         {
-          "name": "headers",
+          "name": "authorization",
           "value": "{{ constants.no_provided }}"
         },
         {
@@ -16,13 +16,13 @@
       ],
       "actions": [
         {
-          "name": "get",
-          "value": "{{ env.url }}/AULGUI/user"
+          "methodName": "get",
+          "url": "{{ env.url }}/AULGUI/user"
         }
       ],
       "assertions": [
         {
-          "name": "statusCode",
+          "name": "status-code",
           "value": "200"
         }
       ]

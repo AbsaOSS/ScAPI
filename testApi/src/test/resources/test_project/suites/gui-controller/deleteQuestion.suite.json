@@ -4,33 +4,25 @@
     {
       "name" : "test-name-1",
       "categories": ["SMOKE"],
-      "arranges" : [
+      "headers" : [
         {
-          "name": "headers",
+          "name": "authorization",
           "value": "{{ constants.header_auth }}"
-        },
-        {
-          "name": "headers",
-          "value": "{{ constants.header_bearer_token }}"
         },
         {
           "name": "contentType",
           "value": "{{ constants.content_type }}"
-        },
-        {
-          "name": "accept",
-          "value": "true"
         }
       ],
       "actions": [
         {
-          "name": "delete",
-          "value": "{{ env.url }}/path/question"
+          "methodName": "delete",
+          "url": "{{ env.url }}/path/question"
         }
       ],
       "assertions": [
         {
-          "name": "statusCode",
+          "name": "status-code",
           "value": "200"
         }
       ]

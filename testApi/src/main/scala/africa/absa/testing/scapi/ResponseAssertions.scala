@@ -21,8 +21,8 @@ object ResponseAssertions {
   def performAssertions(response: Response, assertions: Set[Assertion]): Unit = {
     for (assertion <- assertions) {
       assertion.name match {
-        case "statusCode" => assertStatusCode(response, assertion.value.toInt)
-        case "bodyContains" => assertBodyContains(response, assertion.value)
+        case "status-code" => assertStatusCode(response, assertion.value.toInt)
+        case "body-contains" => assertBodyContains(response, assertion.value)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
       }
     }

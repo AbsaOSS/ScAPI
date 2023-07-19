@@ -23,7 +23,7 @@ import scribe.format.Formatter
 class SuiteFactoryTest extends FunSuite {
   implicit val testLoggingFunctions: TestScribe = new TestScribe(SuiteFactory.getClass.toString)
 
-  class TestScribe(logOrigin: String, formatter: Option[Formatter] = None) extends Scribe(logOrigin, formatter) {
+  class TestScribe(logOrigin: String, logLevel: String = Scribe.INFO, formatter: Option[Formatter] = None) extends Scribe(logOrigin, logLevel, formatter) {
     var logs = List.empty[String]
 
     override def error(message: String, t: Throwable = None.orNull): Unit = {

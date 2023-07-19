@@ -20,13 +20,13 @@
       ],
       "actions": [
         {
-          "name": "get",
-          "value": "{{ env.url }}/GUI/user"
+          "methodName": "get",
+          "url": "{{ env.url }}/GUI/user"
         }
       ],
       "assertions": [
         {
-          "name": "statusCode",
+          "name": "status-code",
           "value": "200"
         }
       ]
