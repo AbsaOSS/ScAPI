@@ -24,7 +24,6 @@ object TxtReporter {
         case None => repeatChar.toString * maxChars
       }
 
-
     // Calculate the max lengths
     val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suite.length).max + 2
     val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.test.length).max + 2
