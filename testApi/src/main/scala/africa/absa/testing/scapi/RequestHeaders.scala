@@ -16,16 +16,28 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.utils.ContentValidator
+
 object RequestHeaders {
+  private val CONTENT_TYPE = "content-type"
+  private val AUTHORIZATION = "authorization"
 
   def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {
       (acc, header) => header.name.toLowerCase match {
-        case "content-type" => acc + (header.name -> header.value)
-        case "authorization" => acc + (header.name -> s"${header.value}")
+        case CONTENT_TYPE => acc + (header.name -> header.value)
+        case AUTHORIZATION => acc + (header.name -> s"${header.value}")
         case _ => acc + (header.name -> header.value)
+        // this place does solve syntax validation, content validation is solved on another place
       }
     }
   }
 
+  def validateContent(header: Header): Unit = {
+    header.name.toLowerCase match {
+      case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value)
+      case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value)
+      case _ => throw UndefinedHeaderType(header.name)
+    }
+  }
 }

@@ -12,10 +12,6 @@
         {
           "name": "content-type",
           "value": "{{ constants.content_type }}"
-        },
-        {
-          "name": "accept",
-          "value": "true"
         }
       ],
       "actions": [

@@ -10,12 +10,8 @@
           "value": "{{ constants.header_bearer_token }}"
         },
         {
-          "name": "contentType",
+          "name": "content-type",
           "value": "{{ constants.content_type }}"
-        },
-        {
-          "name": "accept",
-          "value": "true"
         }
       ],
       "actions": [

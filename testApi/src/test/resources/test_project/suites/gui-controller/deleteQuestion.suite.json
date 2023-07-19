@@ -10,7 +10,7 @@
           "value": "{{ constants.header_auth }}"
         },
         {
-          "name": "contentType",
+          "name": "content-type",
           "value": "{{ constants.content_type }}"
         }
       ],

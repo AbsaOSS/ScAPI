@@ -8,10 +8,6 @@
         {
           "name": "authorization",
           "value": "{{ constants.no_provided }}"
-        },
-        {
-          "name": "accept",
-          "value": "true"
         }
       ],
       "actions": [

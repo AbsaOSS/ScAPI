@@ -12,10 +12,6 @@
         {
           "name": "content-type",
           "value": "{{ constants.content_type }}"
-        },
-        {
-          "name": "accept",
-          "value": "true"
         }
       ],
       "actions": [
@@ -26,7 +22,7 @@
       ],
       "assertions": [
         {
-          "name": "statusCode",
+          "name": "status-code",
           "value": "200"
         }
       ]

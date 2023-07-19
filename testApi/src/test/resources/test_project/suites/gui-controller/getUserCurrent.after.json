@@ -8,10 +8,6 @@
           {
             "name": "headers",
             "value": ["{{ this.headers }}"]
-          },
-          {
-            "name": "accept",
-            "value": "{{ this.unique-key-name-2 }}"
           }
         ],
         "when": [

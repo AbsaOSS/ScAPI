@@ -16,20 +16,34 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.utils.ContentValidator
+
 object ResponseAssertions {
+
+  val STATUS_CODE = "status-code"
+  val BODY_CONTAINS = "body-contains"
+
+  def validateContent(assertion: Assertion): Unit = {
+    assertion.name.toLowerCase match {
+      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.value)
+      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.value)
+      case _ => throw UndefinedAssertionType(assertion.name)
+    }
+  }
 
   def performAssertions(response: Response, assertions: Set[Assertion]): Unit = {
     for (assertion <- assertions) {
       assertion.name match {
-        case "status-code" => assertStatusCode(response, assertion.value.toInt)
-        case "body-contains" => assertBodyContains(response, assertion.value)
+        case STATUS_CODE => assertStatusCode(response, assertion.value)
+        case BODY_CONTAINS => assertBodyContains(response, assertion.value)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
       }
     }
   }
 
-  def assertStatusCode(response: Response, expectedCode: Int): Unit = {
-    assert(response.status == expectedCode, s"Expected $expectedCode, but got ${response.status}")
+  def assertStatusCode(response: Response, expectedCode: String): Unit = {
+    val iExpectedCode: Int = expectedCode.toInt
+    assert(response.status == iExpectedCode, s"Expected $iExpectedCode, but got ${response.status}")
   }
 
   def assertBodyContains(response: Response, expectedContent: String): Unit = {

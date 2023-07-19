@@ -45,6 +45,7 @@ object ScAPIRunnerJob {
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
     val suites: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, logLevel))
+    SuiteFactory.validateSuiteContent(suites)
 
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {

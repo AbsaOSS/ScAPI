@@ -168,6 +168,16 @@ object SuiteFactory {
     import africa.absa.testing.scapi.SuiteJsonProtocol.suiteFormat
     jsonString.parseJson.convertTo[Suite]
   }
+
+  def validateSuiteContent(suites: Set[Suite]): Unit = suites.foreach(validateSuiteContent)
+
+  def validateSuiteContent(suite: Suite): Unit = {
+    suite.tests.foreach(test => {
+      test.headers.foreach(header => RequestHeaders.validateContent(header))
+      test.assertions.foreach(assertion => ResponseAssertions.validateContent(assertion))
+    })
+  }
+
 }
 
 /**

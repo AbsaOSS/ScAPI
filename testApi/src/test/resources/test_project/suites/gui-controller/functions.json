@@ -25,7 +25,7 @@
         ],
         "then": [
           {
-            "name": "statusCode",
+            "name": "status-code",
             "value": 200
           }
         ],
