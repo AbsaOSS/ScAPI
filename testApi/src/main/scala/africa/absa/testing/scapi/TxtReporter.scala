@@ -10,9 +10,9 @@ object TxtReporter {
 
 
     // Calculate the max lengths
-    val maxSuiteLength = testResults.map(_.suite.length).max + 2
-    val maxTestLength = testResults.map(_.test.length).max + 2
-    val maxTestCategoriesLength = testResults.map(_.categories.length).max + 2
+    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suite.length).max + 2
+    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.test.length).max + 2
+    val maxTestCategoriesLength = if (testResults.isEmpty) 10 else math.max(testResults.map(_.categories.length).max + 2, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
@@ -39,37 +39,40 @@ object TxtReporter {
     println(s"Number of successful tests: $successCount")
     println(s"Number of failed tests: $failureCount")
 
-    val suiteSummary = testResults.groupBy(_.suite).map {
-      case (suiteName, results) => (suiteName, results.size, results.count(_.status == TestResults.Success))
-    }
+    if (testResults.nonEmpty) {
+      val suiteSummary = testResults.groupBy(_.suite).map {
+        case (suiteName, results) => (suiteName, results.size, results.count(_.status == TestResults.Success))
+      }
 
-    printInnerHeader("Suites Summary")
-    suiteSummary.foreach {
-      case (suiteName, total, successCount) =>
-        println(s"Suite: $suiteName, Total tests: $total, Successful: $successCount, Failed: ${total - successCount}")
-    }
+      printInnerHeader("Suites Summary")
+      suiteSummary.foreach {
+        case (suiteName, total, successCount) =>
+          println(s"Suite: $suiteName, Total tests: $total, Successful: $successCount, Failed: ${total - successCount}")
+      }
 
-    printInnerHeader("Summary of all tests")
-    println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
-    printTableRowSplitter()
-    val resultsList = testResults.toList.sortBy(_.suite)
-    resultsList.zipWithIndex.foreach { case (result, index) =>
-      val duration = result.duration.map(_.toString).getOrElse("NA")
-      println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.test, duration, result.status, result.categories))
+      printInnerHeader("Summary of all tests")
+      printTableRowSplitter()
+      println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
+      printTableRowSplitter()
+      val resultsList = testResults.toList.sortBy(_.suite)
+      resultsList.zipWithIndex.foreach { case (result, index) =>
+        val duration = result.duration.map(_.toString).getOrElse("NA")
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.test, duration, result.status, result.categories))
 
-      // Check if the index + 1 is divisible by 4 (since index is 0-based)
-      if ((index + 1) % 3 == 0) printTableRowSplitter()
-    }
+        // Check if the index + 1 is divisible by 4 (since index is 0-based)
+        if ((index + 1) % 3 == 0) printTableRowSplitter()
+      }
 
-    if (failureCount > 0) {
-      printInnerHeader("Details of failed tests")
-      testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.test).foreach { result =>
-        println(s"Suite: ${result.suite}")
-        println(s"Test: ${result.test}")
-        println(s"Error: ${result.errMessage.getOrElse("No details available")}")
-        println(s"Duration: ${result.duration.getOrElse("NA")} ms")
-        println(s"Category: ${result.categories}")
-        println()
+      if (failureCount > 0) {
+        printInnerHeader("Details of failed tests")
+        testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.test).foreach { result =>
+          println(s"Suite: ${result.suite}")
+          println(s"Test: ${result.test}")
+          println(s"Error: ${result.errMessage.getOrElse("No details available")}")
+          println(s"Duration: ${result.duration.getOrElse("NA")} ms")
+          println(s"Category: ${result.categories}")
+          println()
+        }
       }
     }
 

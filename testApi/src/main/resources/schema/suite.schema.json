@@ -27,6 +27,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "only": {
+          "type": "boolean"
+        },
         "name": {
           "type": "string"
         },
@@ -103,9 +106,7 @@
       },
       "required": [
         "methodName",
-        "url",
-        "body",
-        "params"
+        "url"
       ],
       "title": "Action"
     },

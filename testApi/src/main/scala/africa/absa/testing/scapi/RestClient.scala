@@ -18,8 +18,6 @@ package africa.absa.testing.scapi
 
 object RestClient {
   def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {
-    // TODO - how to send correct object instead of empty body json string
-
     val response = method.toLowerCase match {
       case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
       case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)

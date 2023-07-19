@@ -50,9 +50,12 @@ object SuiteFactory {
 
     if (suiteResults.values.forall(_.isSuccess)) {
       loggingFunctions.info("All suites loaded.")
-      suiteResults.values.collect {
+      val suites: Set[Suite] = suiteResults.values.collect {
         case Success(suite) => suite
       }.toSet
+
+      onlyOrAll(suites)
+
     } else {
       val failedSuites: Map[String, String] = suiteResults.collect {
         case (key, Failure(exception)) => (key, exception.getMessage)
@@ -64,6 +67,31 @@ object SuiteFactory {
       }
       throw ProjectLoadFailed()
     }
+  }
+
+  private def onlyOrAll(suites: Set[Suite])
+                       (implicit loggingFunctions: Scribe): Set[Suite] = {
+    val suitesWithOnlyTest: Set[Suite] = suites.filter(suite => suite.tests.exists(_.only.getOrElse(false)))
+
+    val updatedSuites = if (suitesWithOnlyTest.isEmpty) {
+      suites
+    } else {
+      val filteredSuites: Set[Suite] = suitesWithOnlyTest.map { suite =>
+        suite.copy(tests = suite.tests.filter(_.only.getOrElse(false)))
+      }
+
+      val numberOfOnlyTests = filteredSuites.foldLeft(0)((acc, suite) => acc + suite.tests.size)
+
+      if (numberOfOnlyTests == 1) {
+        filteredSuites
+      } else {
+        val filteredTestNames = filteredSuites.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).toList
+        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: ${filteredTestNames.mkString(",")}")
+        Set.empty[Suite]
+      }
+    }
+
+    updatedSuites
   }
 
   /**
@@ -150,7 +178,7 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat2(Assertion)
-  implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat5(SuiteTestScenario)
+  implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
 }
 

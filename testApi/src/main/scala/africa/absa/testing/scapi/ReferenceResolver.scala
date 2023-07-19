@@ -156,7 +156,7 @@ case class Header private(name: String, value: String) extends ReferenceResolver
  * @param url the value of the action.
  * @param body the body of the action - optional.
  */
-case class Action private(methodName: String, url: String, body: Option[String], params: Option[Set[Param]]) extends ReferenceResolver {
+case class Action private(methodName: String, url: String, body: Option[String] = None, params: Option[Set[Param]] = None) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
