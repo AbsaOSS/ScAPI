@@ -28,7 +28,7 @@ object SuiteRunnerJob {
         val testStartTime: Long = System.currentTimeMillis()
 
         try {
-          val response: Response = RestClient.sendRequest(
+          val response: Response = new RestClient(RealRequestSender).sendRequest(
             method = test.actions.head.methodName,
             url = test.actions.head.url,
             headers = RequestHeaders.buildHeaders(test.headers),
@@ -43,7 +43,7 @@ object SuiteRunnerJob {
           )
 
           val testEndTime: Long = System.currentTimeMillis()
-          loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.status}'")
+          loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
           TestResults.success(
             suiteName = suite.endpoint,
             testName = test.name,
@@ -73,16 +73,6 @@ object SuiteRunnerJob {
               duration = Some(testEndTime - testStartTime),
               categories = test.categories.mkString(",")
             )
-
-          case e: Exception =>
-            val testEndTime = System.currentTimeMillis()
-            loggingFunctions.error(s"Unexpected exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
-            TestResults.failure(
-              suiteName = suite.endpoint,
-              testName = test.name,
-              errorMessage = e.getMessage,
-              duration = Some(testEndTime - testStartTime),
-              categories = test.categories.mkString(","))
         }
       })
     })

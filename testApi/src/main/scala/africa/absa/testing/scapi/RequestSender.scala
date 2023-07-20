@@ -16,4 +16,9 @@
 
 package africa.absa.testing.scapi
 
-case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])
+trait RequestSender {
+  def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response
+  def post(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response
+  def put(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response
+  def delete(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response
+}

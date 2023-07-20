@@ -16,15 +16,14 @@
 
 package africa.absa.testing.scapi
 
-object RestClient {
+class RestClient(requestSender: RequestSender) {
   def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {
-    val response = method.toLowerCase match {
-      case "get" => requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
-      case "post" => requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
-      case "put" => requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
-      case "delete" => requests.delete(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+    method.toLowerCase match {
+      case "get" => requestSender.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "post" => requestSender.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "put" => requestSender.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
+      case "delete" => requestSender.delete(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
       case _ => throw new IllegalArgumentException("RestClient:sendRequest - unexpected action method called")
     }
-    Response(response.statusCode, response.text(), response.headers.toMap)
   }
 }

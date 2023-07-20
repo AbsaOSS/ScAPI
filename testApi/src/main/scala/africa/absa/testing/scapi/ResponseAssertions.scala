@@ -43,7 +43,7 @@ object ResponseAssertions {
 
   def assertStatusCode(response: Response, expectedCode: String): Unit = {
     val iExpectedCode: Int = expectedCode.toInt
-    assert(response.status == iExpectedCode, s"Expected $iExpectedCode, but got ${response.status}")
+    assert(response.statusCode == iExpectedCode, s"Expected $iExpectedCode, but got ${response.statusCode}")
   }
 
   def assertBodyContains(response: Response, expectedContent: String): Unit = {

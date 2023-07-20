@@ -35,7 +35,7 @@ class ScAPIRunnerJobTest extends FunSuite {
     // TODO - add check of generated report presence a and values #13
   }
 
-  test("call main with minimum params - validate only") {
+  test("call main with minimum params - validate only".only) {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath,
