@@ -40,7 +40,8 @@ Usage: ScAPI.jar [lib options] [options]
 --thread-count <value>          Maximum count of thread used to run test suite. Default is '1'
 --file-format <value>           Format of definition files. Default is all 'json'. Supported formats [json].
 --report <value>                Path to a report output directory.
---validate-only <value>         Validate input definitions only. Default is 'false'
+--validate-only                 Validate input definitions only. Default is 'false'
+--debug                         Activate debug logging. Default is 'false'
 --extra-vars k1=v1,k2=v2...     Extra variables that will be merged into the test definition json files. Overwrites the ones from env.
 
 --help                          prints this usage text
@@ -73,3 +74,22 @@ User(.*)        .... find all suite files which begin with 'User'
 - **Constants** cannot contain reference `{{ key }}`.
 - **Properties** can reference from **Constants** only.
 - Multilevel reference `{{key_{{key_part_2}}}}` are not supported.
+- Json elements follows `camelCase`.
+- Json element methods follows `this-case`. 
+
+### Supported options
+#### Headers
+- methods
+  - "content-type"
+  - "authorization"
+#### Action
+- methods
+    - get | post | put | delete
+- arguments:
+  - url: url string
+  - body: json string (can be null)
+  - params: list of url parameters in format [name, value] (can be null) 
+#### Assertions
+- methods
+  - "status-code"
+  - "body-contains"
