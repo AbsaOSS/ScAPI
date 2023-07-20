@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.utils.ContentValidator
+
 object RequestParams {
 
   def buildParams(paramsSet: Option[Set[Param]]): Map[String, String] = {
@@ -26,6 +28,14 @@ object RequestParams {
         } else {
           acc
         }
+    }
+  }
+
+  def validateContent(paramsSet: Option[Set[Param]]): Unit = {
+    paramsSet.foreach { params =>
+      params.foreach { param =>
+        ContentValidator.validateNonEmptyString(param.name)
+      }
     }
   }
 }

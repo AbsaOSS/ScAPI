@@ -17,7 +17,14 @@
       "actions": [
         {
           "methodName": "post",
-          "url": "{{ env.url }}/path/question"
+          "url": "{{ env.url }}/path/question",
+          "body": "{}",
+          "params" : [
+            {
+              "name": "questionId",
+              "value": "aaaaaaaa-2fcf-4ddc-a098-db35248c39ab"
+            }
+          ]
         }
       ],
       "assertions": [

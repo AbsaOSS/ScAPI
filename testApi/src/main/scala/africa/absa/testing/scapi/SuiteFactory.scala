@@ -174,6 +174,8 @@ object SuiteFactory {
   def validateSuiteContent(suite: Suite): Unit = {
     suite.tests.foreach(test => {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
+      RequestBody.validateContent(test.actions.head.body)
+      RequestParams.validateContent(test.actions.head.params)
       test.assertions.foreach(assertion => ResponseAssertions.validateContent(assertion))
     })
   }

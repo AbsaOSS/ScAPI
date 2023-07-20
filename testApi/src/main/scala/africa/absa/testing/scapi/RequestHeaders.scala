@@ -19,8 +19,8 @@ package africa.absa.testing.scapi
 import africa.absa.testing.scapi.utils.ContentValidator
 
 object RequestHeaders {
-  private val CONTENT_TYPE = "content-type"
-  private val AUTHORIZATION = "authorization"
+  val CONTENT_TYPE = "content-type"
+  val AUTHORIZATION = "authorization"
 
   def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {

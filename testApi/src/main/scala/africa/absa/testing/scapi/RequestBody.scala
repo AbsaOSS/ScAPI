@@ -18,12 +18,29 @@ package africa.absa.testing.scapi
 
 import spray.json._
 
+import scala.util.{Failure, Try}
+
 object RequestBody {
 
   def buildBody(jsonBody: Option[String] = None): String = {
     jsonBody match {
       case Some(body) if body.trim.nonEmpty => body.parseJson.toString()
       case _ => "{}"
+    }
+  }
+
+  def validateContent(jsonBody: Option[String]): Unit = {
+    jsonBody match {
+      // check for non json input
+      case Some(body) if body.trim.nonEmpty =>
+        Try {
+          body.parseJson
+        } match {
+          case Failure(e) =>
+            throw ContentValidationFailed(body, s"Received value cannot be parsed to json: ${e.getMessage}")
+          case _ => ()
+        }
+      case _ => ()
     }
   }
 }
