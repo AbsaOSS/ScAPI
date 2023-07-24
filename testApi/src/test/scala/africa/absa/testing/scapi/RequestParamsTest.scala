@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.Param
+import africa.absa.testing.scapi.rest.request.RequestParams
 import munit.FunSuite
 
 class RequestParamsTest extends FunSuite {

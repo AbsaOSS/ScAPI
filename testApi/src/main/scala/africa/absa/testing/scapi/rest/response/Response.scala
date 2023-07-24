@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.response
 
 case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])

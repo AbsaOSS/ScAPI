@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.{Environment, Suite, SuiteFactory}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import munit.FunSuite
 import scribe.format.Formatter

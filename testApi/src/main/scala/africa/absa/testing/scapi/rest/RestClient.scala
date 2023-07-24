@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest
+
+import africa.absa.testing.scapi.rest.request.sender.RequestSender
+import africa.absa.testing.scapi.rest.response.Response
 
 class RestClient(requestSender: RequestSender) {
   def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {

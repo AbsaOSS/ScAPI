@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
 import munit.FunSuite
 
 class ResponseAssertionsTest extends FunSuite {

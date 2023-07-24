@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.Header
+import africa.absa.testing.scapi.rest.request.RequestHeaders
 import munit.FunSuite
 
 class RequestHeadersTest extends FunSuite {

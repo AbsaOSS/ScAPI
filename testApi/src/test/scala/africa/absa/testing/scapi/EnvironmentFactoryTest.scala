@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
+import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory}
 import munit.FunSuite
 
 import java.net.URL

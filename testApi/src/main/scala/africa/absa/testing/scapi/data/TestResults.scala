@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.data
 
 case class TestResults(suite: String, test: String, status: String, duration: Option[Long], errMessage: Option[String] = None, categories: String = "")
 

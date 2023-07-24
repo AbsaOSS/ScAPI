@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.request
 
+import africa.absa.testing.scapi.ContentValidationFailed
 import spray.json._
 
 import scala.util.{Failure, Try}

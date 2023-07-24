@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json.schema
 
+import africa.absa.testing.scapi.JsonInvalidSchema
 import africa.absa.testing.scapi.utils.JsonUtils
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.networknt.schema.{JsonSchema, JsonSchemaFactory, SpecVersion}

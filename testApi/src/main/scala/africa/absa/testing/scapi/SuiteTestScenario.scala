@@ -16,6 +16,8 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.{Action, Assertion, Header}
+
 /**
  * Case class that represents a suite test scenario.
  *

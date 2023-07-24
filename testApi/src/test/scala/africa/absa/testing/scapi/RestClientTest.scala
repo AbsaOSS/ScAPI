@@ -16,6 +16,9 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.rest.RestClient
+import africa.absa.testing.scapi.rest.request.sender.RequestSender
+import africa.absa.testing.scapi.rest.response.Response
 import munit.FunSuite
 
 class RestClientTest extends FunSuite {

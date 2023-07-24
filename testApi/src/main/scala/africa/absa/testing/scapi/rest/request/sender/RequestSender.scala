@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.request.sender
+
+import africa.absa.testing.scapi.rest.response.Response
 
 trait RequestSender {
   def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response

@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory}
 import munit.FunSuite
 
 class EnvironmentTest extends FunSuite {

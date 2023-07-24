@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.config
 
-import africa.absa.testing.scapi.ScAPIRunnerConfig.{DefaultCategories, DefaultFileFormat, DefaultFilter, DefaultReport, DefaultThreadCount}
+import africa.absa.testing.scapi.config.ScAPIRunnerConfig._
 import africa.absa.testing.scapi.logging.functions.Scribe
 import scopt.OptionParser
 

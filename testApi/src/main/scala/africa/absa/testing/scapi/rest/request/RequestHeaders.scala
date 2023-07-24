@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.utils.ContentValidator
+import africa.absa.testing.scapi.UndefinedHeaderType
+import africa.absa.testing.scapi.json.Header
 
 object RequestHeaders {
   val CONTENT_TYPE = "content-type"

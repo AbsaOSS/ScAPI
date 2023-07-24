@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.utils.JsonUtils
+import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import spray.json._
 
 /**
@@ -52,7 +53,7 @@ object EnvironmentFactory {
    * @return Returns an environment object constructed from the JSON string.
    */
   private def parseToEnvironment(jsonString: String): Environment = {
-    import africa.absa.testing.scapi.EnvironmentJsonProtocol.environmentFormat
+    import EnvironmentJsonProtocol.environmentFormat
     jsonString.parseJson.convertTo[Environment]
   }
 }

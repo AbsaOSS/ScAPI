@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.rest.request.RequestBody
 import munit.FunSuite
 import spray.json.JsonParser.ParsingException
 

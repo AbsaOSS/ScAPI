@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
+
+import africa.absa.testing.scapi.SuiteTestScenario
 
 /**
  * A suite case class that represents a collection of test scenarios for a specific endpoint.
  *
  * @param endpoint  The endpoint which the suite of tests is targeting.
  * @param tests     A set of `SuiteTestScenario` which define the tests in this suite.
- *
  * @constructor Creates a new instance of a Suite.
  */
 case class Suite(endpoint: String, tests: Set[SuiteTestScenario]) {

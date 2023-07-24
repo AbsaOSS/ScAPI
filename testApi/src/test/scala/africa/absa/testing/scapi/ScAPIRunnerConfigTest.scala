@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi
 
+import africa.absa.testing.scapi.config.ScAPIRunnerConfig
 import munit.FunSuite
 
 import scala.util.{Failure, Success}

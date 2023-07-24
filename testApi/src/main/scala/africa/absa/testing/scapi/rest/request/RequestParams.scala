@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.request
 
+import africa.absa.testing.scapi.json.Param
 import africa.absa.testing.scapi.utils.ContentValidator
 
 object RequestParams {

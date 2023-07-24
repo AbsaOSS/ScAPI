@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.reporter
+
+import africa.absa.testing.scapi.data.TestResults
 
 object TxtReporter {
   def printReport(testResults: Set[TestResults]): Unit = {

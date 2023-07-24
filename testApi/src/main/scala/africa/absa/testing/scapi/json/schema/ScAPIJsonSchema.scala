@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json.schema
 
 import java.net.URL
 

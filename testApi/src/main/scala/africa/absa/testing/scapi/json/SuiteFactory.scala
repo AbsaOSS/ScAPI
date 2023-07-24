@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi._
+import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
+import africa.absa.testing.scapi.rest.response.ResponseAssertions
 import africa.absa.testing.scapi.utils.{FileUtils, JsonUtils}
 import spray.json._
 
@@ -154,7 +158,7 @@ object SuiteFactory {
    * @return A SuiteConstants instance.
    */
   def parseToSuiteConstant(jsonString: String): SuiteConstants = {
-    import africa.absa.testing.scapi.SuiteConstantJsonProtocol.suiteConstantFormat
+    import SuiteConstantJsonProtocol.suiteConstantFormat
     jsonString.parseJson.convertTo[SuiteConstants]
   }
 
@@ -165,7 +169,7 @@ object SuiteFactory {
    * @return A Suite instance.
    */
   def parseToSuite(jsonString: String): Suite = {
-    import africa.absa.testing.scapi.SuiteJsonProtocol.suiteFormat
+    import SuiteJsonProtocol.suiteFormat
     jsonString.parseJson.convertTo[Suite]
   }
 

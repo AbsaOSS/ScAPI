@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.utils.ContentValidator
+import africa.absa.testing.scapi.UndefinedAssertionType
+import africa.absa.testing.scapi.json.Assertion
 
 object ResponseAssertions {
 
