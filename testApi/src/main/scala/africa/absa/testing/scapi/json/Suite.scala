@@ -16,8 +16,6 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.SuiteTestScenario
-
 /**
  * A suite case class that represents a collection of test scenarios for a specific endpoint.
  *

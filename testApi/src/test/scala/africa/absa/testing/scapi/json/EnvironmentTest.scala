@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory}
+import africa.absa.testing.scapi.PropertyNotFound
 import munit.FunSuite
 
 class EnvironmentTest extends FunSuite {

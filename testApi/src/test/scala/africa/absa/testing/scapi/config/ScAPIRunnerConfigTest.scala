@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.config
 
-import africa.absa.testing.scapi.config.ScAPIRunnerConfig
 import munit.FunSuite
 
 import scala.util.{Failure, Success}

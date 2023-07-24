@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.json.Assertion
 import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
+import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedAssertionType}
 import munit.FunSuite
 
 class ResponseAssertionsTest extends FunSuite {

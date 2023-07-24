@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.json.{Environment, Suite, SuiteFactory}
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
 import munit.FunSuite
 import scribe.format.Formatter
 

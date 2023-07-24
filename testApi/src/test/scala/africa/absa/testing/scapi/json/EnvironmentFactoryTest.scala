@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory}
+import africa.absa.testing.scapi.{JsonInvalidSchema, UndefinedConstantsInProperties}
 import munit.FunSuite
 
 import java.net.URL

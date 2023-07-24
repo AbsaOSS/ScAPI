@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.json.Header
 import africa.absa.testing.scapi.rest.request.RequestHeaders
+import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedHeaderType}
 import munit.FunSuite
 
 class RequestHeadersTest extends FunSuite {

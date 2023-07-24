@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi
+package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.json.Param
+import africa.absa.testing.scapi.ContentValidationFailed
 import africa.absa.testing.scapi.rest.request.RequestParams
 import munit.FunSuite
 
