@@ -27,8 +27,8 @@ object ResponseAssertions {
 
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
-      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.value)
-      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.value)
+      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.param_1)
+      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.param_1)
       case _ => throw UndefinedAssertionType(assertion.name)
     }
   }
@@ -36,8 +36,8 @@ object ResponseAssertions {
   def performAssertions(response: Response, assertions: Set[Assertion]): Unit = {
     for (assertion <- assertions) {
       assertion.name match {
-        case STATUS_CODE => assertStatusCode(response, assertion.value)
-        case BODY_CONTAINS => assertBodyContains(response, assertion.value)
+        case STATUS_CODE => assertStatusCode(response, assertion.param_1)
+        case BODY_CONTAINS => assertBodyContains(response, assertion.param_1)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
       }
     }

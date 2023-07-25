@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi._
+import africa.absa.testing.scapi.data.SuiteBundle
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
@@ -41,28 +42,28 @@ object SuiteFactory {
    * @return Set of Suite instances.
    */
   def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String)
-               (implicit loggingFunctions: Scribe): Set[Suite] = {
+               (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
     // NOTE: format not used as json is only supported format in time od development
-    val suiteResults: Map[String, Try[Suite]] = {
+    val suiteLoadingResults: Map[String, Try[SuiteBundle]] = {
       val suiteJsonFiles = findSuiteJsonFiles(testRootPath, filter)
       val suiteTries = suiteJsonFiles.map { file =>
-        val suiteTry = Try(loadJsonSuite(file, environment.asMap()))
-        (file, suiteTry)
+        val suiteTry = Try(loadJsonSuiteBundle(file, environment.asMap()))
+        (file.replace(".json", ".bundle"), suiteTry)
       }
       suiteTries.toMap
     }
 
-    if (suiteResults.values.forall(_.isSuccess)) {
+    if (suiteLoadingResults.values.forall(_.isSuccess)) {
       loggingFunctions.info("All suites loaded.")
-      val suites: Set[Suite] = suiteResults.values.collect {
-        case Success(suite) => suite
+      val suiteBundles: Set[SuiteBundle] = suiteLoadingResults.values.collect {
+        case Success(suiteBundle) => suiteBundle
       }.toSet
 
-      filterOnlyOrAll(suites)
+      filterOnlyOrAll(suiteBundles)
 
     } else {
-      val failedSuites: Map[String, String] = suiteResults.collect {
-        case (key, Failure(exception)) => (key, exception.getMessage)
+      val failedSuites: Map[String, String] = suiteLoadingResults.collect {
+        case (key, Failure(exception)) => (key, s"Message: ${exception.getMessage}\nStackTrace:\n${exception.getStackTrace.mkString("\n")}")
       }
 
       loggingFunctions.error("Not all suites loaded. Failed suites:")
@@ -73,29 +74,30 @@ object SuiteFactory {
     }
   }
 
-  def filterOnlyOrAll(suites: Set[Suite])
-                     (implicit loggingFunctions: Scribe): Set[Suite] = {
-    val suitesWithOnlyTest: Set[Suite] = suites.filter(suite => suite.tests.exists(_.only.getOrElse(false)))
+  def filterOnlyOrAll(suiteBundles: Set[SuiteBundle])
+                     (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
+    val suiteBundlesWithOnlyTest: Set[SuiteBundle] = suiteBundles.filter(bundle => bundle.suite.tests.exists(_.only.getOrElse(false)))
 
-    val updatedSuites = if (suitesWithOnlyTest.isEmpty) {
-      suites
+    val updatedSuiteBundles = if (suiteBundlesWithOnlyTest.isEmpty) {
+      suiteBundles
     } else {
-      val filteredSuites: Set[Suite] = suitesWithOnlyTest.map { suite =>
-        suite.copy(tests = suite.tests.filter(_.only.getOrElse(false)))
+      val filteredSuiteBundles: Set[SuiteBundle] = suiteBundlesWithOnlyTest.map { bundle =>
+        bundle.suite.copy(tests = bundle.suite.tests.filter(_.only.getOrElse(false)))
+        bundle
       }
 
-      val numberOfOnlyTests = filteredSuites.foldLeft(0)((acc, suite) => acc + suite.tests.size)
+      val numberOfOnlyTests = filteredSuiteBundles.foldLeft(0)((acc, bundle) => acc + bundle.suite.tests.size)
 
       if (numberOfOnlyTests == 1) {
-        filteredSuites
+        filteredSuiteBundles
       } else {
-        val filteredTestNames = filteredSuites.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).toList
+        val filteredTestNames = filteredSuiteBundles.flatMap(bundle => bundle.suite.tests.map(test => s"${bundle.suite.endpoint}.${test.name}")).toList
         loggingFunctions.error(s"Detected more than one test with defined only option. Tests: ${filteredTestNames.mkString(",")}")
-        Set.empty[Suite]
+        Set.empty[SuiteBundle]
       }
     }
 
-    updatedSuites
+    updatedSuiteBundles
   }
 
   /**
@@ -108,27 +110,30 @@ object SuiteFactory {
   private def findSuiteJsonFiles(path: String, filter: String): Set[String] = FileUtils.findMatchingFiles(path, filter + "\\.suite\\.json")
 
   /**
-   * Method to load a Suite instance from the given suite JSON file path.
+   * Method to load a SuiteBundle instance from the given suite JSON file path.
    *
    * @param suitePath      The path to the suite JSON file.
    * @param environmentMap The map containing environment variables.
-   * @return A Suite instance.
+   * @return A SuiteBundle instance.
    */
-  def loadJsonSuite(suitePath: String, environmentMap: Map[String, String]): Suite = {
+  def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String])
+                         (implicit loggingFunctions: Scribe): SuiteBundle = {
     val (suiteFilePath, suiteFileName) = FileUtils.splitPathAndFileName(suitePath)
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
     val suiteConstants: SuiteConstants = loadJsonSuiteConstants(suiteFilePath, suiteName, environmentMap)
     // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
-    // TODO - code proposal - will be solved in #3
-    // val beforeActions: Map[String, String] = loadJsonSuiteBeforeActions(suiteFilePath, propertiesSum)
-    // val afterActions: Map[String, String] = loadJsonSuiteAfterActions(suiteFilePath, propertiesSum)
+
+    val beforeActions: Option[SuiteBefore] = loadJsonSuiteBefore(suiteFilePath, suiteName, environmentMap ++ suiteConstants.constants)
+    val afterActions: Option[SuiteAfter] = loadJsonSuiteAfter(suiteFilePath, suiteName, environmentMap ++ suiteConstants.constants)
 
     JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE)
     val jsonString: String = JsonUtils.stringFromPath(suitePath)
     val notResolvedSuite: Suite = parseToSuite(jsonString)
-    notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
+    val resolvedSuite: Suite = notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
+    SuiteBundle(resolvedSuite, beforeActions, afterActions)
+    // TODO - test : jsou v before a after pouzitelne suite constants?
   }
 
   /**
@@ -152,6 +157,46 @@ object SuiteFactory {
   }
 
   /**
+   * Method to load a Suite Before instance from the given constants JSON file path.
+   *
+   * @param suiteFilePath The path to the constants JSON file.
+   * @param suiteName     The name of the suite for which constants are to be loaded.
+   * @param properties    The map containing properties variables.
+   * @return A TODO instance.
+   */
+  def loadJsonSuiteBefore(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteBefore] = {
+    val beforeFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.before.json")
+    if (!Files.exists(beforeFilePath)) {
+      None
+    } else {
+      JsonSchemaValidator.validate(beforeFilePath.toString, ScAPIJsonSchema.SUITE_BEFORE)
+      val jsonString: String = JsonUtils.stringFromPath(beforeFilePath.toString)
+      val notResolvedBefore: SuiteBefore = parseToSuiteBefore(jsonString)
+      Some(notResolvedBefore.resolveReferences(properties))
+    }
+  }
+
+  /**
+   * Method to load a Suite After instance from the given constants JSON file path.
+   *
+   * @param suiteFilePath The path to the constants JSON file.
+   * @param suiteName     The name of the suite for which constants are to be loaded.
+   * @param properties    The map containing properties variables.
+   * @return A TODO instance.
+   */
+  def loadJsonSuiteAfter(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteAfter] = {
+    val afterFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.after.json")
+    if (!Files.exists(afterFilePath)) {
+      None
+    } else {
+      JsonSchemaValidator.validate(afterFilePath.toString, ScAPIJsonSchema.SUITE_AFTER)
+      val jsonString: String = JsonUtils.stringFromPath(afterFilePath.toString)
+      val notResolvedAfter: SuiteAfter = parseToSuiteAfter(jsonString)
+      Some(notResolvedAfter.resolveReferences(properties))
+    }
+  }
+
+  /**
    * Method to parse a SuiteConstants instance from the given JSON string.
    *
    * @param jsonString The JSON string to be parsed.
@@ -160,6 +205,28 @@ object SuiteFactory {
   def parseToSuiteConstant(jsonString: String): SuiteConstants = {
     import SuiteConstantJsonProtocol.suiteConstantFormat
     jsonString.parseJson.convertTo[SuiteConstants]
+  }
+
+  /**
+   * Method to parse a SuiteBefore instance from the given JSON string.
+   *
+   * @param jsonString The JSON string to be parsed.
+   * @return A SuiteBefore instance.
+   */
+  def parseToSuiteBefore(jsonString: String): SuiteBefore = {
+    import SuiteBeforeJsonProtocol.suiteBeforeFormat
+    jsonString.parseJson.convertTo[SuiteBefore]
+  }
+
+  /**
+   * Method to parse a SuiteAfter instance from the given JSON string.
+   *
+   * @param jsonString The JSON string to be parsed.
+   * @return A SuiteAfter instance.
+   */
+  def parseToSuiteAfter(jsonString: String): SuiteAfter = {
+    import SuiteAfterJsonProtocol.suiteAfterFormat
+    jsonString.parseJson.convertTo[SuiteAfter]
   }
 
   /**
@@ -173,10 +240,13 @@ object SuiteFactory {
     jsonString.parseJson.convertTo[Suite]
   }
 
-  def validateSuiteContent(suites: Set[Suite]): Unit = suites.foreach(validateSuiteContent)
+  def validateSuiteContent(suiteBundles: Set[SuiteBundle])
+                          (implicit loggingFunctions: Scribe): Unit = suiteBundles.foreach(validateSuiteContent)
 
-  def validateSuiteContent(suite: Suite): Unit = {
-    suite.tests.foreach(test => {
+  def validateSuiteContent(suiteBundle: SuiteBundle)
+                          (implicit loggingFunctions: Scribe): Unit = {
+    loggingFunctions.debug(s"Validation content of suite: ${suiteBundle.suite.endpoint}")
+    suiteBundle.suite.tests.foreach(test => {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
       RequestBody.validateContent(test.actions.head.body)
       RequestParams.validateContent(test.actions.head.params)
@@ -186,6 +256,7 @@ object SuiteFactory {
 
 }
 
+// TODO - try to create common ansestor for Suite, SuiteBefore and Suite After - for formats of header, params, testAction, assertion
 /**
  * Object that provides implicit JSON format for various Suite related classes.
  */
@@ -193,8 +264,9 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat2(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
+  implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
 }
 
@@ -203,4 +275,28 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
  */
 object SuiteConstantJsonProtocol extends DefaultJsonProtocol {
   implicit val suiteConstantFormat: RootJsonFormat[SuiteConstants] = jsonFormat1(SuiteConstants)
+}
+
+/**
+ * Object that provides implicit JSON format for SuiteBefore class.
+ */
+object SuiteBeforeJsonProtocol extends DefaultJsonProtocol {
+  implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
+  implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
+  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
+  implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
+  implicit val suiteBeforeFormat: RootJsonFormat[SuiteBefore] = jsonFormat2(SuiteBefore)
+}
+
+/**
+ * Object that provides implicit JSON format for SuiteAfter class.
+ */
+object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
+  implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
+  implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
+  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
+  implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
+  implicit val suiteAfterFormat: RootJsonFormat[SuiteAfter] = jsonFormat2(SuiteAfter)
 }

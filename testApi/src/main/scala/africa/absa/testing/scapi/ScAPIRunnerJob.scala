@@ -17,8 +17,8 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.data.TestResults
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, Suite, SuiteFactory, SuiteRunnerJob}
+import africa.absa.testing.scapi.data.{SuiteBundle, TestResults}
+import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory, SuiteRunnerJob}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.reporter.TxtReporter
 
@@ -48,15 +48,15 @@ object ScAPIRunnerJob {
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suites: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, logLevel))
-    SuiteFactory.validateSuiteContent(suites)
+    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, logLevel))
+    SuiteFactory.validateSuiteContent(suiteBundles)
 
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {
       loggingFunctions.info("Validate only => end run.")
     } else {
       loggingFunctions.info("Running tests")
-      val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suites, environment)
+      val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suiteBundles, environment)
       TxtReporter.printReport(testResults)
     }
   }

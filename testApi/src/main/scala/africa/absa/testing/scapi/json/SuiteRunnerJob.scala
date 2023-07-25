@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.data.TestResults
+import africa.absa.testing.scapi.data.{SuiteBundle, TestResults}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.RealRequestSender
@@ -24,12 +24,12 @@ import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, Requ
 import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
 
 object SuiteRunnerJob {
-  def runSuites(suites: Set[Suite], environment: Environment)
+  def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment)
                (implicit loggingFunctions: Scribe): Set[TestResults] = {
 
-    suites.flatMap(suite => {
-      suite.tests.map(test => {
-        loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")
+    suiteBundles.flatMap(suiteBundle => {
+      suiteBundle.suite.tests.map(test => {
+        loggingFunctions.debug(s"Running Suite: ${suiteBundle.suite.endpoint}, Test: ${test.name}")
         val testStartTime: Long = System.currentTimeMillis()
 
         try {
@@ -50,7 +50,7 @@ object SuiteRunnerJob {
           val testEndTime: Long = System.currentTimeMillis()
           loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
           TestResults.success(
-            suiteName = suite.endpoint,
+            suiteName = suiteBundle.suite.endpoint,
             testName = test.name,
             duration = Some(testEndTime - testStartTime),
             category = test.categories.mkString(",")
@@ -59,9 +59,9 @@ object SuiteRunnerJob {
         } catch {
           case e: AssertionError =>
             val testEndTime = System.currentTimeMillis()
-            loggingFunctions.error(s"Assertion error while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            loggingFunctions.error(s"Assertion error while running suite: ${suiteBundle.suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
             TestResults.failure(
-              suiteName = suite.endpoint,
+              suiteName = suiteBundle.suite.endpoint,
               testName = test.name,
               errorMessage = e.getMessage,
               duration = Some(testEndTime - testStartTime),
@@ -70,9 +70,9 @@ object SuiteRunnerJob {
 
           case e: Exception =>
             val testEndTime = System.currentTimeMillis()
-            loggingFunctions.error(s"Request exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            loggingFunctions.error(s"Request exception occurred while running suite: ${suiteBundle.suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
             TestResults.failure(
-              suiteName = suite.endpoint,
+              suiteName = suiteBundle.suite.endpoint,
               testName = test.name,
               errorMessage = e.getMessage,
               duration = Some(testEndTime - testStartTime),

@@ -114,18 +114,24 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "group": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
-        "value": {
+        "param_1": {
+          "type": "string"
+        },
+        "param_2": {
           "type": "string"
         }
       },
       "required": [
         "name",
-        "value"
+        "param_1"
       ],
-      "title": "Action"
+      "title": "Assertion"
     },
     "Param": {
       "type": "object",

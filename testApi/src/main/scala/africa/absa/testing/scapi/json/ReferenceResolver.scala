@@ -180,9 +180,9 @@ case class Action private(methodName: String, url: String, body: Option[String] 
  *
  * @constructor create a new Assertion with a name and value.
  * @param name the name of the assertion.
- * @param value the value of the assertion.
+ * @param param_1 the value of the assertion.
  */
-case class Assertion private(name: String, value: String) extends ReferenceResolver {
+case class Assertion private(name: String, param_1: String, group: Option[String] = Some("assert"), param_2: Option[String] = None) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -190,7 +190,9 @@ case class Assertion private(name: String, value: String) extends ReferenceResol
    * @param references the map of references that may be used to resolve references in the value.
    * @return a new Assertion instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Assertion = this.copy(value = getResolved(value, references))
+  def resolveReferences(references: Map[String, String]): Assertion = this.copy(
+    param_1 = getResolved(param_1, references),
+    param_2 = Some(getResolved(param_2.getOrElse(""), references)))
 }
 
 /**
