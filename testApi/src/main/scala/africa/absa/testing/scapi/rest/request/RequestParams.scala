@@ -18,6 +18,7 @@ package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.json.Param
 import africa.absa.testing.scapi.utils.ContentValidator
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
 object RequestParams {
 
@@ -25,7 +26,7 @@ object RequestParams {
     paramsSet.getOrElse(Set.empty[Param]).foldLeft(Map.empty[String, String]) {
       (acc, param) =>
         if (param.name.trim.nonEmpty && param.value.trim.nonEmpty) {
-          acc + (param.name -> param.value)
+          acc + (param.name -> RuntimeCache.resolve(param.value))
         } else {
           acc
         }

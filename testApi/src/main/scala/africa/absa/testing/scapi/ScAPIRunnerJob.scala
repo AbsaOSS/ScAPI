@@ -21,6 +21,7 @@ import africa.absa.testing.scapi.data.{SuiteBundle, TestResults}
 import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory, SuiteRunnerJob}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.reporter.TxtReporter
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
 import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success}
@@ -43,6 +44,8 @@ object ScAPIRunnerJob {
     val logLevel = if (cmd.debug) Scribe.DEBUG else Scribe.INFO
     implicit val loggingFunctions: Scribe = Scribe(this.getClass, logLevel)
     cmd.logConfigInfo
+
+    RuntimeCache.initLogging(loggingFunctions)
 
     if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailed("'suites' directory have to exist in project root.")
 

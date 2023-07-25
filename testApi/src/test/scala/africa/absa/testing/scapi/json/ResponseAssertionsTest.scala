@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
+import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertion}
 import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedAssertionType}
 import munit.FunSuite
 
@@ -26,30 +26,30 @@ class ResponseAssertionsTest extends FunSuite {
     validateContent
    */
   test("validateContent - valid status code string") {
-    val assertion = Assertion(ResponseAssertions.STATUS_CODE, "200")
-    ResponseAssertions.validateContent(assertion)
+    val assertion = Assertion(ResponseAssertion.STATUS_CODE, "200")
+    ResponseAssertion.validateContent(assertion)
   }
 
   test("validateContent - invalid status code string") {
     intercept[ContentValidationFailed] {
-      ResponseAssertions.validateContent(Assertion(ResponseAssertions.STATUS_CODE, "not an integer"))
+      ResponseAssertion.validateContent(Assertion(ResponseAssertion.STATUS_CODE, "not an integer"))
     }
   }
 
   test("validateContent - body is not empty") {
-    val assertion = Assertion(ResponseAssertions.BODY_CONTAINS, "test content")
-    ResponseAssertions.validateContent(assertion)
+    val assertion = Assertion(ResponseAssertion.BODY_CONTAINS, "test content")
+    ResponseAssertion.validateContent(assertion)
   }
 
   test("validateContent - body is empty") {
     intercept[ContentValidationFailed] {
-      ResponseAssertions.validateContent(Assertion(ResponseAssertions.BODY_CONTAINS, ""))
+      ResponseAssertion.validateContent(Assertion(ResponseAssertion.BODY_CONTAINS, ""))
     }
   }
 
   test("validateContent - unsupported assertion") {
     intercept[UndefinedAssertionType] {
-      ResponseAssertions.validateContent(Assertion("unsupported", "value"))
+      ResponseAssertion.validateContent(Assertion("unsupported", "value"))
     }
   }
 
@@ -60,7 +60,7 @@ class ResponseAssertionsTest extends FunSuite {
     val statusCodeAssertion = Assertion("status-code", "200")
     val response = Response(200, "Dummy Body", Map.empty)
 
-    ResponseAssertions.performAssertions(response, Set(statusCodeAssertion))
+    ResponseAssertion.performAssertions(response, Set(statusCodeAssertion))
   }
 
   test("performAssertions - status code assertion - not equals") {
@@ -68,14 +68,14 @@ class ResponseAssertionsTest extends FunSuite {
     val response = Response(500, "Dummy Body", Map.empty)
 
     interceptMessage[java.lang.AssertionError]("assertion failed: Expected 200, but got 500") {
-      ResponseAssertions.performAssertions(response, Set(statusCodeAssertion))
+      ResponseAssertion.performAssertions(response, Set(statusCodeAssertion))
     }
   }
 
   test("performAssertions - body contains assertion") {
     val bodyContainsAssertion = Assertion("body-contains", "dummy")
     val response = Response(200, "This is a dummy body", Map.empty)
-    ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion))
+    ResponseAssertion.performAssertions(response, Set(bodyContainsAssertion))
   }
 
   test("performAssertions - body does not contains assertion") {
@@ -83,7 +83,7 @@ class ResponseAssertionsTest extends FunSuite {
     val response = Response(200, "This is a dummy body", Map.empty)
 
     interceptMessage[java.lang.AssertionError]("assertion failed: Expected body to contain dummies") {
-      ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion))
+      ResponseAssertion.performAssertions(response, Set(bodyContainsAssertion))
     }
   }
 
@@ -92,7 +92,7 @@ class ResponseAssertionsTest extends FunSuite {
     val response = Response(200, "Dummy Body", Map.empty)
 
     interceptMessage[IllegalArgumentException]("Unsupported assertion: unsupported-assertion") {
-      ResponseAssertions.performAssertions(response, Set(unsupportedAssertion))
+      ResponseAssertion.performAssertions(response, Set(unsupportedAssertion))
     }
   }
 }

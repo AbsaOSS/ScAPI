@@ -34,4 +34,11 @@ object ContentValidator {
       throw ContentValidationFailed(input, s"Received string value is empty.")
     }
   }
+
+  def validateNotNone(input: Option[String], paramName: String): Unit = {
+    input match {
+      case Some(_) => // do nothing, input is valid
+      case None => throw new ContentValidationFailed(paramName, "Input cannot be None")
+    }
+  }
 }

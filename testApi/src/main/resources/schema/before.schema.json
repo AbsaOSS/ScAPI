@@ -115,6 +115,15 @@
         },
         "param_2": {
           "type": "string"
+        },
+        "param_3": {
+          "type": "string"
+        },
+        "param_4": {
+          "type": "string"
+        },
+        "param_5": {
+          "type": "string"
         }
       },
       "required": [

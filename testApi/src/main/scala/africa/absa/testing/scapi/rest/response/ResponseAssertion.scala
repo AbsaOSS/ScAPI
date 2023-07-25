@@ -20,7 +20,7 @@ import africa.absa.testing.scapi.utils.ContentValidator
 import africa.absa.testing.scapi.UndefinedAssertionType
 import africa.absa.testing.scapi.json.Assertion
 
-object ResponseAssertions {
+object ResponseAssertion extends ResponsePerformer {
 
   val STATUS_CODE = "status-code"
   val BODY_CONTAINS = "body-contains"
@@ -33,16 +33,17 @@ object ResponseAssertions {
     }
   }
 
-  def performAssertions(response: Response, assertions: Set[Assertion]): Unit = {
-    for (assertion <- assertions) {
-      assertion.name match {
-        case STATUS_CODE => assertStatusCode(response, assertion.param_1)
-        case BODY_CONTAINS => assertBodyContains(response, assertion.param_1)
-        case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
-      }
+  def performAssertions(response: Response, assertion: Assertion): Unit = {
+    assertion.name match {
+      case STATUS_CODE => assertStatusCode(response, assertion.param_1)
+      case BODY_CONTAINS => assertBodyContains(response, assertion.param_1)
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: assert]: ${assertion.name}")
     }
   }
 
+  /*
+    dedicated actions
+   */
   def assertStatusCode(response: Response, expectedCode: String): Unit = {
     val iExpectedCode: Int = expectedCode.toInt
     assert(response.statusCode == iExpectedCode, s"Expected $iExpectedCode, but got ${response.statusCode}")

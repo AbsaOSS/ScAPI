@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.{PropertyNotFound, UndefinedConstantsInProperties}
 
 /**
@@ -63,17 +64,17 @@ sealed protected trait ReferenceResolver {
   private def resolve(toResolve: String, references: Map[String, String]): (String, Set[String]) = {
     val pattern = """\{\{\s*(.*?)\s*}}""".r
     var collected: Set[String] = Set.empty
-    val resolved = if (pattern.findFirstIn(toResolve).isDefined) {
-      pattern.replaceAllIn(toResolve, { matchResult =>
-        val propertyKey: String = matchResult.group(1)
+    val resolved = pattern.replaceAllIn(toResolve, { matchResult =>
+      val propertyKey: String = matchResult.group(1).trim
+      if (propertyKey.contains("cache.")) {
+        matchResult.group(0)
+      } else {
         references.getOrElse(propertyKey, {
           collected = collected + propertyKey
           toResolve
         })
-      })
-    } else {
-      toResolve
-    }
+      }
+    })
 
     (resolved, collected)
   }
@@ -180,9 +181,19 @@ case class Action private(methodName: String, url: String, body: Option[String] 
  *
  * @constructor create a new Assertion with a name and value.
  * @param name the name of the assertion.
- * @param param_1 the value of the assertion.
+ * @param param_1 the 1st parameter of the assertion.
+ * @param param_2 the 2nd parameter of the assertion.
+ * @param param_3 the 3rd parameter of the assertion.
+ * @param param_4 the 4th parameter of the assertion.
+ * @param param_5 the 5st parameter of the assertion.
  */
-case class Assertion private(name: String, param_1: String, group: Option[String] = Some("assert"), param_2: Option[String] = None) extends ReferenceResolver {
+case class Assertion private(name: String,
+                             param_1: String,
+                             group: String,
+                             param_2: Option[String] = None,
+                             param_3: Option[String] = None,
+                             param_4: Option[String] = None,
+                             param_5: Option[String] = None) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -192,7 +203,18 @@ case class Assertion private(name: String, param_1: String, group: Option[String
    */
   def resolveReferences(references: Map[String, String]): Assertion = this.copy(
     param_1 = getResolved(param_1, references),
-    param_2 = Some(getResolved(param_2.getOrElse(""), references)))
+    param_2 = Some(getResolved(param_2.getOrElse(""), references)),
+    param_3 = Some(getResolved(param_3.getOrElse(""), references)),
+    param_4 = Some(getResolved(param_4.getOrElse(""), references)),
+    param_5 = Some(getResolved(param_5.getOrElse(""), references)))
+
+  def resolveByRuntimeCache(): Assertion = this.copy(
+    param_1 = RuntimeCache.resolve(this.param_1),
+    param_2 = this.param_2.map(RuntimeCache.resolve),
+    param_3 = this.param_3.map(RuntimeCache.resolve),
+    param_4 = this.param_4.map(RuntimeCache.resolve),
+    param_5 = this.param_5.map(RuntimeCache.resolve)
+  )
 }
 
 /**

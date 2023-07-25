@@ -21,28 +21,29 @@ import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.RealRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
-import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
+import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
 object SuiteRunnerJob {
   def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment)
                (implicit loggingFunctions: Scribe): Set[TestResults] = {
 
     suiteBundles.flatMap(suiteBundle => {
-      suiteBundle.suite.tests.map(test => {
+      val result = suiteBundle.suite.tests.map(test => {
         loggingFunctions.debug(s"Running Suite: ${suiteBundle.suite.endpoint}, Test: ${test.name}")
         val testStartTime: Long = System.currentTimeMillis()
 
         try {
           val response: Response = new RestClient(RealRequestSender).sendRequest(
             method = test.actions.head.methodName,
-            url = test.actions.head.url,
+            url = RuntimeCache.resolve(test.actions.head.url),
             headers = RequestHeaders.buildHeaders(test.headers),
             body = RequestBody.buildBody(test.actions.head.body),
             params = RequestParams.buildParams(test.actions.head.params),
             verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
           )
 
-          ResponseAssertions.performAssertions(
+          Response.perform(
             response = response,
             assertions = test.assertions
           )
@@ -78,8 +79,13 @@ object SuiteRunnerJob {
               duration = Some(testEndTime - testStartTime),
               categories = test.categories.mkString(",")
             )
+        } finally {
+          RuntimeCache.expire(RuntimeCache.TEST)
         }
       })
+
+      RuntimeCache.expire(RuntimeCache.SUITE)
+      result
     })
   }
 }

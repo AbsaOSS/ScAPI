@@ -19,6 +19,7 @@ package africa.absa.testing.scapi.rest.request
 import africa.absa.testing.scapi.utils.ContentValidator
 import africa.absa.testing.scapi.UndefinedHeaderType
 import africa.absa.testing.scapi.json.Header
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
 object RequestHeaders {
   val CONTENT_TYPE = "content-type"
@@ -27,9 +28,9 @@ object RequestHeaders {
   def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {
       (acc, header) => header.name.toLowerCase match {
-        case CONTENT_TYPE => acc + (header.name -> header.value)
-        case AUTHORIZATION => acc + (header.name -> s"${header.value}")
-        case _ => acc + (header.name -> header.value)
+        case CONTENT_TYPE => acc + (header.name -> RuntimeCache.resolve(header.value))
+        case AUTHORIZATION => acc + (header.name -> s"${RuntimeCache.resolve(header.value)}")
+        case _ => acc + (header.name -> RuntimeCache.resolve(header.value))
         // this place does solve syntax validation, content validation is solved on another place
       }
     }

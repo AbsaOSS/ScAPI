@@ -16,4 +16,34 @@
 
 package africa.absa.testing.scapi.rest.response
 
+import africa.absa.testing.scapi.json.Assertion
+
 case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])
+
+object Response {
+
+  val GROUP_ASSERT: String = "assert"
+  val GROUP_EXTRACT_JSON: String = "extractJson"
+  val GROUP_LOG: String = "log"
+
+  def validate(assertion: Assertion): Unit = {
+    assertion.group match {
+      case GROUP_ASSERT => ResponseAssertion.validateContent(assertion)
+      case GROUP_EXTRACT_JSON => ResponseExtractJson.validateContent(assertion)
+      case GROUP_LOG => ResponseLog.validateContent(assertion)
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
+    }
+  }
+
+  def perform(response: Response, assertions: Set[Assertion]): Unit = {
+    for (assertion <- assertions) {
+      val resolvedAssertion: Assertion = assertion.resolveByRuntimeCache()
+      resolvedAssertion.group match {
+        case GROUP_ASSERT => ResponseAssertion.performAssertions(response, assertion)
+        case GROUP_EXTRACT_JSON => ResponseExtractJson.performAssertions(response, assertion)
+        case GROUP_LOG => ResponseLog.performAssertions(response, assertion)
+        case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
+      }
+    }
+  }
+}

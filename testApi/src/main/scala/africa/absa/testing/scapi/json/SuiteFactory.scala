@@ -21,7 +21,7 @@ import africa.absa.testing.scapi.data.SuiteBundle
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
-import africa.absa.testing.scapi.rest.response.ResponseAssertions
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.{FileUtils, JsonUtils}
 import spray.json._
 
@@ -250,7 +250,7 @@ object SuiteFactory {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
       RequestBody.validateContent(test.actions.head.body)
       RequestParams.validateContent(test.actions.head.params)
-      test.assertions.foreach(assertion => ResponseAssertions.validateContent(assertion))
+      test.assertions.foreach(assertion => Response.validate(assertion))
     })
   }
 
@@ -264,7 +264,7 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
@@ -284,7 +284,7 @@ object SuiteBeforeJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteBeforeFormat: RootJsonFormat[SuiteBefore] = jsonFormat2(SuiteBefore)
 }
@@ -296,7 +296,7 @@ object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat4(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteAfterFormat: RootJsonFormat[SuiteAfter] = jsonFormat2(SuiteAfter)
 }

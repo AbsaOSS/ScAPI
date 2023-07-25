@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import spray.json._
 
 import scala.util.{Failure, Try}
@@ -25,7 +26,7 @@ object RequestBody {
 
   def buildBody(jsonBody: Option[String] = None): String = {
     jsonBody match {
-      case Some(body) if body.trim.nonEmpty => body.parseJson.toString()
+      case Some(body) if body.trim.nonEmpty => RuntimeCache.resolve(body.parseJson.toString())
       case _ => "{}"
     }
   }
