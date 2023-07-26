@@ -32,6 +32,7 @@ import scala.util.{Failure, Success, Try}
  * Object that creates a set of Suite instances from the given test root path.
  */
 object SuiteFactory {
+
   /**
    * Method to create a set of Suite instances from the given test root path.
    *
@@ -44,6 +45,7 @@ object SuiteFactory {
   def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String)
                (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
     // NOTE: format not used as json is only supported format in time od development
+
     val suiteLoadingResults: Map[String, Try[SuiteBundle]] = {
       val suiteJsonFiles = findSuiteJsonFiles(testRootPath, filter)
       val suiteTries = suiteJsonFiles.map { file =>
@@ -133,7 +135,6 @@ object SuiteFactory {
     val notResolvedSuite: Suite = parseToSuite(jsonString)
     val resolvedSuite: Suite = notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
     SuiteBundle(resolvedSuite, beforeActions, afterActions)
-    // TODO - test : jsou v before a after pouzitelne suite constants?
   }
 
   /**
@@ -162,7 +163,7 @@ object SuiteFactory {
    * @param suiteFilePath The path to the constants JSON file.
    * @param suiteName     The name of the suite for which constants are to be loaded.
    * @param properties    The map containing properties variables.
-   * @return A TODO instance.
+   * @return A SuiteBefore instance.
    */
   def loadJsonSuiteBefore(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteBefore] = {
     val beforeFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.before.json")
@@ -182,7 +183,7 @@ object SuiteFactory {
    * @param suiteFilePath The path to the constants JSON file.
    * @param suiteName     The name of the suite for which constants are to be loaded.
    * @param properties    The map containing properties variables.
-   * @return A TODO instance.
+   * @return A SuiteAfter instance.
    */
   def loadJsonSuiteAfter(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteAfter] = {
     val afterFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.after.json")
@@ -253,10 +254,8 @@ object SuiteFactory {
       test.assertions.foreach(assertion => Response.validate(assertion))
     })
   }
-
 }
 
-// TODO - try to create common ansestor for Suite, SuiteBefore and Suite After - for formats of header, params, testAction, assertion
 /**
  * Object that provides implicit JSON format for various Suite related classes.
  */

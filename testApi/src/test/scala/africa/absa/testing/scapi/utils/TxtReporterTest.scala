@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.utils
 
-import africa.absa.testing.scapi.data.TestResults
+import africa.absa.testing.scapi.data.SuiteResults
 import africa.absa.testing.scapi.reporter.TxtReporter
 import munit.FunSuite
 
@@ -54,9 +54,9 @@ class TxtReporterTest extends FunSuite {
         min 1 suites with min 2 tests
      */
     val testResults = Set(
-      TestResults.success("Suite 1", "Test 1", Some(100L), "Category 1"),
-      TestResults.failure("Suite 1", "Test 2", Some(200L), "Category 2", "Error message"),
-      TestResults.success("Suite 2", "Test 1", Some(50L), "Category 3")
+      SuiteResults.successTest("Suite 1", "Test 1", Some(100L), "Category 1"),
+      SuiteResults.failureTest("Suite 1", "Test 2", Some(200L), "Category 2", "Error message"),
+      SuiteResults.successTest("Suite 2", "Test 1", Some(50L), "Category 3")
     )
 
     val baos = new ByteArrayOutputStream()
@@ -90,9 +90,9 @@ class TxtReporterTest extends FunSuite {
   }
   test("results all success") {
     val testResults = Set(
-      TestResults.success("Suite 1", "Test 1", Some(100L), "Category 1"),
-      TestResults.success("Suite 1", "Test 2", Some(200L), "Category 2"),
-      TestResults.success("Suite 2", "Test 1", Some(50L), "Category 3")
+      SuiteResults.successTest("Suite 1", "Test 1", Some(100L), "Category 1"),
+      SuiteResults.successTest("Suite 1", "Test 2", Some(200L), "Category 2"),
+      SuiteResults.successTest("Suite 2", "Test 1", Some(50L), "Category 3")
     )
 
     val baos = new ByteArrayOutputStream()

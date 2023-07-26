@@ -17,8 +17,9 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.data.{SuiteBundle, TestResults}
+import africa.absa.testing.scapi.data.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory, SuiteRunnerJob}
+import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.reporter.TxtReporter
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
@@ -30,7 +31,6 @@ import scala.util.{Failure, Success}
  * Object `ScAPIRunnerJob` serves as the main entry point for the ScAPI runner.
  */
 object ScAPIRunnerJob {
-
   /**
    * The main method that is being invoked to run the ScAPI runner.
    *
@@ -41,8 +41,8 @@ object ScAPIRunnerJob {
       case Success(value) => value
       case Failure(exception) => throw exception
     }
-    val logLevel = if (cmd.debug) Scribe.DEBUG else Scribe.INFO
-    implicit val loggingFunctions: Scribe = Scribe(this.getClass, logLevel)
+    LoggerConfig.logLevel = if (cmd.debug) Scribe.DEBUG else Scribe.INFO
+    implicit val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
     cmd.logConfigInfo
 
     RuntimeCache.initLogging(loggingFunctions)
@@ -51,7 +51,7 @@ object ScAPIRunnerJob {
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, logLevel))
+    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, LoggerConfig.logLevel))
     SuiteFactory.validateSuiteContent(suiteBundles)
 
     // run tests and result reporting - use categories for test filtering
@@ -59,7 +59,7 @@ object ScAPIRunnerJob {
       loggingFunctions.info("Validate only => end run.")
     } else {
       loggingFunctions.info("Running tests")
-      val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suiteBundles, environment)
+      val testResults: Set[SuiteResults] = SuiteRunnerJob.runSuites(suiteBundles, environment)
       TxtReporter.printReport(testResults)
     }
   }

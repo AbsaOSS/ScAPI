@@ -16,10 +16,10 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.data.TestResults
+import africa.absa.testing.scapi.data.SuiteResults
 
 object TxtReporter {
-  def printReport(testResults: Set[TestResults]): Unit = {
+  def printReport(testResults: Set[SuiteResults]): Unit = {
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {
         case Some(text) => s"${repeatChar.toString * ((maxChars - text.length - 2) / 2)} $text ${repeatChar.toString * ((maxChars - text.length - 2) / 2)}"
@@ -28,8 +28,9 @@ object TxtReporter {
 
     // Calculate the max lengths
     val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suite.length).max + 2
-    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.test.length).max + 2
-    val maxTestCategoriesLength = if (testResults.isEmpty) 10 else math.max(testResults.map(_.categories.length).max + 2, 10)
+    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 2
+    val maxTestCategoriesLength = if (testResults.isEmpty) 10
+    else math.max(testResults.flatMap(_.categories).map(_.split(",").length).max + 2, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
@@ -49,7 +50,7 @@ object TxtReporter {
 
     printHeader("Simple Text Report")
 
-    val successCount = testResults.count(_.status == TestResults.Success)
+    val successCount = testResults.count(_.status == SuiteResults.Success)
     val failureCount = testResults.size - successCount
 
     println(s"Number of tests run: ${testResults.size}")
@@ -58,7 +59,7 @@ object TxtReporter {
 
     if (testResults.nonEmpty) {
       val suiteSummary = testResults.groupBy(_.suite).map {
-        case (suiteName, results) => (suiteName, results.size, results.count(_.status == TestResults.Success))
+        case (suiteName, results) => (suiteName, results.size, results.count(_.status == SuiteResults.Success))
       }
 
       printInnerHeader("Suites Summary")
@@ -74,7 +75,7 @@ object TxtReporter {
       val resultsList = testResults.toList.sortBy(_.suite)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.test, duration, result.status, result.categories))
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.name, duration, result.status, result.categories))
 
         // Check if the index + 1 is divisible by 4 (since index is 0-based)
         if ((index + 1) % 3 == 0) printTableRowSplitter()
@@ -82,9 +83,9 @@ object TxtReporter {
 
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
-        testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.test).foreach { result =>
+        testResults.filter(_.status == SuiteResults.Failure).toList.sortBy(_.name).foreach { result =>
           println(s"Suite: ${result.suite}")
-          println(s"Test: ${result.test}")
+          println(s"Test: ${result.name}")
           println(s"Error: ${result.errMessage.getOrElse("No details available")}")
           println(s"Duration: ${result.duration.getOrElse("NA")} ms")
           println(s"Category: ${result.categories}")

@@ -27,7 +27,7 @@ package africa.absa.testing.scapi.json
 case class Method(name: String,
                   headers: Set[Header],
                   actions: Set[Action],
-                  assertions: Set[Assertion]) {
+                  assertions: Set[Assertion]) extends Requestable {
   /**
    * Method to resolve references within the Method instance.
    *

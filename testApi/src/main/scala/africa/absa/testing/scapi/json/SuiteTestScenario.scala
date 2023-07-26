@@ -31,7 +31,7 @@ case class SuiteTestScenario(name: String,
                              headers: Set[Header],
                              actions: Set[Action],
                              assertions: Set[Assertion],
-                             only: Option[Boolean] = Some(false)) {
+                             only: Option[Boolean] = Some(false)) extends Requestable {
   /**
    * Method to resolve references within the SuiteTestScenario instance.
    *
