@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.utils
 
-import africa.absa.testing.scapi.{TestResults, TxtReporter}
+import africa.absa.testing.scapi.{TestResults, StdOutReporter}
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
@@ -30,7 +30,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(Set.empty)
+      StdOutReporter.printReport(Set.empty)
     }
 
     // Get the output as a string
@@ -61,7 +61,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
 
     // Get the output as a string
@@ -97,7 +97,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
 
     // Get the output as a string

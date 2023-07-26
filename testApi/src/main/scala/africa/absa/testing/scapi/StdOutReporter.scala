@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi
 
-object TxtReporter {
+object StdOutReporter {
   def printReport(testResults: Set[TestResults]): Unit = {
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {

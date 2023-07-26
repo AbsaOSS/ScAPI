@@ -53,7 +53,7 @@ object ScAPIRunnerJob {
     } else {
       loggingFunctions.info("Running tests")
       val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suites, environment)
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
   }
 }
