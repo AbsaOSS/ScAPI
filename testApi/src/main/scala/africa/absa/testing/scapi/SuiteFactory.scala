@@ -71,27 +71,24 @@ object SuiteFactory {
 
   def filterOnlyOrAll(suites: Set[Suite])
                      (implicit loggingFunctions: Scribe): Set[Suite] = {
-    val suitesWithOnlyTest: Set[Suite] = suites.filter(suite => suite.tests.exists(_.only.getOrElse(false)))
-
-    val updatedSuites = if (suitesWithOnlyTest.isEmpty) {
-      suites
-    } else {
-      val filteredSuites: Set[Suite] = suitesWithOnlyTest.map { suite =>
-        suite.copy(tests = suite.tests.filter(_.only.getOrElse(false)))
-      }
-
-      val numberOfOnlyTests = filteredSuites.foldLeft(0)((acc, suite) => acc + suite.tests.size)
-
-      if (numberOfOnlyTests == 1) {
-        filteredSuites
-      } else {
-        val filteredTestNames = filteredSuites.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).toList
-        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: ${filteredTestNames.mkString(",")}")
-        Set.empty[Suite]
-      }
+    val (suitesWithOnlyTest, others) = suites.foldLeft((List.empty[Suite], List.empty[Suite])) {
+      case ((onlySuites, normalSuites), suite) =>
+        val onlyTests = suite.tests.filter(_.only.getOrElse(false))
+        onlyTests.size match {
+          case 0 => (onlySuites, suite :: normalSuites) // No 'only' test
+          case 1 => (suite.copy(tests = onlyTests) :: onlySuites, normalSuites) // Exactly one 'only' test
+          case _ => loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only."); (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
+        }
     }
 
-    updatedSuites
+    suitesWithOnlyTest.size match {
+      case 0 => others.toSet // If no suite with 'only' test(s), return all other suites
+      case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
+      case _ => // More than one 'only' test across all suites is an error
+        val testNames = suitesWithOnlyTest.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).mkString(", ")
+        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: $testNames")
+        Set.empty[Suite]
+    }
   }
 
   /**
