@@ -166,7 +166,7 @@ case class Action private(methodName: String, url: String, body: Option[String] 
    */
   def resolveReferences(references: Map[String, String]): Action = this.copy(
     url = getResolved(url, references),
-    body = body.flatMap(b => Option(getResolved(b, references))),
+    body = body.map(b => getResolved(b, references)),
     params = params.map(_.map(param => param.resolveReferences(references)))
   )
 }

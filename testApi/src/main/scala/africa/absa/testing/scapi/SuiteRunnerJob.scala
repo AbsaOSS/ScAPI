@@ -28,7 +28,7 @@ object SuiteRunnerJob {
         val testStartTime: Long = System.currentTimeMillis()
 
         try {
-          val response: Response = new RestClient(RealRequestSender).sendRequest(
+          val response: Response = new RestClient(ScAPIRequestSender).sendRequest(
             method = test.actions.head.methodName,
             url = test.actions.head.url,
             headers = RequestHeaders.buildHeaders(test.headers),
