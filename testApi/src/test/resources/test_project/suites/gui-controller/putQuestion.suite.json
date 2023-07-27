@@ -22,8 +22,9 @@
       ],
       "assertions": [
         {
+          "group": "assert",
           "name": "status-code",
-          "value": "200"
+          "param_1": "200"
         }
       ]
     }
