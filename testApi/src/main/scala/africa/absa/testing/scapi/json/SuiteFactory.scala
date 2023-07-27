@@ -75,14 +75,26 @@ object SuiteFactory {
     }
   }
 
+  /**
+   * This method uses the 'only' attribute in SuiteBundles to filter test cases.
+   * It separates suite bundles into two categories: those with 'only' tests and others.
+   * If a suite has more than one 'only' test, an error is logged.
+   * If more than one suite has 'only' tests, an error is logged and an empty set is returned.
+   * If only one suite has 'only' tests, only that suite is returned.
+   * If no suites have 'only' tests, all suites are returned.
+   *
+   * @param suiteBundles The set of SuiteBundles to be filtered.
+   * @return A set of filtered SuiteBundles based on 'only' attribute.
+   */
   def filterOnlyOrAll(suiteBundles: Set[SuiteBundle])
                      (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
-    val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[Suite], List.empty[Suite])) {
-      case ((onlySuites, normalSuites), suite) =>
-        val onlyTests = suiteBundles.tests.filter(_.only.getOrElse(false))
+    val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[SuiteBundle], List.empty[SuiteBundle])) {
+      case ((onlySuites, normalSuites), suiteBundle) =>
+        val suite = suiteBundle.suite
+        val onlyTests = suite.tests.filter(_.only.getOrElse(false))
         onlyTests.size match {
-          case 0 => (onlySuites, suite :: normalSuites) // No 'only' test
-          case 1 => (suite.copy(tests = onlyTests) :: onlySuites, normalSuites) // Exactly one 'only' test
+          case 0 => (onlySuites, suiteBundle :: normalSuites) // No 'only' test
+          case 1 => (suiteBundle.copy(suite = suite.copy(tests = onlyTests)) :: onlySuites, normalSuites) // Exactly one 'only' test
           case _ => loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only."); (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
         }
     }
@@ -91,9 +103,9 @@ object SuiteFactory {
       case 0 => others.toSet // If no suite with 'only' test(s), return all other suites
       case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
       case _ => // More than one 'only' test across all suites is an error
-        val testNames = suitesWithOnlyTest.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).mkString(", ")
+        val testNames = suitesWithOnlyTest.flatMap(suiteBundle => suiteBundle.suite.tests.map(test => s"${suiteBundle.suite.endpoint}.${test.name}")).mkString(", ")
         loggingFunctions.error(s"Detected more than one test with defined only option. Tests: $testNames")
-        Set.empty[Suite]
+        Set.empty[SuiteBundle]
     }
   }
 
@@ -236,9 +248,21 @@ object SuiteFactory {
     jsonString.parseJson.convertTo[Suite]
   }
 
+  /**
+   * This method validates the content of each SuiteBundle in the set.
+   * It checks each suite's headers, body, parameters, and assertions.
+   *
+   * @param suiteBundles The set of SuiteBundles to be validated.
+   */
   def validateSuiteContent(suiteBundles: Set[SuiteBundle])
                           (implicit loggingFunctions: Scribe): Unit = suiteBundles.foreach(validateSuiteContent)
 
+  /**
+   * This method validates the content of a SuiteBundle.
+   * It checks the suite's headers, body, parameters, and assertions.
+   *
+   * @param suiteBundle The SuiteBundle to be validated.
+   */
   def validateSuiteContent(suiteBundle: SuiteBundle)
                           (implicit loggingFunctions: Scribe): Unit = {
     loggingFunctions.debug(s"Validation content of suite: ${suiteBundle.suite.endpoint}")

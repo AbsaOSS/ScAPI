@@ -50,9 +50,22 @@ sealed protected trait ReferenceResolver {
     resolvedActions
   }
 
+  /**
+   * Method to handle unresolved references. If there are any unresolved references, it throws an exception.
+   *
+   * @param notResolvedReferences A set of unresolved reference keys.
+   * @throws UndefinedConstantsInProperties If there are any unresolved references.
+   */
   private def notResolved(notResolvedReferences: Set[String]): Unit =
     if (notResolvedReferences.nonEmpty) throw UndefinedConstantsInProperties(notResolvedReferences, s"'${getClass.getSimpleName}' action.")
 
+  /**
+   * Method to resolve a map of references to their actual values. It iteratively updates the map with resolved values.
+   *
+   * @param toResolve  A map of references to resolve.
+   * @param references A map of actual reference values.
+   * @return A tuple of a map of resolved references and a set of unresolved references.
+   */
   private def resolve(toResolve: Map[String, String], references: Map[String, String]): (Map[String, String], Set[String]) = {
     toResolve.foldLeft(Map.empty[String, String], Set.empty[String]) {
       case ((accResolved, accNotResolvedReferences), (key, property)) =>
@@ -61,6 +74,13 @@ sealed protected trait ReferenceResolver {
     }
   }
 
+  /**
+   * Method to resolve a single reference to its actual value. It updates the string with resolved value.
+   *
+   * @param toResolve  A string of references to resolve.
+   * @param references A map of actual reference values.
+   * @return A tuple of the resolved reference and a set of unresolved references.
+   */
   private def resolve(toResolve: String, references: Map[String, String]): (String, Set[String]) = {
     val pattern = """\{\{\s*(.*?)\s*}}""".r
     var collected: Set[String] = Set.empty
@@ -208,6 +228,11 @@ case class Assertion private(name: String,
     param_4 = Some(getResolved(param_4.getOrElse(""), references)),
     param_5 = Some(getResolved(param_5.getOrElse(""), references)))
 
+  /**
+   * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
+   *
+   * @return A new Assertion instance with resolved references.
+   */
   def resolveByRuntimeCache(): Assertion = this.copy(
     param_1 = RuntimeCache.resolve(this.param_1),
     param_2 = this.param_2.map(RuntimeCache.resolve),

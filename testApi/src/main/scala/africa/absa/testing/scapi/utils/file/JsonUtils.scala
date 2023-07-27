@@ -28,7 +28,7 @@ object JsonUtils {
   /**
    * Method to read a file from a given path and returns its contents as a String.
    *
-   * @param path The file path as a String.
+   * @param path The file URL.
    * @return The file contents as a String.
    */
   def stringFromPath(path: URL): String = {
@@ -37,6 +37,12 @@ object JsonUtils {
     }
   }
 
+  /**
+   * Method to read a file from a given path and returns its contents as a String.
+   *
+   * @param path The file path as a String.
+   * @return The file contents as a String.
+   */
   def stringFromPath(path: String): String = {
     Using.resource(Source.fromFile(path)) { source =>
       source.getLines().mkString

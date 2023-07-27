@@ -20,11 +20,21 @@ import africa.absa.testing.scapi.UndefinedAssertionType
 import africa.absa.testing.scapi.json.Assertion
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
+/**
+ * Object that validates and performs various assertions on the response received.
+ * It extends the functionality of ResponsePerformer.
+ */
 object ResponseAssertion extends ResponsePerformer {
 
   val STATUS_CODE = "status-code"
   val BODY_CONTAINS = "body-contains"
 
+  /**
+   * Validates the content of an assertion object depending on its type.
+   *
+   * @param assertion The assertion object to be validated.
+   * @throws UndefinedAssertionType If the assertion type is not recognized.
+   */
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
       case STATUS_CODE => ContentValidator.validateIntegerString(assertion.param_1)
@@ -33,6 +43,13 @@ object ResponseAssertion extends ResponsePerformer {
     }
   }
 
+  /**
+   * Performs assertions on a response depending on the type of assertion provided.
+   *
+   * @param response  The response to perform the assertions on.
+   * @param assertion The assertion to be checked.
+   * @throws IllegalArgumentException If the assertion type is not supported.
+   */
   def performAssertions(response: Response, assertion: Assertion): Unit = {
     assertion.name match {
       case STATUS_CODE => assertStatusCode(response, assertion.param_1)
@@ -44,11 +61,26 @@ object ResponseAssertion extends ResponsePerformer {
   /*
     dedicated actions
    */
+
+  /**
+   * Asserts that the status code of the response is as expected.
+   *
+   * @param response     The response to check the status code of.
+   * @param expectedCode The expected status code as a string.
+   * @throws AssertionError If the actual status code does not match the expected one.
+   */
   def assertStatusCode(response: Response, expectedCode: String): Unit = {
     val iExpectedCode: Int = expectedCode.toInt
     assert(response.statusCode == iExpectedCode, s"Expected $iExpectedCode, but got ${response.statusCode}")
   }
 
+  /**
+   * Asserts that the body of the response contains the expected content.
+   *
+   * @param response        The response to check the body of.
+   * @param expectedContent The expected content as a string.
+   * @throws AssertionError If the actual body does not contain the expected content.
+   */
   def assertBodyContains(response: Response, expectedContent: String): Unit = {
     assert(response.body.contains(expectedContent), s"Expected body to contain $expectedContent")
   }

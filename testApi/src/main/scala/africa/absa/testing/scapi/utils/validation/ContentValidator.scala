@@ -17,11 +17,19 @@
 package africa.absa.testing.scapi.utils.validation
 
 import africa.absa.testing.scapi.ContentValidationFailed
-
 import scala.util.{Failure, Success, Try}
 
+/**
+ * Object that provides a validation methods for suite content.
+ */
 object ContentValidator {
 
+  /**
+   * Validates that a string can be parsed to an integer. Throws an exception if the string cannot be parsed.
+   *
+   * @param input The string to be validated.
+   * @throws ContentValidationFailed if the input string cannot be parsed to an integer.
+   */
   def validateIntegerString(input: String): Unit = {
     Try(input.toInt) match {
       case Success(_) => // Do nothing
@@ -29,12 +37,25 @@ object ContentValidator {
     }
   }
 
+  /**
+   * Validates that a string is not empty. Throws an exception if the string is empty.
+   *
+   * @param input The string to be validated.
+   * @throws ContentValidationFailed if the input string is empty.
+   */
   def validateNonEmptyString(input: String): Unit = {
     if (input.isEmpty) {
       throw ContentValidationFailed(input, s"Received string value is empty.")
     }
   }
 
+  /**
+   * Validates that an Option[String] is not None. Throws an exception if the Option is None.
+   *
+   * @param input     The Option[String] to be validated.
+   * @param paramName The name of the parameter, used in error messaging.
+   * @throws ContentValidationFailed if the input Option[String] is None.
+   */
   def validateNotNone(input: Option[String], paramName: String): Unit = {
     input match {
       case Some(_) => // do nothing, input is valid

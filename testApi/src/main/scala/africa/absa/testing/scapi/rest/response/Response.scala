@@ -20,12 +20,22 @@ import africa.absa.testing.scapi.json.Assertion
 
 case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])
 
+/**
+ * A singleton object that is responsible for managing and handling responses.
+ */
 object Response {
 
   val GROUP_ASSERT: String = "assert"
   val GROUP_EXTRACT_JSON: String = "extractJson"
   val GROUP_LOG: String = "log"
 
+  /**
+   * Validates an Assertion based on its group type.
+   * Calls the appropriate group's validateContent method based on group type.
+   *
+   * @param assertion The assertion to be validated.
+   * @throws IllegalArgumentException If the assertion group type is not supported.
+   */
   def validate(assertion: Assertion): Unit = {
     assertion.group match {
       case GROUP_ASSERT => ResponseAssertion.validateContent(assertion)
@@ -35,6 +45,15 @@ object Response {
     }
   }
 
+  /**
+   * Performs actions on the given Response based on a set of Assertions.
+   * Each Assertion is resolved by the runtime cache before being used.
+   * The appropriate group's performAssertions method is called based on the group type of each Assertion.
+   *
+   * @param response   The response on which actions will be performed.
+   * @param assertions The set of assertions that dictate what actions will be performed on the response.
+   * @throws IllegalArgumentException If an assertion group type is not supported.
+   */
   def perform(response: Response, assertions: Set[Assertion]): Unit = {
     for (assertion <- assertions) {
       val resolvedAssertion: Assertion = assertion.resolveByRuntimeCache()

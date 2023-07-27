@@ -18,7 +18,15 @@ package africa.absa.testing.scapi.reporter
 
 import africa.absa.testing.scapi.data.SuiteResults
 
+/**
+ * A singleton object to manage the standard output reporting of test results.
+ */
 object StdOutReporter {
+  /**
+   * Generates and prints a report of test results to the standard output.
+   *
+   * @param testResults The set of test suite results to be reported.
+   */
   def printReport(testResults: Set[SuiteResults]): Unit = {
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {

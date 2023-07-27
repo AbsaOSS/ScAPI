@@ -16,18 +16,28 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.ScAPIRequestSender
 import africa.absa.testing.scapi.data.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
-import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
+/**
+ * Main object handling the running of test suites.
+ */
 object SuiteRunnerJob {
   private lazy val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
 
+  /**
+   * Run a set of test suites.
+   *
+   * @param suiteBundles Set of suites to run.
+   * @param environment  The current environment.
+   * @return Set of SuiteResults.
+   */
   def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment): Set[SuiteResults] = {
     suiteBundles.flatMap(suiteBundle => {
       loggingFunctions.debug(s"Running Suite: ${suiteBundle.suite.endpoint}")
@@ -54,6 +64,15 @@ object SuiteRunnerJob {
     })
   }
 
+  /**
+   * Runs all the suite-before methods for a given test suite.
+   *
+   * @param suiteEndpoint   Suite's endpoint.
+   * @param suiteBeforeName SuiteBefore's name.
+   * @param method          Method to execute.
+   * @param environment     The current environment.
+   * @return SuiteResults after the execution of the suite-before method.
+   */
   private def runSuiteBefore(suiteEndpoint: String, suiteBeforeName: String, method: Method, environment: Environment): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-Before: ${suiteBeforeName}")
     val testStartTime: Long = System.currentTimeMillis()
@@ -77,6 +96,14 @@ object SuiteRunnerJob {
     }
   }
 
+  /**
+   * Runs all the suite-tests methods for a given test suite.
+   *
+   * @param suiteEndpoint Suite's endpoint.
+   * @param test          The test to run.
+   * @param environment   The current environment.
+   * @return SuiteResults after the execution of the suite-test.
+   */
   private def runSuiteTest(suiteEndpoint: String, test: SuiteTestScenario, environment: Environment): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-Test: ${test.name}")
     val testStartTime: Long = System.currentTimeMillis()
@@ -104,6 +131,15 @@ object SuiteRunnerJob {
     }
   }
 
+  /**
+   * Runs all the suite-after methods for a given test suite.
+   *
+   * @param suiteEndpoint  Suite's endpoint.
+   * @param suiteAfterName SuiteAfter's name.
+   * @param method         Method to execute.
+   * @param environment    The current environment.
+   * @return SuiteResults after the execution of the suite-after method.
+   */
   private def runSuiteAfter(suiteEndpoint: String, suiteAfterName: String, method: Method, environment: Environment): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-After: ${suiteAfterName}")
     val testStartTime: Long = System.currentTimeMillis()
@@ -127,8 +163,15 @@ object SuiteRunnerJob {
     }
   }
 
+  /**
+   * Send a request and return the response.
+   *
+   * @param requestable The requestable object containing the data for the request.
+   * @param environment The current environment.
+   * @return Response to the sent request.
+   */
   private def sendRequest(requestable: Requestable, environment: Environment): Response = {
-    new RestClient(RealRequestSender).sendRequest(
+    new RestClient(ScAPIRequestSender).sendRequest(
       method = requestable.actions.head.methodName,
       url = RuntimeCache.resolve(requestable.actions.head.url),
       headers = RequestHeaders.buildHeaders(requestable.headers),
@@ -138,6 +181,16 @@ object SuiteRunnerJob {
     )
   }
 
+  /**
+   * Handles exceptions occurring during suite running.
+   *
+   * @param e             The exception to handle.
+   * @param suiteEndpoint Suite's endpoint.
+   * @param name          The name of the suite or test.
+   * @param testStartTime The starting time of the suite or test.
+   * @param resultType    The type of the suite or test ("Before", "Test", or "After").
+   * @return SuiteResults after the exception handling.
+   */
   private def handleException(e: Throwable, suiteEndpoint: String, name: String, testStartTime: Long, resultType: String): SuiteResults = {
     val testEndTime = System.currentTimeMillis()
     val message = e match {
