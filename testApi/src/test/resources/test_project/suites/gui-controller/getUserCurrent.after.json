@@ -1,29 +1,31 @@
-[
-  {
-    "name" : "after.name.1",
-    "actions" : [
-      {
-        "name" : "action-name-1",
-        "given" : [
-          {
-            "name": "headers",
-            "value": ["{{ this.headers }}"]
-          }
-        ],
-        "when": [
-          {
-            "name": "get",
-            "value": "{{ env.url }}/AULGUI/user"
-          }
-        ],
-        "then": [
-          {
-            "name": "statusCode",
-            "value": 200
-          }
-        ],
-        "extract" : []
-      }
-    ]
-  }
-]
+{
+  "name" : "after.name.1",
+  "methods" : [
+    {
+      "name" : "action-name-1",
+      "headers" : [
+        {
+          "name": "authorization",
+          "value": "{{ constants.header_basic_token }}"
+        },
+        {
+          "name": "content-type",
+          "value": "application/json"
+        }
+      ],
+      "actions": [
+        {
+          "methodName": "get",
+          "url": "{{ env.url }}/AULGUI/user"
+        }
+      ],
+      "assertions": [
+        {
+          "group": "assert",
+          "name": "statusCode",
+          "param_1": "200"
+        }
+      ]
+    }
+  ]
+}

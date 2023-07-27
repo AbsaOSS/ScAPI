@@ -1,8 +1,7 @@
 {
   "constants" : {
     "header_auth": "Authorization",
-    "header_bearer_token": "Bearer {{ env.bearerToken }}",
-    "content_type": "application/json",
-    "unique-key-name-2": "value"
+    "header_bearer_token": "Basic {{ env.basic_token }}",
+    "content_type": "application/json"
   }
 }

@@ -7,7 +7,7 @@
       "headers" : [
         {
           "name": "authorization",
-          "value": "{{ constants.header_bearer_token }}"
+          "value": "{{ constants.header_basic_token }}"
         },
         {
           "name": "content-type",

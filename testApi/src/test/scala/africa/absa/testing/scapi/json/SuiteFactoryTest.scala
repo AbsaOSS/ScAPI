@@ -65,11 +65,11 @@ class SuiteFactoryTest extends FunSuite {
   test("loadJsonSuite - constants loaded") {
     val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
-    val properties: Map[String, String] = Map("env.bearerToken" -> "token#value")
+    val properties: Map[String, String] = Map("env.basic_token" -> "token#value")
     val expected: Map[String, String] = Map(
       "constants.header_auth" -> "Authorization",
       "constants.content_type" -> "application/json",
-      "constants.header_bearer_token" -> "Bearer token#value",
+      "constants.header_basic_token" -> "Basic token#value",
       "constants.unique-key-name-2" -> "value"
     )
 
