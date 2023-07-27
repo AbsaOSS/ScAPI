@@ -38,14 +38,6 @@ object ResponseAssertions {
         case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
       }
     }
-    // TODO - delete comment
-//    for (assertion <- assertions) {
-//      assertion.name match {
-//        case STATUS_CODE => assertStatusCode(response, assertion.value)
-//        case BODY_CONTAINS => assertBodyContains(response, assertion.value)
-//        case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
-//      }
-//    }
   }
 
   def assertStatusCode(response: Response, expectedCode: String): Boolean = {
