@@ -26,9 +26,9 @@ import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success}
 
 /**
- * Object `ScAPIRunnerJob` serves as the main entry point for the ScAPI runner.
+ * Object `ScAPIRunner` serves as the main entry point for the ScAPI runner.
  */
-object ScAPIRunnerJob {
+object ScAPIRunner {
 
   /**
    * The main method that is being invoked to run the ScAPI runner.
@@ -56,7 +56,7 @@ object ScAPIRunnerJob {
       loggingFunctions.info("Validate only => end run.")
     } else {
       loggingFunctions.info("Running tests")
-      val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suites, environment)
+      val testResults: Set[TestResults] = SuiteRunner.runSuites(suites, environment)
       StdOutReporter.printReport(testResults)
     }
   }

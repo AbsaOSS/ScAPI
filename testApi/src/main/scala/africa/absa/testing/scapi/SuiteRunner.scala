@@ -24,7 +24,7 @@ import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
 
-object SuiteRunnerJob {
+object SuiteRunner {
   def runSuites(suites: Set[Suite], environment: Environment)
                (implicit loggingFunctions: Scribe): Set[TestResults] = {
 
