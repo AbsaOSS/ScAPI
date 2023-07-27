@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi._
+import africa.absa.testing.scapi.model.{Suite, SuiteTestScenario}
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}

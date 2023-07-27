@@ -16,8 +16,8 @@
 
 package africa.absa.testing.scapi
 
-import africa.absa.testing.scapi.data.TestResults
-import africa.absa.testing.scapi.json.{Environment, Suite}
+import africa.absa.testing.scapi.model.{Suite, TestResults}
+import africa.absa.testing.scapi.json.Environment
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender

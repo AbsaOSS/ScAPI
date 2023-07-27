@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.model.{Suite, SuiteTestScenario}
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
 import munit.FunSuite

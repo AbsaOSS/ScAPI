@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.data.TestResults
+import africa.absa.testing.scapi.model.TestResults
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream

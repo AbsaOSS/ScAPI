@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.data
+package africa.absa.testing.scapi.model
 
 case class TestResults(suiteName: String,
                        testName: String,

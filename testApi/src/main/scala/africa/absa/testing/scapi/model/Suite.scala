@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.model
 
 /**
  * A suite case class that represents a collection of test scenarios for a specific endpoint.
