@@ -20,11 +20,11 @@ package africa.absa.testing.scapi
  * A suite case class that represents a collection of test scenarios for a specific endpoint.
  *
  * @param endpoint  The endpoint which the suite of tests is targeting.
- * @param tests     A sequence of `SuiteTestScenario` which define the tests in this suite.
+ * @param tests     A set of `SuiteTestScenario` which define the tests in this suite.
  *
  * @constructor Creates a new instance of a Suite.
  */
-case class Suite(endpoint: String, tests: Seq[SuiteTestScenario]) {
+case class Suite(endpoint: String, tests: Set[SuiteTestScenario]) {
 
   /**
    * Method to resolve references in the test scenarios using a provided map of references.

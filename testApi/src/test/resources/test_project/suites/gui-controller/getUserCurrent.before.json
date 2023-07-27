@@ -1,6 +1,6 @@
 [
   {
-    "name" : "after.name.1",
+    "name" : "before.name.1",
     "actions" : [
       {
         "name" : "action-name-1",
@@ -8,10 +8,6 @@
           {
             "name": "headers",
             "value": ["{{ this.headers }}"]
-          },
-          {
-            "name": "accept",
-            "value": "{{ this.unique-key-name-2 }}"
           }
         ],
         "when": [
@@ -22,11 +18,14 @@
         ],
         "then": [
           {
-            "name": "statusCode",
+            "name": "status-code",
             "value": 200
           }
         ],
         "extract" : []
+      },
+      {
+        "@" : "functions.getSurname"
       }
     ]
   }

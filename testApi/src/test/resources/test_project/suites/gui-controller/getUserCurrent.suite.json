@@ -2,18 +2,22 @@
   "endpoint" : "getUserCurrent",
   "tests": [
     {
-      "name" : "test-name-1",
+      "name" : "get current user",
       "categories": ["SMOKE"],
       "headers" : [
         {
           "name": "authorization",
-          "value": "{{ constants.no_provided }}"
+          "value": "{{ constants.header_bearer_token }}"
+        },
+        {
+          "name": "content-type",
+          "value": "{{ constants.content_type }}"
         }
       ],
       "actions": [
         {
           "methodName": "get",
-          "url": "{{ env.url }}/AULGUI/user"
+          "url": "{{ env.url }}/GUI/user"
         }
       ],
       "assertions": [

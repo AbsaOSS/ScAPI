@@ -27,8 +27,6 @@ import scala.util.{Failure, Success, Try}
  * Object that creates a set of Suite instances from the given test root path.
  */
 object SuiteFactory {
-  implicit val loggingFunctions: Scribe = Scribe(this.getClass)
-
   /**
    * Method to create a set of Suite instances from the given test root path.
    *
@@ -52,9 +50,12 @@ object SuiteFactory {
 
     if (suiteResults.values.forall(_.isSuccess)) {
       loggingFunctions.info("All suites loaded.")
-      suiteResults.values.collect {
+      val suites: Set[Suite] = suiteResults.values.collect {
         case Success(suite) => suite
       }.toSet
+
+      filterOnlyOrAll(suites)
+
     } else {
       val failedSuites: Map[String, String] = suiteResults.collect {
         case (key, Failure(exception)) => (key, exception.getMessage)
@@ -65,6 +66,30 @@ object SuiteFactory {
         loggingFunctions.error(s"$key => $value")
       }
       throw ProjectLoadFailed()
+    }
+  }
+
+  def filterOnlyOrAll(suites: Set[Suite])
+                     (implicit loggingFunctions: Scribe): Set[Suite] = {
+    val (suitesWithOnlyTest, others) = suites.foldLeft((List.empty[Suite], List.empty[Suite])) {
+      case ((onlySuites, normalSuites), suite) =>
+        val onlyTests = suite.tests.filter(_.only.getOrElse(false))
+        onlyTests.size match {
+          case 0 => (onlySuites, suite :: normalSuites) // No 'only' test
+          case 1 => (suite.copy(tests = onlyTests) :: onlySuites, normalSuites) // Exactly one 'only' test
+          case _ =>
+            loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only.")
+            (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
+        }
+    }
+
+    suitesWithOnlyTest.size match {
+      case 0 => others.toSet // If no suite with 'only' test(s), return all other suites
+      case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
+      case _ => // More than one 'only' test across all suites is an error
+        val testNames = suitesWithOnlyTest.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).mkString(", ")
+        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: $testNames")
+        Set.empty[Suite]
     }
   }
 
@@ -89,13 +114,13 @@ object SuiteFactory {
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
     val suiteConstants: SuiteConstants = loadJsonSuiteConstants(suiteFilePath, suiteName, environmentMap)
-    // TODO - code proposal - will be solved in #11
+    // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
-    // TODO - code proposal - will be solved in #10
+    // TODO - code proposal - will be solved in #3
     // val beforeActions: Map[String, String] = loadJsonSuiteBeforeActions(suiteFilePath, propertiesSum)
     // val afterActions: Map[String, String] = loadJsonSuiteAfterActions(suiteFilePath, propertiesSum)
 
-    JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE.getPath)
+    JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE)
     val jsonString: String = JsonUtils.stringFromPath(suitePath)
     val notResolvedSuite: Suite = parseToSuite(jsonString)
     notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
@@ -114,7 +139,7 @@ object SuiteFactory {
     if (!Files.exists(constantsFilePath)) {
       SuiteConstants(Map.empty[String, String])
     } else {
-      JsonSchemaValidator.validate(constantsFilePath.toString, ScAPIJsonSchema.SUITE_CONSTANTS.getPath)
+      JsonSchemaValidator.validate(constantsFilePath.toString, ScAPIJsonSchema.SUITE_CONSTANTS)
       val jsonString: String = JsonUtils.stringFromPath(constantsFilePath.toString)
       val notResolvedConstants: SuiteConstants = parseToSuiteConstant(jsonString)
       notResolvedConstants.resolveReferences(properties)
@@ -142,16 +167,29 @@ object SuiteFactory {
     import africa.absa.testing.scapi.SuiteJsonProtocol.suiteFormat
     jsonString.parseJson.convertTo[Suite]
   }
+
+  def validateSuiteContent(suites: Set[Suite]): Unit = suites.foreach(validateSuiteContent)
+
+  def validateSuiteContent(suite: Suite): Unit = {
+    suite.tests.foreach(test => {
+      test.headers.foreach(header => RequestHeaders.validateContent(header))
+      RequestBody.validateContent(test.actions.head.body)
+      RequestParams.validateContent(test.actions.head.params)
+      test.assertions.foreach(assertion => ResponseAssertions.validateContent(assertion))
+    })
+  }
+
 }
 
 /**
  * Object that provides implicit JSON format for various Suite related classes.
  */
 object SuiteJsonProtocol extends DefaultJsonProtocol {
-  implicit val preparationFormat: RootJsonFormat[Arrange] = jsonFormat2(Arrange)
-  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat2(Action)
+  implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
+  implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
+  implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat2(Assertion)
-  implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat5(SuiteTestScenario)
+  implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
 }
 

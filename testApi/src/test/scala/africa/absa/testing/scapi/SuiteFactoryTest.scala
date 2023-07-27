@@ -23,7 +23,7 @@ import scribe.format.Formatter
 class SuiteFactoryTest extends FunSuite {
   implicit val testLoggingFunctions: TestScribe = new TestScribe(SuiteFactory.getClass.toString)
 
-  class TestScribe(logOrigin: String, formatter: Option[Formatter] = None) extends Scribe(logOrigin, formatter) {
+  class TestScribe(logOrigin: String, logLevel: String = Scribe.INFO, formatter: Option[Formatter] = None) extends Scribe(logOrigin, logLevel, formatter) {
     var logs = List.empty[String]
 
     override def error(message: String, t: Throwable = None.orNull): Unit = {
@@ -48,7 +48,7 @@ class SuiteFactoryTest extends FunSuite {
     }
 
     assert(caught.isInstanceOf[ProjectLoadFailed])
-    assert(testLoggingFunctions.logs.head.contains("Undefined constant(s): 'constants.no_provided' in ''Arrange' action."))
+    assert(testLoggingFunctions.logs.head.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
     assert(testLoggingFunctions.logs(1).contains("Not all suites loaded. Failed suites:"))
   }
 
@@ -62,7 +62,7 @@ class SuiteFactoryTest extends FunSuite {
     loadJsonSuiteConstants
    */
   test("loadJsonSuite - constants loaded") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map("env.bearerToken" -> "token#value")
     val expected: Map[String, String] = Map(
@@ -78,7 +78,7 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - no constants file exist") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "notExist"
     val properties: Map[String, String] = Map.empty
     val expected: Map[String, String] = Map.empty
@@ -89,12 +89,55 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - not all references resolved") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/aulgui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map.empty
 
     intercept[UndefinedConstantsInProperties] {
       SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
     }
+  }
+
+  /*
+    filterOnlyOrAll
+   */
+  test("filterOnlyOrAll - only used - once") {
+    val suites = Set(
+      Suite(endpoint = "endpoint1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      )),
+      Suite(endpoint = "endpoint2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+      ))
+    )
+
+    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
+
+    assertEquals(filteredSuites.size, 1)
+
+    val filteredSuite = filteredSuites.head
+    assertEquals(filteredSuite.endpoint, "endpoint1")
+    assertEquals(filteredSuite.tests.size, 1)
+
+    val filteredTest = filteredSuite.tests.head
+    assertEquals(filteredTest.name, "test2")
+    assertEquals(filteredTest.only, Some(true))
+  }
+
+  test("fromFile - only used - twice") {
+    val suites = Set(
+      Suite(endpoint = "endpoint1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      )),
+      Suite(endpoint = "endpoint2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true)),
+      ))
+    )
+
+    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
+
+    assertEquals(filteredSuites.size, 0)
   }
 }

@@ -16,28 +16,56 @@
 
 package africa.absa.testing.scapi
 
-import io.restassured.RestAssured.`given`
-import io.restassured.http.ContentType
-import io.restassured.module.scala.RestAssuredSupport.AddThenToResponse
+import africa.absa.testing.scapi.logging.functions.Scribe
 
 object SuiteRunnerJob {
+  def runSuites(suites: Set[Suite], environment: Environment)
+               (implicit loggingFunctions: Scribe): Set[TestResults] = {
 
-  def runSuites(suites: Set[Suite]): Unit = {
-    // Note: this is initial example logic to in touch with target library - Rest Assured
-    given()
-      .headers(
-        "Authorization",
-        "Bearer " + "bearerToken",
-        "Content-Type",
-        ContentType.JSON
-      )
-      .accept("")
-    .when()
-//      .get("http://localhost:8080/restcontroller/AULGUI/user")
-      .get("http://google.com")
-    .Then()
-      .statusCode(200)
-      .extract()
-      .response().body()
+    suites.flatMap(suite => {
+      suite.tests.map(test => {
+        loggingFunctions.debug(s"Running Suite: ${suite.endpoint}, Test: ${test.name}")
+        val testStartTime: Long = System.currentTimeMillis()
+
+        try {
+          val response: Response = new RestClient(ScAPIRequestSender).sendRequest(
+            method = test.actions.head.methodName,
+            url = test.actions.head.url,
+            headers = RequestHeaders.buildHeaders(test.headers),
+            body = RequestBody.buildBody(test.actions.head.body),
+            params = RequestParams.buildParams(test.actions.head.params),
+            verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
+          )
+
+          val isSuccess: Boolean = ResponseAssertions.performAssertions(
+            response = response,
+            assertions = test.assertions
+          )
+
+          val testEndTime: Long = System.currentTimeMillis()
+          loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
+          TestResults.withBooleanStatus(
+            suiteName = suite.endpoint,
+            testName = test.name,
+            isSuccess,
+            duration = Some(testEndTime - testStartTime),
+            categories = Some(test.categories.mkString(","))
+          )
+
+        } catch {
+          case e: Exception =>
+            val testEndTime = System.currentTimeMillis()
+            loggingFunctions.error(s"Request exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
+            TestResults(
+              suiteName = suite.endpoint,
+              testName = test.name,
+              TestResults.Failure,
+              errMessage = Some(e.getMessage),
+              duration = Some(testEndTime - testStartTime),
+              categories = Some(test.categories.mkString(","))
+            )
+        }
+      })
+    })
   }
 }

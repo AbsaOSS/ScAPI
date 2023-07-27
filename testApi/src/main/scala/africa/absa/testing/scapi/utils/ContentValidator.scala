@@ -16,30 +16,22 @@
 
 package africa.absa.testing.scapi.utils
 
-import java.net.URL
-import scala.io.Source
-import scala.util.Using
+import africa.absa.testing.scapi.ContentValidationFailed
 
-/**
- * Utility object that provides JSON related operations.
- */
-object JsonUtils {
+import scala.util.{Failure, Success, Try}
 
-  /**
-   * Method to read a file from a given path and returns its contents as a String.
-   *
-   * @param path The file path as a String.
-   * @return The file contents as a String.
-   */
-  def stringFromPath(path: URL): String = {
-    Using.resource(Source.fromInputStream(path.openStream())) { source =>
-      source.getLines().mkString
+object ContentValidator {
+
+  def validateIntegerString(input: String): Unit = {
+    Try(input.toInt) match {
+      case Success(_) => // Do nothing
+      case Failure(e) => throw ContentValidationFailed(input, s"Received value cannot be parsed to an integer: ${e.getMessage}")
     }
   }
 
-  def stringFromPath(path: String): String = {
-    Using.resource(Source.fromFile(path)) { source =>
-      source.getLines().mkString
+  def validateNonEmptyString(input: String): Unit = {
+    if (input.isEmpty) {
+      throw ContentValidationFailed(input, s"Received string value is empty.")
     }
   }
 }

@@ -27,6 +27,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "only": {
+          "type": "boolean"
+        },
         "name": {
           "type": "string"
         },
@@ -36,10 +39,10 @@
             "type": "string"
           }
         },
-        "arranges": {
+        "headers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Action"
+            "$ref": "#/definitions/Header"
           }
         },
         "actions": {
@@ -51,20 +54,63 @@
         "assertions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Action"
+            "$ref": "#/definitions/Assertion"
           }
         }
       },
       "required": [
         "name",
         "categories",
-        "arranges",
+        "headers",
         "actions",
         "assertions"
       ],
       "title": "Test"
     },
+    "Header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Header"
+    },
     "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "methodName": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "body": {
+          "type": ["string", "null"]
+        },
+        "params": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/definitions/Param"
+          }
+        }
+      },
+      "required": [
+        "methodName",
+        "url"
+      ],
+      "title": "Action"
+    },
+    "Assertion": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -80,6 +126,23 @@
         "value"
       ],
       "title": "Action"
+    },
+    "Param": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Param"
     }
   }
 }

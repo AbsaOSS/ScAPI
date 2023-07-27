@@ -31,7 +31,7 @@ object EnvironmentFactory {
    * @return Returns an environment object constructed from the JSON file.
    */
   def fromFile(path: String): Environment = {
-    JsonSchemaValidator.validate(path, ScAPIJsonSchema.ENVIRONMENT.getPath)
+    JsonSchemaValidator.validate(path, ScAPIJsonSchema.ENVIRONMENT)
     val jsonString: String = readJsonFile(path)
     val environment: Environment = parseToEnvironment(jsonString)
     environment.resolveReferences

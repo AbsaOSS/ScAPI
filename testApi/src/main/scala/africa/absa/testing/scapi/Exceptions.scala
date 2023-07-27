@@ -32,3 +32,12 @@ case class JsonInvalidSchema(messages: mutable.Set[ValidationMessage])
 case class ProjectLoadFailed() extends Exception("Problems during project loading.")
 
 case class SuiteLoadFailed(detail: String) extends Exception(s"Problems during project loading. Details: $detail")
+
+case class UndefinedHeaderType(undefinedType: String)
+  extends Exception(s"Undefined Header content type: '$undefinedType'")
+
+case class UndefinedAssertionType(undefinedType: String)
+  extends Exception(s"Undefined Assertion content type: '$undefinedType'")
+
+case class ContentValidationFailed(value: String, message: String)
+  extends Exception(s"Content validation failed for '$value': $message")

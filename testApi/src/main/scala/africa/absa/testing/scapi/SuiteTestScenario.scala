@@ -21,15 +21,17 @@ package africa.absa.testing.scapi
  *
  * @param name The name of the test scenario.
  * @param categories The required test categories of the test scenario.
- * @param arranges The set of arrange objects for the test scenario.
+ * @param headers The set of header options for the test scenario.
  * @param actions The set of action objects for the test scenario.
  * @param assertions The set of assertion objects for the test scenario.
+ * @param only The control if test should be only be running when set to true.
  */
 case class SuiteTestScenario(name: String,
                              categories: Set[String],
-                             arranges: Set[Arrange],
+                             headers: Set[Header],
                              actions: Set[Action],
-                             assertions: Set[Assertion]) {
+                             assertions: Set[Assertion],
+                             only: Option[Boolean] = Some(false)) {
   /**
    * Method to resolve references within the SuiteTestScenario instance.
    *
@@ -40,9 +42,10 @@ case class SuiteTestScenario(name: String,
     SuiteTestScenario(
       name,
       categories,
-      arranges.map(c => c.resolveReferences(references)),
+      headers.map(c => c.resolveReferences(references)),
       actions.map(c => c.resolveReferences(references)),
-      assertions.map(c => c.resolveReferences(references))
+      assertions.map(c => c.resolveReferences(references)),
+      only
     )
   }
 }

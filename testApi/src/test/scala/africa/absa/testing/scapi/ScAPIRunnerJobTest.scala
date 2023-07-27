@@ -39,7 +39,7 @@ class ScAPIRunnerJobTest extends FunSuite {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath,
-      "--validate-only", "true"
+      "--validate-only"
     )
     ScAPIRunnerJob.main(args)
   }
@@ -53,7 +53,8 @@ class ScAPIRunnerJobTest extends FunSuite {
       "--thread-count", "3",
       "--file-format", "json",
       "--report", "/path/to/report",
-      "--validate-only", "true"
+      "--validate-only",
+      "--debug"
     )
     ScAPIRunnerJob.main(args)
   }

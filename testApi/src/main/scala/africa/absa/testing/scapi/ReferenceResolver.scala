@@ -128,23 +128,22 @@ case class SuiteConstants private(constants: Map[String, String]) extends Refere
 }
 
 /**
- * Case class that represents Arrange.
- * This class is used to hold test arrangements.
+ * Case class that represents one Header option.
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
- * @constructor create a new Arrange with a name and value.
- * @param name the name of the arrangement.
- * @param value the value of the arrangement.
+ * @constructor create a new Header with a name and value.
+ * @param name the name of the header option.
+ * @param value the value of the header option.
  */
-case class Arrange private(name: String, value: String) extends ReferenceResolver {
+case class Header private(name: String, value: String) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
    *
    * @param references the map of references that may be used to resolve references in the value.
-   * @return a new Arrange instance with resolved references.
+   * @return a new Header option instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Arrange = this.copy(value = getResolved(value, references))
+  def resolveReferences(references: Map[String, String]): Header = this.copy(value = getResolved(value, references))
 }
 
 /**
@@ -153,10 +152,11 @@ case class Arrange private(name: String, value: String) extends ReferenceResolve
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
  * @constructor create a new Action with a name and value.
- * @param name the name of the action.
- * @param value the value of the action.
+ * @param methodName the name of the action.
+ * @param url the value of the action.
+ * @param body the body of the action - optional.
  */
-case class Action private(name: String, value: String) extends ReferenceResolver {
+case class Action private(methodName: String, url: String, body: Option[String] = None, params: Option[Set[Param]] = None) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -164,7 +164,11 @@ case class Action private(name: String, value: String) extends ReferenceResolver
    * @param references the map of references that may be used to resolve references in the value.
    * @return a new Action instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Action = this.copy(value = getResolved(value, references))
+  def resolveReferences(references: Map[String, String]): Action = this.copy(
+    url = getResolved(url, references),
+    body = body.map(b => getResolved(b, references)),
+    params = params.map(_.map(param => param.resolveReferences(references)))
+  )
 }
 
 /**
@@ -185,5 +189,24 @@ case class Assertion private(name: String, value: String) extends ReferenceResol
    * @return a new Assertion instance with resolved references.
    */
   def resolveReferences(references: Map[String, String]): Assertion = this.copy(value = getResolved(value, references))
+}
+
+/**
+ * Case class that represents one Header option.
+ * It implements the `ReferenceResolver` trait to support resolution of reference constants.
+ *
+ * @constructor create a new Header with a name and value.
+ * @param name the name of the header option.
+ * @param value the value of the header option.
+ */
+case class Param private(name: String, value: String) extends ReferenceResolver {
+
+  /**
+   * Method to resolve references.
+   *
+   * @param references the map of params that may be used to resolve references in the value.
+   * @return a new Param option instance with resolved references.
+   */
+  def resolveReferences(references: Map[String, String]): Param = this.copy(value = getResolved(value, references))
 }
 
