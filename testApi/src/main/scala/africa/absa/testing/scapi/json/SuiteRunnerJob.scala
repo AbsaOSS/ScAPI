@@ -20,7 +20,7 @@ import africa.absa.testing.scapi.data.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
-import africa.absa.testing.scapi.rest.request.sender.RealRequestSender
+import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.RuntimeCache

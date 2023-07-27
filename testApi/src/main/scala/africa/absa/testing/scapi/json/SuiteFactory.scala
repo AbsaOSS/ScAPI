@@ -22,7 +22,7 @@ import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSche
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
-import africa.absa.testing.scapi.utils.{FileUtils, JsonUtils}
+import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
 import spray.json._
 
 import java.nio.file.{Files, Path, Paths}
@@ -32,7 +32,6 @@ import scala.util.{Failure, Success, Try}
  * Object that creates a set of Suite instances from the given test root path.
  */
 object SuiteFactory {
-
   /**
    * Method to create a set of Suite instances from the given test root path.
    *
@@ -78,28 +77,24 @@ object SuiteFactory {
 
   def filterOnlyOrAll(suiteBundles: Set[SuiteBundle])
                      (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
-    val suiteBundlesWithOnlyTest: Set[SuiteBundle] = suiteBundles.filter(bundle => bundle.suite.tests.exists(_.only.getOrElse(false)))
-
-    val updatedSuiteBundles = if (suiteBundlesWithOnlyTest.isEmpty) {
-      suiteBundles
-    } else {
-      val filteredSuiteBundles: Set[SuiteBundle] = suiteBundlesWithOnlyTest.map { bundle =>
-        bundle.suite.copy(tests = bundle.suite.tests.filter(_.only.getOrElse(false)))
-        bundle
-      }
-
-      val numberOfOnlyTests = filteredSuiteBundles.foldLeft(0)((acc, bundle) => acc + bundle.suite.tests.size)
-
-      if (numberOfOnlyTests == 1) {
-        filteredSuiteBundles
-      } else {
-        val filteredTestNames = filteredSuiteBundles.flatMap(bundle => bundle.suite.tests.map(test => s"${bundle.suite.endpoint}.${test.name}")).toList
-        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: ${filteredTestNames.mkString(",")}")
-        Set.empty[SuiteBundle]
-      }
+    val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[Suite], List.empty[Suite])) {
+      case ((onlySuites, normalSuites), suite) =>
+        val onlyTests = suiteBundles.tests.filter(_.only.getOrElse(false))
+        onlyTests.size match {
+          case 0 => (onlySuites, suite :: normalSuites) // No 'only' test
+          case 1 => (suite.copy(tests = onlyTests) :: onlySuites, normalSuites) // Exactly one 'only' test
+          case _ => loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only."); (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
+        }
     }
 
-    updatedSuiteBundles
+    suitesWithOnlyTest.size match {
+      case 0 => others.toSet // If no suite with 'only' test(s), return all other suites
+      case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
+      case _ => // More than one 'only' test across all suites is an error
+        val testNames = suitesWithOnlyTest.flatMap(suite => suite.tests.map(test => s"${suite.endpoint}.${test.name}")).mkString(", ")
+        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: $testNames")
+        Set.empty[Suite]
+    }
   }
 
   /**

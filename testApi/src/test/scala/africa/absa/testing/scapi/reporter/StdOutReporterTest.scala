@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.utils
+package africa.absa.testing.scapi.reporter
 
 import africa.absa.testing.scapi.data.SuiteResults
-import africa.absa.testing.scapi.reporter.TxtReporter
+import africa.absa.testing.scapi.reporter.StdOutReporter
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
 
-class TxtReporterTest extends FunSuite {
+class StdOutReporterTest extends FunSuite {
 
   /*
     printReport
@@ -31,7 +31,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(Set.empty)
+      StdOutReporter.printReport(Set.empty)
     }
 
     // Get the output as a string
@@ -62,7 +62,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
 
     // Get the output as a string
@@ -98,7 +98,7 @@ class TxtReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
 
     // Get the output as a string

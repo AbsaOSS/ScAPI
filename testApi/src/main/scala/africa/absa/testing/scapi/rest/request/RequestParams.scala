@@ -17,8 +17,8 @@
 package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.json.Param
-import africa.absa.testing.scapi.utils.ContentValidator
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
+import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 object RequestParams {
 

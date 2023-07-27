@@ -18,7 +18,7 @@ package africa.absa.testing.scapi.rest.request.sender
 
 import africa.absa.testing.scapi.rest.response.Response
 
-object RealRequestSender extends RequestSender {
+object ScAPIRequestSender extends RequestSender {
   override def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
     val response = requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params)
     Response(response.statusCode, response.text(), response.headers.toMap)
