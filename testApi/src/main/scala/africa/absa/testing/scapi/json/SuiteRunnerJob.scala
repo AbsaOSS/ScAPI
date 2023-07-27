@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.json
 import africa.absa.testing.scapi.data.TestResults
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.rest.RestClient
-import africa.absa.testing.scapi.rest.request.sender.RealRequestSender
+import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertions}
 
@@ -33,7 +33,7 @@ object SuiteRunnerJob {
         val testStartTime: Long = System.currentTimeMillis()
 
         try {
-          val response: Response = new RestClient(RealRequestSender).sendRequest(
+          val response: Response = new RestClient(ScAPIRequestSender).sendRequest(
             method = test.actions.head.methodName,
             url = test.actions.head.url,
             headers = RequestHeaders.buildHeaders(test.headers),

@@ -16,8 +16,8 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.utils.JsonUtils
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
+import africa.absa.testing.scapi.utils.file.JsonUtils
 import spray.json._
 
 /**

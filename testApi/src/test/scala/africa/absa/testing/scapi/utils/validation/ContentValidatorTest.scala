@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.utils
+package africa.absa.testing.scapi.utils.validation
 
 import africa.absa.testing.scapi.ContentValidationFailed
 import munit.FunSuite

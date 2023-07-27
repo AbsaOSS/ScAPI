@@ -20,7 +20,7 @@ import africa.absa.testing.scapi.config.ScAPIRunnerConfig
 import africa.absa.testing.scapi.data.TestResults
 import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, Suite, SuiteFactory, SuiteRunnerJob}
 import africa.absa.testing.scapi.logging.functions.Scribe
-import africa.absa.testing.scapi.reporter.TxtReporter
+import africa.absa.testing.scapi.reporter.StdOutReporter
 
 import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success}
@@ -57,7 +57,7 @@ object ScAPIRunnerJob {
     } else {
       loggingFunctions.info("Running tests")
       val testResults: Set[TestResults] = SuiteRunnerJob.runSuites(suites, environment)
-      TxtReporter.printReport(testResults)
+      StdOutReporter.printReport(testResults)
     }
   }
 }

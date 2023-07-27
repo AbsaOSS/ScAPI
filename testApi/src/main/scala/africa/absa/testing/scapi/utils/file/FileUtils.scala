@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.utils
+package africa.absa.testing.scapi.utils.file
 
 import java.io.File
 import java.nio.file.{Path, Paths}

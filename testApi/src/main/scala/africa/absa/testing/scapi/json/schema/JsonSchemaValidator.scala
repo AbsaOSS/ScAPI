@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.json.schema
 
 import africa.absa.testing.scapi.JsonInvalidSchema
-import africa.absa.testing.scapi.utils.JsonUtils
+import africa.absa.testing.scapi.utils.file.JsonUtils
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.networknt.schema.{JsonSchema, JsonSchemaFactory, SpecVersion}
 

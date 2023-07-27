@@ -16,9 +16,9 @@
 
 package africa.absa.testing.scapi.rest.request
 
-import africa.absa.testing.scapi.utils.ContentValidator
 import africa.absa.testing.scapi.UndefinedHeaderType
 import africa.absa.testing.scapi.json.Header
+import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 object RequestHeaders {
   val CONTENT_TYPE = "content-type"
