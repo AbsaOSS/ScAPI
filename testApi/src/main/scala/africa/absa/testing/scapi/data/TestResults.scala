@@ -16,15 +16,27 @@
 
 package africa.absa.testing.scapi.data
 
-case class TestResults(suite: String, test: String, status: String, duration: Option[Long], errMessage: Option[String] = None, categories: String = "")
+case class TestResults(suiteName: String,
+                       testName: String,
+                       status: String,
+                       duration: Option[Long] = None,
+                       errMessage: Option[String] = None,
+                       categories: Option[String] = None)
 
 object TestResults {
   val Success: String = "Success"
   val Failure: String = "Failure"
 
-  def success(suiteName: String, testName: String, duration: Option[Long], category: String = ""): TestResults =
-    TestResults(suite = suiteName, test = testName, status = Success, duration = duration, categories = category)
-
-  def failure(suiteName: String, testName: String, duration: Option[Long], categories: String = "", errorMessage: String): TestResults =
-    TestResults(suite = suiteName, test = testName, status = Failure, duration = duration, categories = categories, errMessage = Some(errorMessage))
+  def withBooleanStatus(suiteName: String,
+                        testName: String,
+                        status: Boolean,
+                        duration: Option[Long] = None,
+                        errMessage: Option[String] = None,
+                        categories: Option[String] = None): TestResults =
+    TestResults(suiteName = suiteName,
+      testName = testName,
+      status = if (status) Success else Failure,
+      duration = duration,
+      errMessage = errMessage,
+      categories = categories)
 }

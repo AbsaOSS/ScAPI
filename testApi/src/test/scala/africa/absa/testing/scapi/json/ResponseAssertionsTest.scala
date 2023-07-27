@@ -60,31 +60,27 @@ class ResponseAssertionsTest extends FunSuite {
     val statusCodeAssertion = Assertion("status-code", "200")
     val response = Response(200, "Dummy Body", Map.empty)
 
-    ResponseAssertions.performAssertions(response, Set(statusCodeAssertion))
+    assert(ResponseAssertions.performAssertions(response, Set(statusCodeAssertion)))
   }
 
   test("performAssertions - status code assertion - not equals") {
     val statusCodeAssertion = Assertion("status-code", "200")
     val response = Response(500, "Dummy Body", Map.empty)
 
-    interceptMessage[java.lang.AssertionError]("assertion failed: Expected 200, but got 500") {
-      ResponseAssertions.performAssertions(response, Set(statusCodeAssertion))
-    }
+    assertEquals(false, ResponseAssertions.performAssertions(response, Set(statusCodeAssertion)))
   }
 
   test("performAssertions - body contains assertion") {
     val bodyContainsAssertion = Assertion("body-contains", "dummy")
     val response = Response(200, "This is a dummy body", Map.empty)
-    ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion))
+    assert(ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion)))
   }
 
   test("performAssertions - body does not contains assertion") {
     val bodyContainsAssertion = Assertion("body-contains", "dummies")
     val response = Response(200, "This is a dummy body", Map.empty)
 
-    interceptMessage[java.lang.AssertionError]("assertion failed: Expected body to contain dummies") {
-      ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion))
-    }
+    assertEquals(false, ResponseAssertions.performAssertions(response, Set(bodyContainsAssertion)))
   }
 
   test("performAssertions - unsupported assertion") {

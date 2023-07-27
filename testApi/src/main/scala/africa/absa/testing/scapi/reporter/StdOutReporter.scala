@@ -27,9 +27,9 @@ object StdOutReporter {
       }
 
     // Calculate the max lengths
-    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suite.length).max + 2
-    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.test.length).max + 2
-    val maxTestCategoriesLength = if (testResults.isEmpty) 10 else math.max(testResults.map(_.categories.length).max + 2, 10)
+    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 3
+    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.testName.length).max + 3
+    val maxTestCategoriesLength = if (testResults.isEmpty) 10 else math.max(testResults.map(_.categories.getOrElse("").length).max + 3, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
@@ -57,7 +57,7 @@ object StdOutReporter {
     println(s"Number of failed tests: $failureCount")
 
     if (testResults.nonEmpty) {
-      val suiteSummary = testResults.groupBy(_.suite).map {
+      val suiteSummary = testResults.groupBy(_.suiteName).map {
         case (suiteName, results) => (suiteName, results.size, results.count(_.status == TestResults.Success))
       }
 
@@ -71,10 +71,10 @@ object StdOutReporter {
       printTableRowSplitter()
       println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
-      val resultsList = testResults.toList.sortBy(_.suite)
+      val resultsList = testResults.toList.sortBy(_.suiteName)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.test, duration, result.status, result.categories))
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.testName, duration, result.status, result.categories.getOrElse("")))
 
         // Check if the index + 1 is divisible by 4 (since index is 0-based)
         if ((index + 1) % 3 == 0) printTableRowSplitter()
@@ -82,12 +82,12 @@ object StdOutReporter {
 
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
-        testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.test).foreach { result =>
-          println(s"Suite: ${result.suite}")
-          println(s"Test: ${result.test}")
+        testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.testName).foreach { result =>
+          println(s"Suite: ${result.suiteName}")
+          println(s"Test: ${result.testName}")
           println(s"Error: ${result.errMessage.getOrElse("No details available")}")
           println(s"Duration: ${result.duration.getOrElse("NA")} ms")
-          println(s"Category: ${result.categories}")
+          println(s"Category: ${result.categories.getOrElse("")}")
           println()
         }
       }
