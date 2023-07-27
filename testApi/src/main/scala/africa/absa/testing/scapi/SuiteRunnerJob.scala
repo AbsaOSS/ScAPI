@@ -37,41 +37,32 @@ object SuiteRunnerJob {
             verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
           )
 
-          ResponseAssertions.performAssertions(
+          val isSuccess: Boolean = ResponseAssertions.performAssertions(
             response = response,
             assertions = test.assertions
           )
 
           val testEndTime: Long = System.currentTimeMillis()
           loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
-          TestResults.success(
+          TestResults.withBooleanStatus(
             suiteName = suite.endpoint,
             testName = test.name,
+            isSuccess,
             duration = Some(testEndTime - testStartTime),
-            category = test.categories.mkString(",")
+            categories = Some(test.categories.mkString(","))
           )
 
         } catch {
-          case e: AssertionError =>
-            val testEndTime = System.currentTimeMillis()
-            loggingFunctions.error(s"Assertion error while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
-            TestResults.failure(
-              suiteName = suite.endpoint,
-              testName = test.name,
-              errorMessage = e.getMessage,
-              duration = Some(testEndTime - testStartTime),
-              categories = test.categories.mkString(",")
-            )
-
           case e: Exception =>
             val testEndTime = System.currentTimeMillis()
             loggingFunctions.error(s"Request exception occurred while running suite: ${suite.endpoint}, Test: ${test.name}. Exception: ${e.getMessage}")
-            TestResults.failure(
+            TestResults(
               suiteName = suite.endpoint,
               testName = test.name,
-              errorMessage = e.getMessage,
+              TestResults.Failure,
+              errMessage = Some(e.getMessage),
               duration = Some(testEndTime - testStartTime),
-              categories = test.categories.mkString(",")
+              categories = Some(test.categories.mkString(","))
             )
         }
       })

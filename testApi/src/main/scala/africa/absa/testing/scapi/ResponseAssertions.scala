@@ -19,7 +19,6 @@ package africa.absa.testing.scapi
 import africa.absa.testing.scapi.utils.ContentValidator
 
 object ResponseAssertions {
-
   val STATUS_CODE = "status-code"
   val BODY_CONTAINS = "body-contains"
 
@@ -31,22 +30,37 @@ object ResponseAssertions {
     }
   }
 
-  def performAssertions(response: Response, assertions: Set[Assertion]): Unit = {
-    for (assertion <- assertions) {
+  def performAssertions(response: Response, assertions: Set[Assertion]): Boolean = {
+    assertions.forall { assertion =>
       assertion.name match {
         case STATUS_CODE => assertStatusCode(response, assertion.value)
         case BODY_CONTAINS => assertBodyContains(response, assertion.value)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
       }
     }
+    // TODO - delete comment
+//    for (assertion <- assertions) {
+//      assertion.name match {
+//        case STATUS_CODE => assertStatusCode(response, assertion.value)
+//        case BODY_CONTAINS => assertBodyContains(response, assertion.value)
+//        case _ => throw new IllegalArgumentException(s"Unsupported assertion: ${assertion.name}")
+//      }
+//    }
   }
 
-  def assertStatusCode(response: Response, expectedCode: String): Unit = {
+  def assertStatusCode(response: Response, expectedCode: String): Boolean = {
     val iExpectedCode: Int = expectedCode.toInt
-    assert(response.statusCode == iExpectedCode, s"Expected $iExpectedCode, but got ${response.statusCode}")
+
+    val isSuccess: Boolean = response.statusCode == iExpectedCode
+    if (!isSuccess)
+      println(s"Expected $iExpectedCode, but got ${response.statusCode}")  // TODO - replace by logger call in Issue #11
+    isSuccess
   }
 
-  def assertBodyContains(response: Response, expectedContent: String): Unit = {
-    assert(response.body.contains(expectedContent), s"Expected body to contain $expectedContent")
+  def assertBodyContains(response: Response, expectedContent: String): Boolean = {
+    val isSuccess: Boolean = response.body.contains(expectedContent)
+    if (!isSuccess)
+      println(s"Expected body to contain $expectedContent") // TODO - replace by logger call in Issue #11
+    isSuccess
   }
 }
