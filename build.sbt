@@ -61,7 +61,7 @@ lazy val testApi = project
   .settings(
     name := "testApi",
     libraryDependencies ++= BaseDependencies :+ getScalaDependency(scalaVersion.value) ,
-    assembly / mainClass := Some("africa.absa.testing.scapi.ScAPIRunnerJob"),
+    assembly / mainClass := Some("africa.absa.testing.scapi.ScAPIRunner"),
     assembly / test := {},
     scalacOptions += "-Yrangepos",
     testFrameworks += MUnitFramework,
