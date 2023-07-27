@@ -21,7 +21,7 @@ import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
 
-class TxtReporterTest extends FunSuite {
+class StdOutReporterTest extends FunSuite {
 
   /*
     printReport
