@@ -35,10 +35,10 @@ object StdOutReporter {
       }
 
     // Calculate the max lengths
-    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 2
-    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 2
+    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 3
+    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 3
     val maxTestCategoriesLength = if (testResults.isEmpty) 10
-    else math.max(testResults.flatMap(_.categories.flatMap(c => Option(c).map(_.split(",").length))).maxOption.getOrElse(0) + 2, 10)
+    else math.max(testResults.flatMap(_.categories.flatMap(c => Option(c).map(_.split(",").length))).maxOption.getOrElse(0) + 3, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
@@ -83,7 +83,7 @@ object StdOutReporter {
       val resultsList = testResults.toList.sortBy(_.suiteName)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.name, duration, result.status, result.categories))
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.name, duration, result.status, result.categories.getOrElse("")))
 
         // Check if the index + 1 is divisible by 4 (since index is 0-based)
         if ((index + 1) % 3 == 0) printTableRowSplitter()
