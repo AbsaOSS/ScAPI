@@ -85,11 +85,27 @@ User(.*)        .... find all suite files which begin with 'User'
 #### Action
 - methods
     - get | post | put | delete
-- arguments:
-  - url: url string
-  - body: json string (can be null)
-  - params: list of url parameters in format [name, value] (can be null) 
+  - arguments:
+    - url: url string
+    - body: json string (can be null)
+    - params: list of url parameters in format [name, value] (can be null) 
 #### Assertions
-- methods
+- Assert group
   - "status-code"
+    - arguments:
+      - param_1: status code string
   - "body-contains"
+    - arguments:
+      - param_1: string to find in body
+- Log group
+  - "info"
+    - arguments:
+      - param_1: string to log with info level
+- Extract Json group
+  - "string_from_list"
+    - arguments:
+      - param_1: RuntimeCache key string 
+      - param_2: json array index [0+]
+      - param_3: json element string to find
+      - param_4: RuntimeCache expiration level [Global, Suite, Test]
+
