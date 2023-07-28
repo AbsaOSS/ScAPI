@@ -64,12 +64,11 @@ object ResponseAssertion extends ResponsePerformer {
    */
 
   /**
-   * Asserts that the status code of the response is as expected.
+   * Asserts that the status code of the response matches the expected status code.
    *
-   * @param response     The response to check the status code of.
+   * @param response     The response whose status code is to be checked.
    * @param expectedCode The expected status code as a string.
-   * @return TODO
-   * @throws AssertionError If the actual status code does not match the expected one.
+   * @return A Boolean indicating whether the response's status code matches the expected code. Returns true if they match, false otherwise.
    */
   def assertStatusCode(response: Response, expectedCode: String): Boolean = {
     val iExpectedCode: Int = expectedCode.toInt
@@ -83,10 +82,9 @@ object ResponseAssertion extends ResponsePerformer {
   /**
    * Asserts that the body of the response contains the expected content.
    *
-   * @param response        The response to check the body of.
-   * @param expectedContent The expected content as a string.
-   * @return TODO
-   * @throws AssertionError If the actual body does not contain the expected content.
+   * @param response        The HTTP response to check the body of.
+   * @param expectedContent The expected content present in the response body as a string.
+   * @return A Boolean indicating whether the expected content is present in the response body or not.
    */
   def assertBodyContains(response: Response, expectedContent: String): Boolean = {
     val isSuccess: Boolean = response.body.contains(expectedContent)

@@ -24,7 +24,7 @@ import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
-import africa.absa.testing.scapi.utils.cache.RuntimeCache
+import africa.absa.testing.scapi.utils.cache.{RuntimeCache, SuiteLevel, TestLevel}
 
 /**
  * Main object handling the running of test suites.
@@ -60,7 +60,7 @@ object SuiteRunner {
         }.getOrElse(Set.empty)
       }
 
-      RuntimeCache.expire(RuntimeCache.SUITE)
+      RuntimeCache.expire(SuiteLevel)
       resultSuiteBefore ++ resultSuite ++ resultSuiteAfter
     })
   }
@@ -132,7 +132,7 @@ object SuiteRunner {
     } catch {
       case e: Exception => handleException(e, suiteEndpoint, test.name, testStartTime, "Test", Some(test.categories.mkString(",")))
     } finally {
-      RuntimeCache.expire(RuntimeCache.TEST)
+      RuntimeCache.expire(TestLevel)
     }
   }
 

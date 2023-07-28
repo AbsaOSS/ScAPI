@@ -71,10 +71,10 @@ object ResponseExtractJson extends ResponsePerformer {
    * @param cacheKey             The key to use when storing the extracted string in the runtime cache.
    * @param listIndex            The index in the JSON array from which to extract the string.
    * @param jsonKey              The key in the JSON object from which to extract the string.
-   * @param cacheExpirationLevel The expiration level to use when storing the extracted string in the runtime cache.
+   * @param runtimeCacheLevel    The expiration level to use when storing the extracted string in the runtime cache.
    * @return Boolean indicating whether the string extraction and caching operation was successful.
    */
-  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, cacheExpirationLevel: String): Boolean = {
+  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Boolean = {
     val jsonAst = response.body.parseJson
 
     val objects = jsonAst match {
@@ -92,7 +92,7 @@ object ResponseExtractJson extends ResponsePerformer {
         return false
     }
 
-    RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(cacheExpirationLevel))
+    RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
     true
   }
 

@@ -20,18 +20,22 @@ import africa.absa.testing.scapi.logging.functions.Scribe
 
 import scala.collection.mutable
 
+sealed trait RuntimeCacheLevel
+
+case object GlobalLevel extends RuntimeCacheLevel
+
+case object SuiteLevel extends RuntimeCacheLevel
+
+case object TestLevel extends RuntimeCacheLevel
+
 /** RuntimeCache is a utility object that provides a caching functionality.
  * It provides methods to store, retrieve, update and remove key-value pairs,
  * as well as reset the cache. Each key-value pair is associated with an expiration level.
  * There are methods to remove all pairs at a certain level and reset the entire cache.
  */
 object RuntimeCache {
-  private val cache: mutable.Map[String, (String, String)] = mutable.Map.empty[String, (String, String)]
+  private val cache: mutable.Map[String, (String, RuntimeCacheLevel)] = mutable.Map.empty[String, (String, RuntimeCacheLevel)]
   private var loggingFunctions: Option[Scribe] = None
-
-  val GLOBAL: String = "global"
-  val SUITE: String = "suite"
-  val TEST: String = "test"
 
   /**
    * Initializes logging functions.
@@ -47,17 +51,26 @@ object RuntimeCache {
    * @param value the value
    * @param level the expiration level
    */
-  def put(key: String, value: String, level: String = TEST): Unit = {
-    cache.put(key, (value, level))
+  def put(key: String, value: String, level: RuntimeCacheLevel = TestLevel): Unit = {
+    if (!cache.contains(key)) {
+      cache.put(key, (value, level))
+    } else {
+      println(s"Error - Put already existing key into cache is not allowed. No change applied.") // TODO - replace by logger call in Issue #11
+    }
   }
 
   /**
    * Retrieves the value for a given key.
    *
    * @param key the key
-   * @return the value, or None if the key is not in the cache
+   * @return the value associated with the key
+   * @throws NoSuchElementException if the key is not found in the cache
    */
-  def get(key: String): Option[String] = cache.get(key).map(_._1)
+  def get(key: String): Option[String] = {
+    // throw new NoSuchElementException(s"Key $key not found in cache")
+
+    cache.get(key).map(_._1)
+  }
 
   /**
    * Updates the value for a given key.
@@ -79,7 +92,7 @@ object RuntimeCache {
    * @param value the new value
    * @param level the new expiration level
    */
-  def update(key: String, value: String, level: String): Unit = {
+  def update(key: String, value: String, level: RuntimeCacheLevel): Unit = {
     cache.update(key, (value, level))
   }
 
@@ -97,8 +110,16 @@ object RuntimeCache {
    *
    * @param level the expiration level
    */
-  def expire(level: String): Unit = {
-    cache.filterInPlace { case (_, (_, cacheLevel)) => cacheLevel != level }
+  def expire(level: RuntimeCacheLevel): Unit = {
+    level match {
+      case TestLevel =>
+        cache.filterInPlace { case (_, (_, cacheLevel)) => cacheLevel != TestLevel }
+
+      case SuiteLevel =>
+        cache.filterInPlace { case (_, (_, cacheLevel)) => cacheLevel != SuiteLevel && cacheLevel != TestLevel }
+
+      case GlobalLevel => reset()
+    }
   }
 
   /** Clears all entries from the cache.
@@ -112,14 +133,15 @@ object RuntimeCache {
    * @param level the input string
    * @return the defined constant for a known level, or TEST_LEVEL for an unknown level
    */
-  def determineLevel(level: String): String = {
+  def determineLevel(level: String): RuntimeCacheLevel = {
     level.toLowerCase match {
-      case GLOBAL => GLOBAL
-      case SUITE => SUITE
+      case "global" => GlobalLevel
+      case "suite" => SuiteLevel
+      case "test" => TestLevel
       case _ => {
         if (loggingFunctions.nonEmpty)
           this.loggingFunctions.get.warning(s"Not known expiration cache level: '$level'. Used default TEST level.")
-        TEST
+        TestLevel
       }
     }
   }
@@ -150,5 +172,3 @@ object RuntimeCache {
     })
   }
 }
-// TODO - add logic call to expire after test run
-// TODO - add logic call to expire after suite run
