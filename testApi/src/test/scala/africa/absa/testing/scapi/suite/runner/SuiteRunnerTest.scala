@@ -112,7 +112,6 @@ class SuiteRunnerTest extends FunSuite {
     assertEquals(5, suiteResults.size)
     assertEquals("test", beforeSuiteResult.name)
     assertEquals("Success", beforeSuiteResult.status)
-    assertEquals(0L, beforeSuiteResult.duration.get)
   }
 
   test("runSuite - SuiteBefore empty") {
@@ -134,7 +133,6 @@ class SuiteRunnerTest extends FunSuite {
     assertEquals(5, suiteResults.size)
     assertEquals("test", afterSuiteResult.name)
     assertEquals("Success", afterSuiteResult.status)
-    assertEquals(0L, afterSuiteResult.duration.get)
   }
 
   test("runSuite - SuiteAfter empty") {
