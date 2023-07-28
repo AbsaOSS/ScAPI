@@ -130,7 +130,7 @@ object SuiteRunner {
       )
 
     } catch {
-      case e: Exception => handleException(e, suiteEndpoint, test.name, testStartTime, "Test")
+      case e: Exception => handleException(e, suiteEndpoint, test.name, testStartTime, "Test", Some(test.categories.mkString(",")))
     } finally {
       RuntimeCache.expire(RuntimeCache.TEST)
     }
@@ -198,7 +198,7 @@ object SuiteRunner {
    * @param resultType    The type of the suite or test ("Before", "Test", or "After").
    * @return SuiteResults after the exception handling.
    */
-  private def handleException(e: Throwable, suiteEndpoint: String, name: String, testStartTime: Long, resultType: String): SuiteResults = {
+  private def handleException(e: Throwable, suiteEndpoint: String, name: String, testStartTime: Long, resultType: String, categories: Option[String] = None): SuiteResults = {
     val testEndTime = System.currentTimeMillis()
     val message = e match {
       case _ => s"Request exception occurred while running suite: ${suiteEndpoint}, ${resultType}: ${name}. Exception: ${e.getMessage}"
@@ -219,7 +219,9 @@ object SuiteRunner {
         name = name,
         status = false,
         errMessage = Some(e.getMessage),
-        duration = Some(testEndTime - testStartTime))
+        duration = Some(testEndTime - testStartTime),
+        categories = categories
+      )
 
       case "After" => SuiteResults.withBooleanStatus(
         resultType = SuiteResults.RESULT_TYPE_AFTER_METHOD,

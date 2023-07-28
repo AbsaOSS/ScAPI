@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi
 
 import munit.FunSuite
+import org.mockito.ArgumentMatchers._
 
 class ScAPIRunnerTest extends FunSuite {
 
@@ -26,7 +27,7 @@ class ScAPIRunnerTest extends FunSuite {
     }
   }
 
-  test("call main with minimum params".ignore) {
+  test("call main with minimum params") {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath)
@@ -35,7 +36,7 @@ class ScAPIRunnerTest extends FunSuite {
     // TODO - add check of generated report presence a and values #13
   }
 
-  test("call main with minimum params - validate only".ignore) {
+  test("call main with minimum params - validate only") {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath,

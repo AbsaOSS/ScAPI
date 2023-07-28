@@ -38,7 +38,7 @@ object StdOutReporter {
     val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 2
     val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 2
     val maxTestCategoriesLength = if (testResults.isEmpty) 10
-    else math.max(testResults.flatMap(_.categories).map(_.split(",").length).max + 2, 10)
+    else math.max(testResults.flatMap(_.categories.flatMap(c => Option(c).map(_.split(",").length))).maxOption.getOrElse(0) + 2, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
