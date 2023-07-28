@@ -36,7 +36,7 @@ class SuiteFactoryTest extends FunSuite {
   /*
     fromFile
    */
-  // Note: positive way covered in ScAPIRunnerJobTest.class
+  // Note: positive way covered in ScAPIRunnerTest.class
 
   test("fromFile - report fails - undefined constant".ignore) {
     val constants: Map[String, String] = Map.empty
@@ -56,7 +56,7 @@ class SuiteFactoryTest extends FunSuite {
   /*
     loadJsonSuite
    */
-  // Note: positive way covered in ScAPIRunnerJobTest.class
+  // Note: positive way covered in ScAPIRunnerTest.class
   // Note: negative way covered during tests of fromFile
 
   /*

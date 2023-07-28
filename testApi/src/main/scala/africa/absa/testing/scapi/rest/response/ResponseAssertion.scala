@@ -47,10 +47,11 @@ object ResponseAssertion extends ResponsePerformer {
    * Performs assertions on a response depending on the type of assertion provided.
    *
    * @param response  The response to perform the assertions on.
-   * @param assertion The assertion to be checked.
+   * @param assertion The assertion to perform on the response.
+   * @return Boolean value indicating whether the assertion passed or failed.
    * @throws IllegalArgumentException If the assertion type is not supported.
    */
-  def performAssertions(response: Response, assertion: Assertion): Unit = {
+  def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
       case STATUS_CODE => assertStatusCode(response, assertion.param_1)
       case BODY_CONTAINS => assertBodyContains(response, assertion.param_1)
@@ -67,11 +68,16 @@ object ResponseAssertion extends ResponsePerformer {
    *
    * @param response     The response to check the status code of.
    * @param expectedCode The expected status code as a string.
+   * @return TODO
    * @throws AssertionError If the actual status code does not match the expected one.
    */
-  def assertStatusCode(response: Response, expectedCode: String): Unit = {
+  def assertStatusCode(response: Response, expectedCode: String): Boolean = {
     val iExpectedCode: Int = expectedCode.toInt
-    assert(response.statusCode == iExpectedCode, s"Expected $iExpectedCode, but got ${response.statusCode}")
+
+    val isSuccess: Boolean = response.statusCode == iExpectedCode
+    if (!isSuccess)
+      println(s"Expected $iExpectedCode, but got ${response.statusCode}") // TODO - replace by logger call in Issue #11
+    isSuccess
   }
 
   /**
@@ -79,9 +85,13 @@ object ResponseAssertion extends ResponsePerformer {
    *
    * @param response        The response to check the body of.
    * @param expectedContent The expected content as a string.
+   * @return TODO
    * @throws AssertionError If the actual body does not contain the expected content.
    */
-  def assertBodyContains(response: Response, expectedContent: String): Unit = {
-    assert(response.body.contains(expectedContent), s"Expected body to contain $expectedContent")
+  def assertBodyContains(response: Response, expectedContent: String): Boolean = {
+    val isSuccess: Boolean = response.body.contains(expectedContent)
+    if (!isSuccess)
+      println(s"Expected body to contain $expectedContent") // TODO - replace by logger call in Issue #11
+    isSuccess
   }
 }

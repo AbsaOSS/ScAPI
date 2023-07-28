@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.data
-
-import africa.absa.testing.scapi.json.{Suite, SuiteAfter, SuiteBefore}
+package africa.absa.testing.scapi.model
 
 /**
  * Represents a suite of tests, with optional "before" and "after" setup/teardown.

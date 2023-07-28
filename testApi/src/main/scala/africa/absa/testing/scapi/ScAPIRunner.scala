@@ -17,20 +17,21 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.data.{SuiteBundle, SuiteResults}
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory, SuiteRunnerJob}
+import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory}
 import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.model.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.reporter.StdOutReporter
+import africa.absa.testing.scapi.suite.runner.SuiteRunner
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
 import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success}
 
 /**
- * Object `ScAPIRunnerJob` serves as the main entry point for the ScAPI runner.
+ * Object `ScAPIRunner` serves as the main entry point for the ScAPI runner.
  */
-object ScAPIRunnerJob {
+object ScAPIRunner {
   /**
    * The main method that is being invoked to run the ScAPI runner.
    *
@@ -59,7 +60,7 @@ object ScAPIRunnerJob {
       loggingFunctions.info("Validate only => end run.")
     } else {
       loggingFunctions.info("Running tests")
-      val testResults: Set[SuiteResults] = SuiteRunnerJob.runSuites(suiteBundles, environment)
+      val testResults: Set[SuiteResults] = SuiteRunner.runSuites(suiteBundles, environment)
       StdOutReporter.printReport(testResults)
     }
   }

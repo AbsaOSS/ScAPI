@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.model
+
+import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
 
 /**
  * Case class that represents a suite test scenario.

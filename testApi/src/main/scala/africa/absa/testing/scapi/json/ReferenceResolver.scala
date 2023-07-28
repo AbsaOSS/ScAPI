@@ -260,4 +260,3 @@ case class Param private(name: String, value: String) extends ReferenceResolver 
    */
   def resolveReferences(references: Map[String, String]): Param = this.copy(value = getResolved(value, references))
 }
-

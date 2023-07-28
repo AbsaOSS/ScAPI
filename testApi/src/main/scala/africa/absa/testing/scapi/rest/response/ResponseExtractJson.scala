@@ -52,7 +52,7 @@ object ResponseExtractJson extends ResponsePerformer {
    * @param assertion The Assertion instance containing the assertion details.
    * @throws IllegalArgumentException if an unsupported assertion group is encountered.
    */
-  def performAssertions(response: Response, assertion: Assertion): Unit = {
+  def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
       case STRING_FROM_LIST => stringFromList(response, assertion.param_1, assertion.param_2.get.toInt, assertion.param_3.get, assertion.param_4.get)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${assertion.name}")
@@ -72,23 +72,28 @@ object ResponseExtractJson extends ResponsePerformer {
    * @param listIndex            The index in the JSON array from which to extract the string.
    * @param jsonKey              The key in the JSON object from which to extract the string.
    * @param cacheExpirationLevel The expiration level to use when storing the extracted string in the runtime cache.
-   * @throws DeserializationException if a non-array JSON object is encountered or if the expected string field is not found.
+   * @return Boolean indicating whether the string extraction and caching operation was successful.
    */
-  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, cacheExpirationLevel: String): Unit = {
+  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, cacheExpirationLevel: String): Boolean = {
     val jsonAst = response.body.parseJson
 
     val objects = jsonAst match {
       case JsArray(array) => array
-      case _ => throw DeserializationException("Expected a JSON array")
+      case _ =>
+        println("Expected a JSON array") // TODO - replace by logger call in Issue #11
+        return false
     }
 
     // Extract "jsonKey" from the object at the given index
     val value: String = objects(listIndex).asJsObject.getFields(jsonKey) match {
       case Seq(JsString(value)) => value
-      case _ => throw new DeserializationException(s"Expected a single '$jsonKey' field of type string")
+      case _ =>
+        println(s"Expected a single '$jsonKey' field of type string") // TODO - replace by logger call in Issue #11
+        return false
     }
 
     RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(cacheExpirationLevel))
+    true
   }
 
   /**

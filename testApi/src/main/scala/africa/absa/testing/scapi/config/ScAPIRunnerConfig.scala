@@ -51,7 +51,7 @@ case class ScAPIRunnerConfig(envPath: String = "",
    * @param loggingFunctions The logging function
    */
   def logConfigInfo(implicit loggingFunctions: Scribe): Unit = {
-    loggingFunctions.info("ScAPIRunnerJob started with provided configuration:")
+    loggingFunctions.info("ScAPIRunner started with provided configuration:")
     loggingFunctions.info(s"env: $envPath")
     loggingFunctions.info(s"testRootDir: $testRootPath")
     loggingFunctions.info(s"filter: $filter")

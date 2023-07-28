@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.data.SuiteResults
+import africa.absa.testing.scapi.model.SuiteResults
 
 /**
  * A singleton object to manage the standard output reporting of test results.
@@ -35,7 +35,7 @@ object StdOutReporter {
       }
 
     // Calculate the max lengths
-    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suite.length).max + 2
+    val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 2
     val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 2
     val maxTestCategoriesLength = if (testResults.isEmpty) 10
     else math.max(testResults.flatMap(_.categories).map(_.split(",").length).max + 2, 10)
@@ -66,7 +66,7 @@ object StdOutReporter {
     println(s"Number of failed tests: $failureCount")
 
     if (testResults.nonEmpty) {
-      val suiteSummary = testResults.groupBy(_.suite).map {
+      val suiteSummary = testResults.groupBy(_.suiteName).map {
         case (suiteName, results) => (suiteName, results.size, results.count(_.status == SuiteResults.Success))
       }
 
@@ -80,10 +80,10 @@ object StdOutReporter {
       printTableRowSplitter()
       println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
-      val resultsList = testResults.toList.sortBy(_.suite)
+      val resultsList = testResults.toList.sortBy(_.suiteName)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suite, result.name, duration, result.status, result.categories))
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.name, duration, result.status, result.categories))
 
         // Check if the index + 1 is divisible by 4 (since index is 0-based)
         if ((index + 1) % 3 == 0) printTableRowSplitter()
@@ -92,7 +92,7 @@ object StdOutReporter {
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
         testResults.filter(_.status == SuiteResults.Failure).toList.sortBy(_.name).foreach { result =>
-          println(s"Suite: ${result.suite}")
+          println(s"Suite: ${result.suiteName}")
           println(s"Test: ${result.name}")
           println(s"Error: ${result.errMessage.getOrElse("No details available")}")
           println(s"Duration: ${result.duration.getOrElse("NA")} ms")

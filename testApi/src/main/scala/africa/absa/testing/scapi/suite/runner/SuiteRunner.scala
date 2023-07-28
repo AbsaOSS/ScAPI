@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.suite.runner
 
-import africa.absa.testing.scapi.ScAPIRequestSender
-import africa.absa.testing.scapi.data.{SuiteBundle, SuiteResults}
+import africa.absa.testing.scapi.json.{Environment, Requestable}
 import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.model.{Method, SuiteBundle, SuiteResults, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
+import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
@@ -28,7 +29,7 @@ import africa.absa.testing.scapi.utils.cache.RuntimeCache
 /**
  * Main object handling the running of test suites.
  */
-object SuiteRunnerJob {
+object SuiteRunner {
   private lazy val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
 
   /**
@@ -79,16 +80,18 @@ object SuiteRunnerJob {
 
     try {
       val response: Response = sendRequest(method, environment)
-      Response.perform(
+      val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = method.assertions
       )
 
       val testEndTime: Long = System.currentTimeMillis()
       loggingFunctions.debug(s"Before method '${method.name}' finished. Response statusCode is '${response.statusCode}'")
-      SuiteResults.successBefore(
+      SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_BEFORE_METHOD,
         suiteName = suiteEndpoint,
-        methodName = method.name,
+        name = method.name,
+        status = isSuccess,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
@@ -110,18 +113,20 @@ object SuiteRunnerJob {
 
     try {
       val response: Response = sendRequest(test, environment)
-      Response.perform(
+      val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = test.assertions
       )
 
       val testEndTime: Long = System.currentTimeMillis()
       loggingFunctions.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
-      SuiteResults.successTest(
+      SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_TEST,
         suiteName = suiteEndpoint,
-        testName = test.name,
+        name = test.name,
+        status = isSuccess,
         duration = Some(testEndTime - testStartTime),
-        category = Some(test.categories.mkString(","))
+        categories = Some(test.categories.mkString(","))
       )
 
     } catch {
@@ -146,16 +151,18 @@ object SuiteRunnerJob {
 
     try {
       val response: Response = sendRequest(method, environment)
-      Response.perform(
+      val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = method.assertions
       )
 
       val testEndTime: Long = System.currentTimeMillis()
       loggingFunctions.debug(s"After method '${method.name}' finished. Response statusCode is '${response.statusCode}'")
-      SuiteResults.successAfter(
+      SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_AFTER_METHOD,
         suiteName = suiteEndpoint,
-        methodName = method.name,
+        name = method.name,
+        status = isSuccess,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
@@ -194,14 +201,33 @@ object SuiteRunnerJob {
   private def handleException(e: Throwable, suiteEndpoint: String, name: String, testStartTime: Long, resultType: String): SuiteResults = {
     val testEndTime = System.currentTimeMillis()
     val message = e match {
-      case _: AssertionError => s"Assertion error while running suite: ${suiteEndpoint}, ${resultType}: ${name}. Exception: ${e.getMessage}"
       case _ => s"Request exception occurred while running suite: ${suiteEndpoint}, ${resultType}: ${name}. Exception: ${e.getMessage}"
     }
     loggingFunctions.error(message)
     resultType match {
-      case "Before" => SuiteResults.failureBefore(suiteName = suiteEndpoint, methodName = name, errorMessage = Some(e.getMessage), duration = Some(testEndTime - testStartTime))
-      case "Test" => SuiteResults.failureTest(suiteName = suiteEndpoint, testName = name, errorMessage = Some(e.getMessage), duration = Some(testEndTime - testStartTime))
-      case "After" => SuiteResults.failureAfter(suiteName = suiteEndpoint, methodName = name, errorMessage = Some(e.getMessage), duration = Some(testEndTime - testStartTime))
+      case "Before" => SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_BEFORE_METHOD,
+        suiteName = suiteEndpoint,
+        name = name,
+        status = false,
+        errMessage = Some(e.getMessage),
+        duration = Some(testEndTime - testStartTime))
+
+      case "Test" => SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_TEST,
+        suiteName = suiteEndpoint,
+        name = name,
+        status = false,
+        errMessage = Some(e.getMessage),
+        duration = Some(testEndTime - testStartTime))
+
+      case "After" => SuiteResults.withBooleanStatus(
+        resultType = SuiteResults.RESULT_TYPE_AFTER_METHOD,
+        suiteName = suiteEndpoint,
+        name = name,
+        status = false,
+        errMessage = Some(e.getMessage),
+        duration = Some(testEndTime - testStartTime))
     }
   }
 }

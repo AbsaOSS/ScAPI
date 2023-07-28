@@ -53,7 +53,7 @@ object ResponseLog extends ResponsePerformer {
    * @param assertion The assertion to be performed on the response.
    * @throws IllegalArgumentException if the assertion's name is not recognized.
    */
-  def performAssertions(response: Response, assertion: Assertion): Unit = {
+  def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
       case INFO => logInfo(assertion.param_1)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: log]: ${assertion.name}")
@@ -70,8 +70,9 @@ object ResponseLog extends ResponsePerformer {
    *
    * @param message The message to be logged.
    */
-  def logInfo(message: String): Unit = {
+  def logInfo(message: String): Boolean = {
     implicit val loggingFunctions: Scribe = Scribe(this.getClass, Scribe.INFO)
     loggingFunctions.info(message)
+    true
   }
 }

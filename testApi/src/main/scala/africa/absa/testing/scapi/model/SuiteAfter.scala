@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.model
 
 /**
  * Case class that represents a suite after methods.

@@ -18,11 +18,11 @@ package africa.absa.testing.scapi
 
 import munit.FunSuite
 
-class ScAPIRunnerJobTest extends FunSuite {
+class ScAPIRunnerTest extends FunSuite {
 
   test("call main without params") {
     interceptMessage[IllegalArgumentException]("Wrong options provided. List can be found above\n") {
-      ScAPIRunnerJob.main(Array())
+      ScAPIRunner.main(Array())
     }
   }
 
@@ -30,7 +30,7 @@ class ScAPIRunnerJobTest extends FunSuite {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath)
-    ScAPIRunnerJob.main(args)
+    ScAPIRunner.main(args)
 
     // TODO - add check of generated report presence a and values #13
   }
@@ -41,7 +41,7 @@ class ScAPIRunnerJobTest extends FunSuite {
       "--test-root-path", getClass.getResource("/test_project").getPath,
       "--validate-only"
     )
-    ScAPIRunnerJob.main(args)
+    ScAPIRunner.main(args)
   }
 
   test("call main with full params - validate only") {
@@ -56,7 +56,7 @@ class ScAPIRunnerJobTest extends FunSuite {
       "--validate-only",
       "--debug"
     )
-    ScAPIRunnerJob.main(args)
+    ScAPIRunner.main(args)
   }
 
   test("no suite folder in project") {
@@ -65,7 +65,7 @@ class ScAPIRunnerJobTest extends FunSuite {
       "--test-root-path", "/random/path/without/suite")
 
     interceptMessage[SuiteLoadFailed]("Problems during project loading. Details: 'suites' directory have to exist in project root.") {
-      ScAPIRunnerJob.main(args)
+      ScAPIRunner.main(args)
     }
   }
 }

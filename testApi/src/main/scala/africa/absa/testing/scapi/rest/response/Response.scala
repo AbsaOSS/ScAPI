@@ -49,18 +49,20 @@ object Response {
    * Performs actions on the given Response based on a set of Assertions.
    * Each Assertion is resolved by the runtime cache before being used.
    * The appropriate group's performAssertions method is called based on the group type of each Assertion.
+   * Returns true only if all assertions return true, and false as soon as any assertion returns false.
    *
    * @param response   The response on which actions will be performed.
    * @param assertions The set of assertions that dictate what actions will be performed on the response.
+   * @return           Boolean indicating whether all assertions passed (true) or any assertion failed (false).
    * @throws IllegalArgumentException If an assertion group type is not supported.
    */
-  def perform(response: Response, assertions: Set[Assertion]): Unit = {
-    for (assertion <- assertions) {
+  def perform(response: Response, assertions: Set[Assertion]): Boolean = {
+    assertions.forall { assertion =>
       val resolvedAssertion: Assertion = assertion.resolveByRuntimeCache()
       resolvedAssertion.group match {
-        case GROUP_ASSERT => ResponseAssertion.performAssertions(response, assertion)
-        case GROUP_EXTRACT_JSON => ResponseExtractJson.performAssertions(response, assertion)
-        case GROUP_LOG => ResponseLog.performAssertions(response, assertion)
+        case GROUP_ASSERT => ResponseAssertion.performAssertion(response, assertion)
+        case GROUP_EXTRACT_JSON => ResponseExtractJson.performAssertion(response, assertion)
+        case GROUP_LOG => ResponseLog.performAssertion(response, assertion)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
       }
     }

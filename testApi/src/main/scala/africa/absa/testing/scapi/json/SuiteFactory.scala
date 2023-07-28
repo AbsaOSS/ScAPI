@@ -17,9 +17,9 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi._
-import africa.absa.testing.scapi.data.SuiteBundle
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.model.{Method, Suite, SuiteAfter, SuiteBefore, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
@@ -95,7 +95,9 @@ object SuiteFactory {
         onlyTests.size match {
           case 0 => (onlySuites, suiteBundle :: normalSuites) // No 'only' test
           case 1 => (suiteBundle.copy(suite = suite.copy(tests = onlyTests)) :: onlySuites, normalSuites) // Exactly one 'only' test
-          case _ => loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only."); (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
+          case _ =>
+            loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only.")
+            (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
         }
     }
 
