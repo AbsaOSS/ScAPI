@@ -21,7 +21,6 @@ import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.model.{Method, SuiteBundle, SuiteResults, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
-import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.{RuntimeCache, SuiteLevel, TestLevel}
@@ -30,7 +29,8 @@ import africa.absa.testing.scapi.utils.cache.{RuntimeCache, SuiteLevel, TestLeve
  * Main object handling the running of test suites.
  */
 object SuiteRunner {
-  private lazy val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
+  private val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
+  type RestClientCreator = () => RestClient
 
   /**
    * Run a set of test suites.
@@ -39,12 +39,12 @@ object SuiteRunner {
    * @param environment  The current environment.
    * @return Set of SuiteResults.
    */
-  def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment): Set[SuiteResults] = {
+  def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment, restClientCreator: RestClientCreator): Set[SuiteResults] = {
     suiteBundles.flatMap(suiteBundle => {
       loggingFunctions.debug(s"Running Suite: ${suiteBundle.suite.endpoint}")
 
       val resultSuiteBefore: Set[SuiteResults] = suiteBundle.suiteBefore.flatMap { suiteBefore =>
-        Some(suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment) })
+        Some(suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment, restClientCreator) })
       }.getOrElse(Set.empty)
 
       var resultSuite: Set[SuiteResults] = Set.empty
@@ -53,10 +53,10 @@ object SuiteRunner {
         loggingFunctions.error(s"Suite-Before for Suite: ${suiteBundle.suite.endpoint} has failed methods. Not executing main tests and Suite-After.")
       } else {
         resultSuite = suiteBundle.suite.tests.map(test =>
-          this.runSuiteTest(suiteBundle.suite.endpoint, test, environment))
+          this.runSuiteTest(suiteBundle.suite.endpoint, test, environment, restClientCreator))
 
         resultSuiteAfter = suiteBundle.suiteAfter.flatMap { suiteAfter =>
-          Some(suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.endpoint, suiteAfter.name, method, environment) })
+          Some(suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.endpoint, suiteAfter.name, method, environment, restClientCreator) })
         }.getOrElse(Set.empty)
       }
 
@@ -74,12 +74,12 @@ object SuiteRunner {
    * @param environment     The current environment.
    * @return SuiteResults after the execution of the suite-before method.
    */
-  private def runSuiteBefore(suiteEndpoint: String, suiteBeforeName: String, method: Method, environment: Environment): SuiteResults = {
+  private def runSuiteBefore(suiteEndpoint: String, suiteBeforeName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-Before: ${suiteBeforeName}")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(method, environment)
+      val response: Response = sendRequest(method, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = method.assertions
@@ -107,12 +107,12 @@ object SuiteRunner {
    * @param environment   The current environment.
    * @return SuiteResults after the execution of the suite-test.
    */
-  private def runSuiteTest(suiteEndpoint: String, test: SuiteTestScenario, environment: Environment): SuiteResults = {
+  private def runSuiteTest(suiteEndpoint: String, test: SuiteTestScenario, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-Test: ${test.name}")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(test, environment)
+      val response: Response = sendRequest(test, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = test.assertions
@@ -145,12 +145,12 @@ object SuiteRunner {
    * @param environment    The current environment.
    * @return SuiteResults after the execution of the suite-after method.
    */
-  private def runSuiteAfter(suiteEndpoint: String, suiteAfterName: String, method: Method, environment: Environment): SuiteResults = {
+  private def runSuiteAfter(suiteEndpoint: String, suiteAfterName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
     loggingFunctions.debug(s"Running Suite-After: ${suiteAfterName}")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(method, environment)
+      val response: Response = sendRequest(method, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
         assertions = method.assertions
@@ -177,8 +177,8 @@ object SuiteRunner {
    * @param environment The current environment.
    * @return Response to the sent request.
    */
-  private def sendRequest(requestable: Requestable, environment: Environment): Response = {
-    new RestClient(ScAPIRequestSender).sendRequest(
+  private def sendRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Response = {
+    restClientCreator().sendRequest(
       method = requestable.actions.head.methodName,
       url = RuntimeCache.resolve(requestable.actions.head.url),
       headers = RequestHeaders.buildHeaders(requestable.headers),

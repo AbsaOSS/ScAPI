@@ -22,6 +22,8 @@ import africa.absa.testing.scapi.logging.LoggerConfig
 import africa.absa.testing.scapi.logging.functions.Scribe
 import africa.absa.testing.scapi.model.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.reporter.StdOutReporter
+import africa.absa.testing.scapi.rest.RestClient
+import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.suite.runner.SuiteRunner
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 
@@ -60,7 +62,7 @@ object ScAPIRunner {
       loggingFunctions.info("Validate only => end run.")
     } else {
       loggingFunctions.info("Running tests")
-      val testResults: Set[SuiteResults] = SuiteRunner.runSuites(suiteBundles, environment)
+      val testResults: Set[SuiteResults] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
       StdOutReporter.printReport(testResults)
     }
   }
