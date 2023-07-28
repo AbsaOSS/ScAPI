@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
 import munit.FunSuite
 import scribe.format.Formatter
@@ -38,7 +39,7 @@ class SuiteFactoryTest extends FunSuite {
    */
   // Note: positive way covered in ScAPIRunnerTest.class
 
-  test("fromFile - report fails - undefined constant".ignore) {
+  test("fromFile - report fails - undefined constant") {
     val constants: Map[String, String] = Map.empty
     val properties: Map[String, String] = Map.empty
     val environment: Environment = Environment(constants, properties)
@@ -102,45 +103,45 @@ class SuiteFactoryTest extends FunSuite {
   /*
     filterOnlyOrAll
    */
-  test("filterOnlyOrAll - only used - once".ignore) {
-    // TODO - fix it
-//    val suites = Set(
-//      Suite(endpoint = "endpoint1", tests = Set(
-//        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
-//        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
-//      )),
-//      Suite(endpoint = "endpoint2", tests = Set(
-//        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
-//      ))
-//    )
-//
-//    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
-//
-//    assertEquals(filteredSuites.size, 1)
-//
-//    val filteredSuite = filteredSuites.head
-//    assertEquals(filteredSuite.endpoint, "endpoint1")
-//    assertEquals(filteredSuite.tests.size, 1)
-//
-//    val filteredTest = filteredSuite.tests.head
-//    assertEquals(filteredTest.name, "test2")
-//    assertEquals(filteredTest.only, Some(true))
+  test("filterOnlyOrAll - only used - once") {
+    val suitesBundles = Set(
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+      ))))
+
+    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
+
+    assertEquals(filteredSuiteBundles.size, 1)
+
+    val filteredSuite = filteredSuiteBundles.head.suite
+    assertEquals(filteredSuite.endpoint, "endpoint1")
+    assertEquals(filteredSuite.tests.size, 1)
+
+    val filteredTest = filteredSuite.tests.head
+    assertEquals(filteredTest.name, "test2")
+    assertEquals(filteredTest.only, Some(true))
   }
 
-  test("fromFile - only used - twice".ignore) {
-    // TODO - fix it
-//    val suites = Set(
-//      Suite(endpoint = "endpoint1", tests = Set(
-//        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
-//        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
-//      )),
-//      Suite(endpoint = "endpoint2", tests = Set(
-//        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true)),
-//      ))
-//    )
-//
-//    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
-//
-//    assertEquals(filteredSuites.size, 0)
+  test("fromFile - only used - twice") {
+    val suitesBundles = Set(
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true)),
+      ))))
+
+    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
+
+    assertEquals(filteredSuiteBundles.size, 0)
   }
 }

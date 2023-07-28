@@ -207,9 +207,9 @@ case class Action private(methodName: String, url: String, body: Option[String] 
  * @param param_4 the 4th parameter of the assertion.
  * @param param_5 the 5st parameter of the assertion.
  */
-case class Assertion private(name: String,
+case class Assertion private(group: String,
+                             name: String,
                              param_1: String,
-                             group: String,
                              param_2: Option[String] = None,
                              param_3: Option[String] = None,
                              param_4: Option[String] = None,

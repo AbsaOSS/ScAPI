@@ -17,7 +17,6 @@
 package africa.absa.testing.scapi
 
 import munit.FunSuite
-import org.mockito.ArgumentMatchers._
 
 class ScAPIRunnerTest extends FunSuite {
 
