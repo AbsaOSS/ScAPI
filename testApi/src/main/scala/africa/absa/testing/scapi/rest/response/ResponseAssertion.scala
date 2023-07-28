@@ -37,8 +37,8 @@ object ResponseAssertion extends ResponsePerformer {
    */
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
-      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.param_1)
-      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.param_1)
+      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.param_1, s"ResponseAssertion.$STATUS_CODE.param_1")
+      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.param_1, s"ResponseAssertion.$BODY_CONTAINS.param_1")
       case _ => throw UndefinedAssertionType(assertion.name)
     }
   }

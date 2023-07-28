@@ -192,8 +192,31 @@ class RuntimeCacheTest extends FunSuite {
     }
   }
 
+  test("resolve - multiple placeholders, some keys not exist") {
+    RuntimeCache.put("key", "value")
+    intercept[NoSuchElementException] {
+      RuntimeCache.resolve("{{ cache.key }} and {{ cache.notExist }}")
+    }
+  }
+
   test("resolve - no placeholder to resolve") {
     RuntimeCache.put("key", "value")
     assertEquals(RuntimeCache.resolve("cache.key"), "cache.key")
+  }
+
+  test("resolve - mixed placeholders") {
+    RuntimeCache.put("key", "value")
+    assertEquals(RuntimeCache.resolve("{{ cache.key }} and {{ not.cache.key }}"), "value and {{ not.cache.key }}")
+  }
+
+  test("resolve - empty key") {
+    intercept[NoSuchElementException] {
+      RuntimeCache.resolve("{{ cache. }}")
+    }
+  }
+
+  test("resolve - empty value") {
+    RuntimeCache.put("key", "")
+    assertEquals(RuntimeCache.resolve("{{ cache.key }}"), "")
   }
 }

@@ -26,18 +26,18 @@ class ContentValidatorTest extends FunSuite {
    */
 
   test("validateIntegerString - succeeds with valid integer string") {
-    ContentValidator.validateIntegerString("123")
+    ContentValidator.validateIntegerString("123", "unitTest")
   }
 
   test("validateIntegerString - fails with non-integer string") {
     intercept[ContentValidationFailed] {
-      ContentValidator.validateIntegerString("not an integer")
+      ContentValidator.validateIntegerString("not an integer", "unitTest")
     }
   }
 
-  test("validateIntegerString fails with empty string") {
+  test("validateIntegerString - fails with empty string") {
     intercept[ContentValidationFailed] {
-      ContentValidator.validateIntegerString("")
+      ContentValidator.validateIntegerString("", "unitTest")
     }
   }
 
@@ -46,12 +46,12 @@ class ContentValidatorTest extends FunSuite {
    */
 
   test("validateNonEmptyString succeeds with non-empty string") {
-    ContentValidator.validateNonEmptyString("non-empty string")
+    ContentValidator.validateNonEmptyString("non-empty string", "unitTest")
   }
 
-  test("validateNonEmptyString fails with empty string") {
+  test("validateNonEmptyString - fails with empty string") {
     intercept[ContentValidationFailed] {
-      ContentValidator.validateNonEmptyString("")
+      ContentValidator.validateNonEmptyString("", "unitTest")
     }
   }
 }

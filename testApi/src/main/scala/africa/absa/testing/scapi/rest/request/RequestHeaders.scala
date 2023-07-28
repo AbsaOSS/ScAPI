@@ -56,8 +56,8 @@ object RequestHeaders {
    */
   def validateContent(header: Header): Unit = {
     header.name.toLowerCase match {
-      case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value)
-      case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value)
+      case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
+      case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
       case _ => throw UndefinedHeaderType(header.name)
     }
   }

@@ -30,10 +30,10 @@ object ContentValidator {
    * @param input The string to be validated.
    * @throws ContentValidationFailed if the input string cannot be parsed to an integer.
    */
-  def validateIntegerString(input: String): Unit = {
+  def validateIntegerString(input: String, param: String): Unit = {
     Try(input.toInt) match {
       case Success(_) => // Do nothing
-      case Failure(e) => throw ContentValidationFailed(input, s"Received value cannot be parsed to an integer: ${e.getMessage}")
+      case Failure(e) => throw ContentValidationFailed(input, s"Received value of '$param' cannot be parsed to an integer: ${e.getMessage}")
     }
   }
 
@@ -43,9 +43,9 @@ object ContentValidator {
    * @param input The string to be validated.
    * @throws ContentValidationFailed if the input string is empty.
    */
-  def validateNonEmptyString(input: String): Unit = {
+  def validateNonEmptyString(input: String, param: String): Unit = {
     if (input.isEmpty) {
-      throw ContentValidationFailed(input, s"Received string value is empty.")
+      throw ContentValidationFailed(input, s"Received string value of '$param' is empty.")
     }
   }
 

@@ -53,7 +53,7 @@ object RequestParams {
   def validateContent(paramsSet: Option[Set[Param]]): Unit = {
     paramsSet.foreach { params =>
       params.foreach { param =>
-        ContentValidator.validateNonEmptyString(param.name)
+        ContentValidator.validateNonEmptyString(param.name, s"Param.${param.name}")
       }
     }
   }

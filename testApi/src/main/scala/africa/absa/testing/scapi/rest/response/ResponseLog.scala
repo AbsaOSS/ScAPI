@@ -39,7 +39,7 @@ object ResponseLog extends ResponsePerformer {
    */
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
-      case INFO => ContentValidator.validateNonEmptyString(assertion.param_1)
+      case INFO => ContentValidator.validateNonEmptyString(assertion.param_1, s"ResponseLog.$INFO.param_1")
       case _ => throw UndefinedAssertionType(assertion.name)
     }
   }

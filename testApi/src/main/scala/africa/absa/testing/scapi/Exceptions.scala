@@ -39,4 +39,4 @@ case class UndefinedAssertionType(undefinedType: String)
   extends Exception(s"Undefined Assertion content type: '$undefinedType'")
 
 case class ContentValidationFailed(value: String, message: String)
-  extends Exception(s"Content validation failed for '$value': $message")
+  extends Exception(s"Content validation failed for value: '$value': $message")

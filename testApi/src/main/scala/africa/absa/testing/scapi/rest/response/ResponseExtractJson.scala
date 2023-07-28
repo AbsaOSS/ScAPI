@@ -75,25 +75,31 @@ object ResponseExtractJson extends ResponsePerformer {
    * @return Boolean indicating whether the string extraction and caching operation was successful.
    */
   def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Boolean = {
-    val jsonAst = response.body.parseJson
+    try {
+      val jsonAst = response.body.parseJson
 
-    val objects = jsonAst match {
-      case JsArray(array) => array
-      case _ =>
-        println("Expected a JSON array") // TODO - replace by logger call in Issue #11
-        return false
+      val objects = jsonAst match {
+        case JsArray(array) => array
+        case _ =>
+          println("Expected a JSON array") // TODO - replace by logger call in Issue #11
+          return false
+      }
+
+      // Extract "jsonKey" from the object at the given index
+      val value: String = objects(listIndex).asJsObject.getFields(jsonKey) match {
+        case Seq(JsString(value)) => value
+        case _ =>
+          println(s"Expected '$jsonKey' field not found in provided json.") // TODO - replace by logger call in Issue #11
+          return false
+      }
+
+      RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
+      true
+    } catch {
+      case e: spray.json.JsonParser.ParsingException =>
+        println(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
+        false
     }
-
-    // Extract "jsonKey" from the object at the given index
-    val value: String = objects(listIndex).asJsObject.getFields(jsonKey) match {
-      case Seq(JsString(value)) => value
-      case _ =>
-        println(s"Expected a single '$jsonKey' field of type string") // TODO - replace by logger call in Issue #11
-        return false
-    }
-
-    RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
-    true
   }
 
   /**
@@ -107,10 +113,10 @@ object ResponseExtractJson extends ResponsePerformer {
     ContentValidator.validateNotNone(assertion.param_2, s"ExtractJson.$STRING_FROM_LIST.param_2")
     ContentValidator.validateNotNone(assertion.param_3, s"ExtractJson.$STRING_FROM_LIST.param_3")
 
-    ContentValidator.validateNonEmptyString(assertion.param_1)
-    ContentValidator.validateNonEmptyString(assertion.param_2.get)
-    ContentValidator.validateNonEmptyString(assertion.param_3.get)
+    ContentValidator.validateNonEmptyString(assertion.param_1, s"ExtractJson.$STRING_FROM_LIST.param_1")
+    ContentValidator.validateNonEmptyString(assertion.param_2.get, s"ExtractJson.$STRING_FROM_LIST.param_2")
+    ContentValidator.validateNonEmptyString(assertion.param_3.get, s"ExtractJson.$STRING_FROM_LIST.param_3")
 
-    ContentValidator.validateIntegerString(assertion.param_2.get)
+    ContentValidator.validateIntegerString(assertion.param_2.get, s"ExtractJson.$STRING_FROM_LIST.param_2")
   }
 }
