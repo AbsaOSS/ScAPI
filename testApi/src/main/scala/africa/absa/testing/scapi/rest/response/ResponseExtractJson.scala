@@ -88,6 +88,7 @@ object ResponseExtractJson extends ResponsePerformer {
       // Extract "jsonKey" from the object at the given index
       val value: String = objects(listIndex).asJsObject.getFields(jsonKey) match {
         case Seq(JsString(value)) => value
+        case Seq(JsNumber(value)) => value.toString()
         case _ =>
           println(s"Expected '$jsonKey' field not found in provided json.") // TODO - replace by logger call in Issue #11
           return false
