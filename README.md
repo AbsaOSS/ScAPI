@@ -17,7 +17,7 @@ sbt jacoco
 Report should be available on path `{project-root}/testApi/target/scala-2.13/jacoco/report/html`
 
 ### How to generate jars 
-Run command from path `{project-root}`
+Run command from path `{project-root}/testApi`
 ```
 sbt assembly
 ```
