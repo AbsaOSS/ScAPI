@@ -19,12 +19,13 @@ package africa.absa.testing.scapi.json
 import africa.absa.testing.scapi._
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.functions.Scribe
-import africa.absa.testing.scapi.model.{Method, Suite, SuiteAfter, SuiteBefore, SuiteBundle, SuiteTestScenario}
+import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
 import spray.json._
 
+import java.net.URL
 import java.nio.file.{Files, Path, Paths}
 import scala.util.{Failure, Success, Try}
 
@@ -136,8 +137,22 @@ object SuiteFactory {
     // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
 
-    val beforeActions: Option[SuiteBefore] = loadJsonSuiteBefore(suiteFilePath, suiteName, environmentMap ++ suiteConstants.constants)
-    val afterActions: Option[SuiteAfter] = loadJsonSuiteAfter(suiteFilePath, suiteName, environmentMap ++ suiteConstants.constants)
+    val beforeActions: Option[SuiteBefore] = loadJsonSuite[SuiteBefore](
+      suiteFilePath,
+      suiteName,
+      environmentMap ++ suiteConstants.constants,
+      ScAPIJsonSchema.SUITE_BEFORE,
+      "before",
+      parseToSuiteBefore
+    )
+    val afterActions: Option[SuiteAfter] = loadJsonSuite[SuiteAfter](
+      suiteFilePath,
+      suiteName,
+      environmentMap ++ suiteConstants.constants,
+      ScAPIJsonSchema.SUITE_BEFORE,
+      "after",
+      parseToSuiteAfter
+    )
 
     JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE)
     val jsonString: String = JsonUtils.stringFromPath(suitePath)
@@ -167,42 +182,29 @@ object SuiteFactory {
   }
 
   /**
-   * Method to load a Suite Before instance from the given constants JSON file path.
+   * Loads a Suite instance from the given constants JSON file path.
    *
    * @param suiteFilePath The path to the constants JSON file.
    * @param suiteName     The name of the suite for which constants are to be loaded.
    * @param properties    The map containing properties variables.
-   * @return A SuiteBefore instance.
-   */
-  def loadJsonSuiteBefore(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteBefore] = {
-    val beforeFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.before.json")
-    if (!Files.exists(beforeFilePath)) {
+   * @param jsonSchema    The URL to the schema to be used for validation.
+   * @param extension     The file extension.
+   * @param parser        The parser function used to parse JSON string.
+   * @return A Suite instance.
+   */  def loadJsonSuite[T <: SuiteAround](suiteFilePath: String,
+                                      suiteName: String,
+                                      properties: Map[String, String],
+                                      jsonSchema: URL,
+                                      extension: String,
+                                      parser: String => T): Option[T] = {
+    val filePath: Path = Paths.get(suiteFilePath, s"$suiteName.$extension.json")
+    if (!Files.exists(filePath)) {
       None
     } else {
-      JsonSchemaValidator.validate(beforeFilePath.toString, ScAPIJsonSchema.SUITE_BEFORE)
-      val jsonString: String = JsonUtils.stringFromPath(beforeFilePath.toString)
-      val notResolvedBefore: SuiteBefore = parseToSuiteBefore(jsonString)
-      Some(notResolvedBefore.resolveReferences(properties))
-    }
-  }
-
-  /**
-   * Method to load a Suite After instance from the given constants JSON file path.
-   *
-   * @param suiteFilePath The path to the constants JSON file.
-   * @param suiteName     The name of the suite for which constants are to be loaded.
-   * @param properties    The map containing properties variables.
-   * @return A SuiteAfter instance.
-   */
-  def loadJsonSuiteAfter(suiteFilePath: String, suiteName: String, properties: Map[String, String]): Option[SuiteAfter] = {
-    val afterFilePath: Path = Paths.get(suiteFilePath, s"$suiteName.after.json")
-    if (!Files.exists(afterFilePath)) {
-      None
-    } else {
-      JsonSchemaValidator.validate(afterFilePath.toString, ScAPIJsonSchema.SUITE_AFTER)
-      val jsonString: String = JsonUtils.stringFromPath(afterFilePath.toString)
-      val notResolvedAfter: SuiteAfter = parseToSuiteAfter(jsonString)
-      Some(notResolvedAfter.resolveReferences(properties))
+      JsonSchemaValidator.validate(filePath.toString, jsonSchema)
+      val jsonString: String = JsonUtils.stringFromPath(filePath.toString)
+      val notResolvedSuite: T = parser(jsonString)
+      Some(notResolvedSuite.resolveReferences(properties).asInstanceOf[T])
     }
   }
 

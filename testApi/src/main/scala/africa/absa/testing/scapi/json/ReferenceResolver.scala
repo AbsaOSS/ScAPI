@@ -19,6 +19,8 @@ package africa.absa.testing.scapi.json
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.{PropertyNotFound, UndefinedConstantsInProperties}
 
+import scala.util.matching.Regex
+
 /**
  * A sealed protected trait that provides functionality for resolving references.
  */
@@ -51,7 +53,7 @@ sealed protected trait ReferenceResolver {
   }
 
   /**
-   * Method to handle unresolved references. If there are any unresolved references, it throws an exception.
+   * If there are any unresolved references, it throws an exception.
    *
    * @param notResolvedReferences A set of unresolved reference keys.
    * @throws UndefinedConstantsInProperties If there are any unresolved references.
@@ -60,7 +62,7 @@ sealed protected trait ReferenceResolver {
     if (notResolvedReferences.nonEmpty) throw UndefinedConstantsInProperties(notResolvedReferences, s"'${getClass.getSimpleName}' action.")
 
   /**
-   * Method to resolve a map of references to their actual values. It iteratively updates the map with resolved values.
+   * Resolve a map of references to their actual values. It iteratively updates the map with resolved values.
    *
    * @param toResolve  A map of references to resolve.
    * @param references A map of actual reference values.
@@ -75,7 +77,7 @@ sealed protected trait ReferenceResolver {
   }
 
   /**
-   * Method to resolve a single reference to its actual value. It updates the string with resolved value.
+   * Resolve a single reference to its actual value. It updates the string with resolved value.
    *
    * @param toResolve  A string of references to resolve.
    * @param references A map of actual reference values.
@@ -84,7 +86,7 @@ sealed protected trait ReferenceResolver {
   private def resolve(toResolve: String, references: Map[String, String]): (String, Set[String]) = {
     val pattern = """\{\{\s*(.*?)\s*}}""".r
     var collected: Set[String] = Set.empty
-    val resolved = pattern.replaceAllIn(toResolve, { matchResult =>
+    val resultMatch = (matchResult: Regex.Match) => {
       val propertyKey: String = matchResult.group(1).trim
       if (propertyKey.contains("cache.")) {
         matchResult.group(0)
@@ -94,7 +96,8 @@ sealed protected trait ReferenceResolver {
           toResolve
         })
       }
-    })
+    }
+    val resolved = pattern.replaceAllIn(toResolve, resultMatch)
 
     (resolved, collected)
   }
