@@ -29,10 +29,5 @@ abstract class SuiteAround(name: String, methods: Set[Method]) {
    * @param references A map containing the references to be resolved.
    * @return A new SuiteBefore instance where all references are resolved.
    */
-  def resolveReferences(references: Map[String, String]): SuiteAround = {
-    SuiteBefore(
-      name,
-      methods.map(c => c.resolveReferences(references))
-    )
-  }
+  def resolveReferences(references: Map[String, String]): SuiteAround
 }
