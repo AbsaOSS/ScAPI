@@ -37,30 +37,37 @@ object SuiteRunner {
    * @param environment  The current environment.
    * @return Set of SuiteResults.
    */
-  def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment, restClientCreator: RestClientCreator): Set[SuiteResults] = {
-    suiteBundles.flatMap(suiteBundle => {
+  def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment, restClientCreator: RestClientCreator): List[SuiteResults] = {
+    suiteBundles.foldLeft(List[SuiteResults]()) { (resultList, suiteBundle) =>
       Logger.debug(s"Running Suite: ${suiteBundle.suite.endpoint}")
 
-      val resultSuiteBefore: Set[SuiteResults] = suiteBundle.suiteBefore.map { suiteBefore =>
+      val resultSuiteBefore: List[SuiteResults] = suiteBundle.suiteBefore.toList.flatMap { suiteBefore =>
         suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment, restClientCreator) }
-      }.getOrElse(Set.empty)
+      }
 
-      var resultSuite: Set[SuiteResults] = Set.empty
-      var resultSuiteAfter: Set[SuiteResults] = Set.empty
+      var resultSuite: List[SuiteResults] = List.empty
+      var resultSuiteAfter: List[SuiteResults] = List.empty
       if (!resultSuiteBefore.forall(_.isSuccess)) {
         Logger.error(s"Suite-Before for Suite: ${suiteBundle.suite.endpoint} has failed methods. Not executing main tests and Suite-After.")
+        resultSuite = resultSuite :+ SuiteResults.withBooleanStatus(
+          resultType = SuiteResults.RESULT_TYPE_TEST,
+          suiteName = suiteBundle.suite.endpoint,
+          name = "SKIPPED",
+          status = false,
+          duration = Some(0L),
+          categories = Some("SKIPPED"))
       } else {
-        resultSuite = suiteBundle.suite.tests.map(test =>
+        resultSuite = suiteBundle.suite.tests.toList.map(test =>
           this.runSuiteTest(suiteBundle.suite.endpoint, test, environment, restClientCreator))
 
-        resultSuiteAfter = suiteBundle.suiteAfter.map { suiteAfter =>
+        resultSuiteAfter = suiteBundle.suiteAfter.toList.flatMap { suiteAfter =>
           suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.endpoint, suiteAfter.name, method, environment, restClientCreator) }
-        }.getOrElse(Set.empty)
+        }
       }
 
       RuntimeCache.expire(SuiteLevel)
-      resultSuiteBefore ++ resultSuite ++ resultSuiteAfter
-    })
+      resultList ++ resultSuiteBefore ++ resultSuite ++ resultSuiteAfter
+    }
   }
 
   /**
