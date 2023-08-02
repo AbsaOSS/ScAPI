@@ -18,14 +18,13 @@ package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
 import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory}
-import africa.absa.testing.scapi.logging.LoggerConfig
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model.{SuiteBundle, SuiteResults}
 import africa.absa.testing.scapi.reporter.StdOutReporter
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
 import africa.absa.testing.scapi.suite.runner.SuiteRunner
-import africa.absa.testing.scapi.utils.cache.RuntimeCache
+import org.apache.logging.log4j.Level
 
 import java.nio.file.{Files, Paths}
 import scala.util.{Failure, Success}
@@ -44,24 +43,22 @@ object ScAPIRunner {
       case Success(value) => value
       case Failure(exception) => throw exception
     }
-    LoggerConfig.logLevel = if (cmd.debug) Scribe.DEBUG else Scribe.INFO
-    implicit val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
-    cmd.logConfigInfo
 
-    RuntimeCache.initLogging(loggingFunctions)
+    Logger.setLevel(if (cmd.debug) Level.DEBUG else Level.INFO)
+    cmd.logConfigInfo()
 
     if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailed("'suites' directory have to exist in project root.")
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)(Scribe(SuiteFactory.getClass, LoggerConfig.logLevel))
+    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
     SuiteFactory.validateSuiteContent(suiteBundles)
 
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {
-      loggingFunctions.info("Validate only => end run.")
+      Logger.info("Validate only => end run.")
     } else {
-      loggingFunctions.info("Running tests")
+      Logger.info("Running tests")
       val testResults: Set[SuiteResults] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
       StdOutReporter.printReport(testResults)
     }

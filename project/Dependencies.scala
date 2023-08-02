@@ -25,18 +25,21 @@ object Dependencies {
   private val absaCommonsVersion = "1.3.4"
   private val commonsIoVersion = "2.13.0"
   private val requestsVersion = "0.8.0"
+  private val loggerVersion = "2.14.1"
 
   def getScalaDependency(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion
 
   val BaseDependencies: Seq[ModuleID] = Seq(
-    "com.github.scopt"    %% "scopt"                  % scoptVersion,
-    "com.outr"            %% "scribe"                 % scribeVersion,
-    "io.spray"            %% "spray-json"             % sprayJsonVersion,
-    "com.networknt"       %  "json-schema-validator"  % jsonSchemaValidatorVersion,
-    "za.co.absa.commons"  %% "commons"                % absaCommonsVersion,
-    "commons-io"          %  "commons-io"             % commonsIoVersion,
+    "com.github.scopt"          %% "scopt"                  % scoptVersion,
+    "com.outr"                  %% "scribe"                 % scribeVersion,
+    "io.spray"                  %% "spray-json"             % sprayJsonVersion,
+    "com.networknt"             %  "json-schema-validator"  % jsonSchemaValidatorVersion,
+    "za.co.absa.commons"        %% "commons"                % absaCommonsVersion,
+    "commons-io"                %  "commons-io"             % commonsIoVersion,
     // INFO: to used this library no imports needed. code is in root of src dir
-    "com.lihaoyi"         %% "requests"               % requestsVersion,
+    "com.lihaoyi"               %% "requests"               % requestsVersion,
+    "org.apache.logging.log4j"  % "log4j-core"              % loggerVersion,
+    "org.apache.logging.log4j"  % "log4j-api"               % loggerVersion,
 
     // test
     "org.scalameta"       %% "munit"                  % munitVersion          % Test

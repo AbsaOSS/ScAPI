@@ -18,7 +18,7 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.UndefinedAssertionType
 import africa.absa.testing.scapi.json.Assertion
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 /**
@@ -66,13 +66,11 @@ object ResponseLog extends ResponsePerformer {
 
   /**
    * This method logs a message at the INFO level.
-   * It creates an implicit `Scribe` instance and uses its `info` method to log the message.
    *
    * @param message The message to be logged.
    */
   def logInfo(message: String): Boolean = {
-    implicit val loggingFunctions: Scribe = Scribe(this.getClass, Scribe.INFO)
-    loggingFunctions.info(message)
+    Logger.info(message)
     true
   }
 }

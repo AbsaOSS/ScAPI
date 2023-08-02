@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.config
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig._
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 import scopt.OptionParser
 
 import scala.util.{Failure, Success, Try}
@@ -47,20 +47,21 @@ case class ScAPIRunnerConfig(envPath: String = "",
                              validateOnly: Boolean = false) {
   /**
    * Method to log configuration information
-   *
-   * @param loggingFunctions The logging function
    */
-  def logConfigInfo(implicit loggingFunctions: Scribe): Unit = {
-    loggingFunctions.info("ScAPIRunner started with provided configuration:")
-    loggingFunctions.info(s"env: $envPath")
-    loggingFunctions.info(s"testRootDir: $testRootPath")
-    loggingFunctions.info(s"filter: $filter")
-    loggingFunctions.info(s"categories: $categories")
-    loggingFunctions.info(s"report: $report")
-    loggingFunctions.info(s"fileFormat: $fileFormat")
-    loggingFunctions.info(s"threadCount: $threadCount")
-    loggingFunctions.info(s"debug: $debug")
-    loggingFunctions.info(s"validate only: $validateOnly")
+  def logConfigInfo(): Unit = {
+  Logger.info(
+    s"""
+       |ScAPIRunner started with provided configuration:
+       |--env: $envPath
+       |--testRootDir: $testRootPath
+       |--filter: $filter
+       |--categories: $categories
+       |--report: $report
+       |--fileFormat: $fileFormat
+       |--threadCount: $threadCount
+       |--debug: $debug
+       |--validate only: $validateOnly
+  """.stripMargin)
   }
 }
 
