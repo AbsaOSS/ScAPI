@@ -146,7 +146,7 @@ object SuiteFactory {
       suiteFilePath,
       suiteName,
       environmentMap ++ suiteConstants.constants,
-      ScAPIJsonSchema.SUITE_BEFORE,
+      ScAPIJsonSchema.SUITE_AFTER,
       "after",
       parseToSuiteAfter
     )

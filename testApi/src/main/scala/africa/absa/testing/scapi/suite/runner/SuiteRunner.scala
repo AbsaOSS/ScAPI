@@ -41,8 +41,8 @@ object SuiteRunner {
     suiteBundles.flatMap(suiteBundle => {
       Logger.debug(s"Running Suite: ${suiteBundle.suite.endpoint}")
 
-      val resultSuiteBefore: Set[SuiteResults] = suiteBundle.suiteBefore.flatMap { suiteBefore =>
-        Some(suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment, restClientCreator) })
+      val resultSuiteBefore: Set[SuiteResults] = suiteBundle.suiteBefore.map { suiteBefore =>
+        suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment, restClientCreator) }
       }.getOrElse(Set.empty)
 
       var resultSuite: Set[SuiteResults] = Set.empty
@@ -53,8 +53,8 @@ object SuiteRunner {
         resultSuite = suiteBundle.suite.tests.map(test =>
           this.runSuiteTest(suiteBundle.suite.endpoint, test, environment, restClientCreator))
 
-        resultSuiteAfter = suiteBundle.suiteAfter.flatMap { suiteAfter =>
-          Some(suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.endpoint, suiteAfter.name, method, environment, restClientCreator) })
+        resultSuiteAfter = suiteBundle.suiteAfter.map { suiteAfter =>
+          suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.endpoint, suiteAfter.name, method, environment, restClientCreator) }
         }.getOrElse(Set.empty)
       }
 

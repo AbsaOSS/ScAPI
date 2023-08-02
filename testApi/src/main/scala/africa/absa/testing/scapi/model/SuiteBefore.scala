@@ -22,4 +22,11 @@ package africa.absa.testing.scapi.model
  * @param name The name of the before methods.
  * @param methods The set of suite before methods.
  */
-case class SuiteBefore(name: String, methods: Set[Method]) extends SuiteAround(name, methods)
+case class SuiteBefore(name: String, methods: Set[Method]) extends SuiteAround(name, methods) {
+  override def resolveReferences(references: Map[String, String]): SuiteAround = {
+    SuiteBefore(
+      name,
+      methods.map(c => c.resolveReferences(references))
+    )
+  }
+}
