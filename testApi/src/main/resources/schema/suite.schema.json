@@ -119,24 +119,15 @@
         },
         "name": {
           "type": "string"
-        },
-        "param_1": {
-          "type": "string"
-        },
-        "param_2": {
-          "type": "string"
-        },
-        "param_3": {
-          "type": "string"
-        },
-        "param_4": {
-          "type": "string"
-        },
-        "param_5": {
+        }
+      },
+      "patternProperties": {
+        "^param_[0-9]+$": {
           "type": "string"
         }
       },
       "required": [
+        "group",
         "name",
         "param_1"
       ],

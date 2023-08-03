@@ -281,7 +281,7 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
@@ -301,7 +301,7 @@ object SuiteBeforeJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteBeforeFormat: RootJsonFormat[SuiteBefore] = jsonFormat2(SuiteBefore)
 }
@@ -313,7 +313,30 @@ object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = jsonFormat7(Assertion)
+  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteAfterFormat: RootJsonFormat[SuiteAfter] = jsonFormat2(SuiteAfter)
+}
+
+/**
+ * Object that provides implicit JSON format for Assertion class.
+ */
+object AssertionJsonProtocol extends DefaultJsonProtocol {
+
+  implicit object AssertionJsonFormat extends RootJsonFormat[Assertion] {
+    def write(a: Assertion): JsObject = JsObject(
+      ("group" -> JsString(a.group)) +:
+        ("name" -> JsString(a.name)) +:
+        a.params.view.mapValues(JsString(_)).toSeq: _*
+    )
+
+    def read(value: JsValue): Assertion = {
+      value.asJsObject.getFields("group", "name") match {
+        case Seq(JsString(group), JsString(name)) =>
+          val params = value.asJsObject.fields.view.filterKeys(_.startsWith("param_")).toMap
+          Assertion(group, name, params.map { case (k, v) => k -> v.convertTo[String] })
+        case _ => throw new DeserializationException("Assertion expected")
+      }
+    }
+  }
 }

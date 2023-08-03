@@ -204,19 +204,12 @@ case class Action private(methodName: String, url: String, body: Option[String] 
  *
  * @constructor create a new Assertion with a name and value.
  * @param name the name of the assertion.
- * @param param_1 the 1st parameter of the assertion.
- * @param param_2 the 2nd parameter of the assertion.
- * @param param_3 the 3rd parameter of the assertion.
- * @param param_4 the 4th parameter of the assertion.
- * @param param_5 the 5st parameter of the assertion.
+ * @param params the map containing the parameters of the assertion. Each key-value pair in the map
+ * represents a parameter name and its corresponding value.
  */
 case class Assertion private(group: String,
                              name: String,
-                             param_1: String,
-                             param_2: Option[String] = None,
-                             param_3: Option[String] = None,
-                             param_4: Option[String] = None,
-                             param_5: Option[String] = None) extends ReferenceResolver {
+                             params: Map[String, String]) extends ReferenceResolver {
 
   /**
    * Method to resolve references.
@@ -225,11 +218,8 @@ case class Assertion private(group: String,
    * @return a new Assertion instance with resolved references.
    */
   def resolveReferences(references: Map[String, String]): Assertion = this.copy(
-    param_1 = getResolved(param_1, references),
-    param_2 = Some(getResolved(param_2.getOrElse(""), references)),
-    param_3 = Some(getResolved(param_3.getOrElse(""), references)),
-    param_4 = Some(getResolved(param_4.getOrElse(""), references)),
-    param_5 = Some(getResolved(param_5.getOrElse(""), references)))
+    params = this.params.map { case (k, v) => k -> getResolved(v, references) }
+  )
 
   /**
    * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
@@ -237,11 +227,7 @@ case class Assertion private(group: String,
    * @return A new Assertion instance with resolved references.
    */
   def resolveByRuntimeCache(): Assertion = this.copy(
-    param_1 = RuntimeCache.resolve(this.param_1),
-    param_2 = this.param_2.map(RuntimeCache.resolve),
-    param_3 = this.param_3.map(RuntimeCache.resolve),
-    param_4 = this.param_4.map(RuntimeCache.resolve),
-    param_5 = this.param_5.map(RuntimeCache.resolve)
+    params = this.params.map { case (k, v) => k -> RuntimeCache.resolve(v) }
   )
 }
 

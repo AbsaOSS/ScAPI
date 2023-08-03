@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.model
 
 /**
- * Case class that represents a suite after methods.
+ * Abstract class that represents a suite support methods.
  *
  * @param name The name of the after methods.
  * @param methods The set of suite after methods.
