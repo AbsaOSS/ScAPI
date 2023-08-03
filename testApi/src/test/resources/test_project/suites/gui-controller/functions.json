@@ -11,7 +11,7 @@
             "name": "headers",
             "value": [
               "Authorization",
-              "Bearer {{ env.bearerToken }}",
+              "Basic {{ env.basic_token }}",
               "Content-Type",
               "application/json"
             ]

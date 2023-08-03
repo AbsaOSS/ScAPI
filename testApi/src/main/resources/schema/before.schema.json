@@ -1,1 +1,144 @@
-{}
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/suiteBefore",
+
+  "definitions": {
+    "suiteBefore": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Method"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "methods"
+      ],
+      "title": "SuiteBefore"
+    },
+    "Method" : {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Header"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Action"
+          }
+        },
+        "assertions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Assertion"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "headers",
+        "actions",
+        "assertions"
+      ],
+      "title": "Method"
+    },
+    "Header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Header"
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "methodName": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "body": {
+          "type": ["string", "null"]
+        },
+        "params": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/definitions/Param"
+          }
+        }
+      },
+      "required": [
+        "methodName",
+        "url"
+      ],
+      "title": "Action"
+    },
+    "Assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "patternProperties": {
+        "^param_[0-9]+$": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "group",
+        "name",
+        "param_1"
+      ],
+      "title": "Assertion"
+    },
+    "Param": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Param"
+    }
+  }
+}

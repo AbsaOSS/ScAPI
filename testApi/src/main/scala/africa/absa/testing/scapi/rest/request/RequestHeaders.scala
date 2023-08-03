@@ -18,27 +18,46 @@ package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.UndefinedHeaderType
 import africa.absa.testing.scapi.json.Header
+import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
+/**
+ * Represents an object to manage request headers.
+ */
 object RequestHeaders {
   val CONTENT_TYPE = "content-type"
   val AUTHORIZATION = "authorization"
 
+  /**
+   * Builds a Map of headers from a given set of Header objects.
+   * Syntax validation is done here; content validation is handled elsewhere.
+   *
+   * @param headersSet A set of Header objects to be processed.
+   * @return A Map where the key is the header name (lowercase) and the value is the resolved header value.
+   */
   def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {
       (acc, header) => header.name.toLowerCase match {
-        case CONTENT_TYPE => acc + (header.name -> header.value)
-        case AUTHORIZATION => acc + (header.name -> s"${header.value}")
-        case _ => acc + (header.name -> header.value)
+        case CONTENT_TYPE => acc + (header.name -> RuntimeCache.resolve(header.value))
+        case AUTHORIZATION => acc + (header.name -> s"${RuntimeCache.resolve(header.value)}")
+        case _ => acc + (header.name -> RuntimeCache.resolve(header.value))
         // this place does solve syntax validation, content validation is solved on another place
       }
     }
   }
 
+  /**
+   * Validates the content of a given header.
+   * For 'content-type' and 'authorization', it checks if the value is not an empty string.
+   * For any other header type, it throws an UndefinedHeaderType exception.
+   *
+   * @param header The Header object to be validated.
+   * @throws UndefinedHeaderType If an undefined header type is encountered.
+   */
   def validateContent(header: Header): Unit = {
     header.name.toLowerCase match {
-      case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value)
-      case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value)
+      case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
+      case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
       case _ => throw UndefinedHeaderType(header.name)
     }
   }

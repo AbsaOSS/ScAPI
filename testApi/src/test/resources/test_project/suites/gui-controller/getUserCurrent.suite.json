@@ -7,7 +7,7 @@
       "headers" : [
         {
           "name": "authorization",
-          "value": "{{ constants.header_bearer_token }}"
+          "value": "{{ constants.header_basic_token }}"
         },
         {
           "name": "content-type",
@@ -22,8 +22,9 @@
       ],
       "assertions": [
         {
+          "group": "assert",
           "name": "status-code",
-          "value": "200"
+          "param_1": "200"
         }
       ]
     }

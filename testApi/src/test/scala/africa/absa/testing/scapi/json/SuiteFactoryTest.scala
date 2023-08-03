@@ -16,8 +16,8 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.model.{Suite, SuiteTestScenario}
 import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
 import munit.FunSuite
 import scribe.format.Formatter
@@ -66,11 +66,11 @@ class SuiteFactoryTest extends FunSuite {
   test("loadJsonSuite - constants loaded") {
     val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
     val suiteName = "getUserCurrent"
-    val properties: Map[String, String] = Map("env.bearerToken" -> "token#value")
+    val properties: Map[String, String] = Map("env.basic_token" -> "token#value")
     val expected: Map[String, String] = Map(
       "constants.header_auth" -> "Authorization",
       "constants.content_type" -> "application/json",
-      "constants.header_bearer_token" -> "Bearer token#value",
+      "constants.header_basic_token" -> "Basic token#value",
       "constants.unique-key-name-2" -> "value"
     )
 
@@ -104,21 +104,24 @@ class SuiteFactoryTest extends FunSuite {
     filterOnlyOrAll
    */
   test("filterOnlyOrAll - only used - once") {
-    val suites = Set(
-      Suite(endpoint = "endpoint1", tests = Set(
+    val suitesBundles = Set(
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
         SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
-      )),
-      Suite(endpoint = "endpoint2", tests = Set(
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
-      ))
-    )
+        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
+      ))))
 
-    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
+    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
-    assertEquals(filteredSuites.size, 1)
+    assertEquals(filteredSuiteBundles.size, 1)
 
-    val filteredSuite = filteredSuites.head
+    val filteredSuite = filteredSuiteBundles.head.suite
     assertEquals(filteredSuite.endpoint, "endpoint1")
     assertEquals(filteredSuite.tests.size, 1)
 
@@ -128,18 +131,17 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("fromFile - only used - twice") {
-    val suites = Set(
-      Suite(endpoint = "endpoint1", tests = Set(
+    val suitesBundles = Set(
+      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(false)),
         SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true))
-      )),
-      Suite(endpoint = "endpoint2", tests = Set(
+      ))),
+      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, assertions = Set.empty, only = Some(true)),
-      ))
-    )
+      ))))
 
-    val filteredSuites: Set[Suite] = SuiteFactory.filterOnlyOrAll(suites)
+    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
-    assertEquals(filteredSuites.size, 0)
+    assertEquals(filteredSuiteBundles.size, 0)
   }
 }

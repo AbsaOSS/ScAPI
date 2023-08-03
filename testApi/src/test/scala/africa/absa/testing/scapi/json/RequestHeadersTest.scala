@@ -62,7 +62,7 @@ class RequestHeadersTest extends FunSuite {
 
   test("validateContent - CONTENT_TYPE header - empty") {
     val header = Header(RequestHeaders.CONTENT_TYPE, "")
-    interceptMessage[ContentValidationFailed]("Content validation failed for '': Received string value is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'Header.content-type' is empty.") {
       RequestHeaders.validateContent(header)
     }
   }
@@ -74,7 +74,7 @@ class RequestHeadersTest extends FunSuite {
 
   test("validateContent - AUTHORIZATION header - empty") {
     val header = Header(RequestHeaders.AUTHORIZATION, "")
-    interceptMessage[ContentValidationFailed]("Content validation failed for '': Received string value is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'Header.authorization' is empty.") {
       RequestHeaders.validateContent(header)
     }
   }

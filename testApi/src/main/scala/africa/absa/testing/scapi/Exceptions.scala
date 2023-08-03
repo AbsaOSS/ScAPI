@@ -25,9 +25,8 @@ case class UndefinedConstantsInProperties(undefinedConstants: Set[String], sourc
 
 case class PropertyNotFound(property: String) extends Exception(s"Property not found: '$property'.")
 
-
-case class JsonInvalidSchema(messages: mutable.Set[ValidationMessage])
-  extends Exception("Json file not valid to defined json schema. " + messages.mkString("\n"))
+case class JsonInvalidSchema(filePath: String, messages: mutable.Set[ValidationMessage])
+  extends Exception(s"Json file '$filePath' not valid to defined json schema. " + messages.mkString("\n"))
 
 case class ProjectLoadFailed() extends Exception("Problems during project loading.")
 
@@ -40,4 +39,4 @@ case class UndefinedAssertionType(undefinedType: String)
   extends Exception(s"Undefined Assertion content type: '$undefinedType'")
 
 case class ContentValidationFailed(value: String, message: String)
-  extends Exception(s"Content validation failed for '$value': $message")
+  extends Exception(s"Content validation failed for value: '$value': $message")

@@ -61,7 +61,7 @@ case class JsonSchemaValidator(jsonPath: String, schemaPath: URL) {
     val errors = jsonSchema.validate(jsonNode)
 
     import scala.jdk.CollectionConverters._
-    if (!errors.isEmpty) throw JsonInvalidSchema(errors.asScala)
+    if (!errors.isEmpty) throw JsonInvalidSchema(jsonPath, errors.asScala)
   }
 }
 

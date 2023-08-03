@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.model
 
-import africa.absa.testing.scapi.json.{Action, Assertion, Header}
+import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
 
 /**
  * Case class that represents a suite test scenario.
@@ -33,7 +33,7 @@ case class SuiteTestScenario(name: String,
                              headers: Set[Header],
                              actions: Set[Action],
                              assertions: Set[Assertion],
-                             only: Option[Boolean] = Some(false)) {
+                             only: Option[Boolean] = Some(false)) extends Requestable {
   /**
    * Method to resolve references within the SuiteTestScenario instance.
    *

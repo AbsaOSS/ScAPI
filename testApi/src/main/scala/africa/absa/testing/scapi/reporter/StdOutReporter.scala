@@ -16,10 +16,18 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.TestResults
+import africa.absa.testing.scapi.model.SuiteResults
 
+/**
+ * A singleton object to manage the standard output reporting of test results.
+ */
 object StdOutReporter {
-  def printReport(testResults: Set[TestResults]): Unit = {
+  /**
+   * Generates and prints a report of test results to the standard output.
+   *
+   * @param testResults The set of test suite results to be reported.
+   */
+  def printReport(testResults: Set[SuiteResults]): Unit = {
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {
         case Some(text) => s"${repeatChar.toString * ((maxChars - text.length - 2) / 2)} $text ${repeatChar.toString * ((maxChars - text.length - 2) / 2)}"
@@ -28,8 +36,9 @@ object StdOutReporter {
 
     // Calculate the max lengths
     val maxSuiteLength = if (testResults.isEmpty) 10 else testResults.map(_.suiteName.length).max + 3
-    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.testName.length).max + 3
-    val maxTestCategoriesLength = if (testResults.isEmpty) 10 else math.max(testResults.map(_.categories.getOrElse("").length).max + 3, 10)
+    val maxTestLength = if (testResults.isEmpty) 10 else testResults.map(_.name.length).max + 3
+    val maxTestCategoriesLength = if (testResults.isEmpty) 10
+    else math.max(testResults.flatMap(_.categories.flatMap(c => Option(c).map(_.split(",").length))).maxOption.getOrElse(0) + 3, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
     def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
@@ -49,7 +58,7 @@ object StdOutReporter {
 
     printHeader("Simple Text Report")
 
-    val successCount = testResults.count(_.status == TestResults.Success)
+    val successCount = testResults.count(_.status == SuiteResults.Success)
     val failureCount = testResults.size - successCount
 
     println(s"Number of tests run: ${testResults.size}")
@@ -58,7 +67,7 @@ object StdOutReporter {
 
     if (testResults.nonEmpty) {
       val suiteSummary = testResults.groupBy(_.suiteName).map {
-        case (suiteName, results) => (suiteName, results.size, results.count(_.status == TestResults.Success))
+        case (suiteName, results) => (suiteName, results.size, results.count(_.status == SuiteResults.Success))
       }
 
       printInnerHeader("Suites Summary")
@@ -74,7 +83,7 @@ object StdOutReporter {
       val resultsList = testResults.toList.sortBy(_.suiteName)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.testName, duration, result.status, result.categories.getOrElse("")))
+        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.name, duration, result.status, result.categories.getOrElse("")))
 
         // Check if the index + 1 is divisible by 4 (since index is 0-based)
         if ((index + 1) % 3 == 0) printTableRowSplitter()
@@ -82,12 +91,12 @@ object StdOutReporter {
 
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
-        testResults.filter(_.status == TestResults.Failure).toList.sortBy(_.testName).foreach { result =>
+        testResults.filter(_.status == SuiteResults.Failure).toList.sortBy(_.name).foreach { result =>
           println(s"Suite: ${result.suiteName}")
-          println(s"Test: ${result.testName}")
+          println(s"Test: ${result.name}")
           println(s"Error: ${result.errMessage.getOrElse("No details available")}")
           println(s"Duration: ${result.duration.getOrElse("NA")} ms")
-          println(s"Category: ${result.categories.getOrElse("")}")
+          println(s"Category: ${result.categories}")
           println()
         }
       }

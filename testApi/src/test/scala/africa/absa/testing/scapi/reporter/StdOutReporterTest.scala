@@ -16,12 +16,56 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.TestResults
+import africa.absa.testing.scapi.model.SuiteResults
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
 
 class StdOutReporterTest extends FunSuite {
+
+  val successTestResults: Set[SuiteResults] = Set(
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 1",
+      name = "Test 1",
+      status = true,
+      duration = Some(100L),
+      categories = Some("Category 1")),
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 1",
+      name = "Test 2",
+      status = true,
+      duration = Some(200L),
+      categories = Some("Category 2")
+    ),
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 2",
+      name = "Test 1",
+      status = true,
+      duration = Some(50L),
+      categories = Some("Category 3"))
+  )
+
+  val mixedSuccessTestResults: Set[SuiteResults] = Set(
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 1",
+      name = "Test 1",
+      status = true,
+      duration = Some(100L),
+      categories = Some("Category 1")),
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 1",
+      name = "Test 2",
+      status = false,
+      duration = Some(200L),
+      categories = Some("Category 2"),
+      errMessage = Some("Error message")),
+    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      suiteName = "Suite 2",
+      name = "Test 1",
+      status = true,
+      duration = Some(50L),
+      categories = Some("Category 3"))
+  )
 
   /*
     printReport
@@ -52,16 +96,12 @@ class StdOutReporterTest extends FunSuite {
         min 2 Suites
         min 1 suites with min 2 tests
      */
-    val testResults = Set(
-      TestResults(suiteName = "Suite 1", testName = "Test 1", status = TestResults.Success, duration = Some(100L), categories = Some("Category 1")),
-      TestResults(suiteName = "Suite 1", testName = "Test 2", status = TestResults.Failure, duration = Some(200L), categories = Some("Category 2"), errMessage = Some("Error message")),
-      TestResults.withBooleanStatus(suiteName = "Suite 2", testName = "Test 1", status = true, duration = Some(50L), categories = Some("Category 3"))
-    )
+    var failedTestResults = successTestResults
 
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      StdOutReporter.printReport(testResults)
+      StdOutReporter.printReport(mixedSuccessTestResults)
     }
 
     // Get the output as a string
@@ -80,24 +120,20 @@ class StdOutReporterTest extends FunSuite {
     assertEquals(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")), true)
 
     // summary of all tests
-    assertEquals(clue(output.contains("| Suite 1    | Test 1    |           100 | Success | Category 1    |")), true)
-    assertEquals(clue(output.contains("| Suite 1    | Test 2    |           200 | Failure | Category 2    |")), true)
-    assertEquals(clue(output.contains("| Suite 2    | Test 1    |            50 | Success | Category 3    |")), true)
+    val updatedOutput = output.replace(" ", "")
+    assertEquals(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")), true)
+    assertEquals(clue(updatedOutput.contains("|Suite1|Test2|200|Failure|Category2|")), true)
+    assertEquals(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")), true)
 
     // error from detail
     assertEquals(clue(output.contains("Error: Error message")), true)
   }
-  test("results all success") {
-    val testResults = Set(
-      TestResults(suiteName = "Suite 1", testName = "Test 1", status = TestResults.Success, duration = Some(100L), categories = Some("Category 1")),
-      TestResults(suiteName = "Suite 1", testName = "Test 2", status = TestResults.Success, duration = Some(200L), categories = Some("Category 2")),
-      TestResults(suiteName = "Suite 2", testName = "Test 1", status = TestResults.Success, duration = Some(50L), categories = Some("Category 3"))
-    )
 
+  test("results all success") {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      StdOutReporter.printReport(testResults)
+      StdOutReporter.printReport(successTestResults)
     }
 
     // Get the output as a string
@@ -116,8 +152,9 @@ class StdOutReporterTest extends FunSuite {
     assertEquals(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")), true)
 
     // summary of all tests
-    assertEquals(clue(output.contains("| Suite 1    | Test 1    |           100 | Success | Category 1    |")), true)
-    assertEquals(clue(output.contains("| Suite 1    | Test 2    |           200 | Success | Category 2    |")), true)
-    assertEquals(clue(output.contains("| Suite 2    | Test 1    |            50 | Success | Category 3    |")), true)
+    val updatedOutput = output.replace(" ", "")
+    assertEquals(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")), true)
+    assertEquals(clue(updatedOutput.contains("|Suite1|Test2|200|Success|Category2|")), true)
+    assertEquals(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")), true)
   }
 }

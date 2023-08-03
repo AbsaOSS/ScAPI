@@ -22,9 +22,9 @@ object Dependencies {
   private val scoptVersion = "4.1.0"
   private val sprayJsonVersion = "1.3.6"
   private val jsonSchemaValidatorVersion = "1.0.83"
-  private val absaCommons = "1.3.4"
-  private val commonsIo = "2.13.0"
-  private val requests = "0.8.0"
+  private val absaCommonsVersion = "1.3.4"
+  private val commonsIoVersion = "2.13.0"
+  private val requestsVersion = "0.8.0"
 
   def getScalaDependency(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion
 
@@ -33,12 +33,13 @@ object Dependencies {
     "com.outr"            %% "scribe"                 % scribeVersion,
     "io.spray"            %% "spray-json"             % sprayJsonVersion,
     "com.networknt"       %  "json-schema-validator"  % jsonSchemaValidatorVersion,
-    "za.co.absa.commons"  %% "commons"                % absaCommons,
-    "commons-io"          %  "commons-io"             % commonsIo,
+    "za.co.absa.commons"  %% "commons"                % absaCommonsVersion,
+    "commons-io"          %  "commons-io"             % commonsIoVersion,
     // INFO: to used this library no imports needed. code is in root of src dir
-    "com.lihaoyi"         %% "requests"               % requests,
+    "com.lihaoyi"         %% "requests"               % requestsVersion,
 
     // test
-    "org.scalameta"       %% "munit"                  % munitVersion  % Test
+    "org.scalameta"       %% "munit"                  % munitVersion          % Test
+
   )
 }
