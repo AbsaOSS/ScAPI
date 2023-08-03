@@ -39,7 +39,11 @@ object ResponseLog extends ResponsePerformer {
    */
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
-      case INFO => ContentValidator.validateNonEmptyString(assertion.param_1, s"ResponseLog.$INFO.param_1")
+      case INFO =>
+        assertion.params.get("param_1") match {
+          case param_1 => ContentValidator.validateNonEmptyString(param_1.get, s"ResponseLog.$INFO.param_1")
+          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $INFO")
+        }
       case _ => throw UndefinedAssertionType(assertion.name)
     }
   }
@@ -55,7 +59,9 @@ object ResponseLog extends ResponsePerformer {
    */
   def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
-      case INFO => logInfo(assertion.param_1)
+      case INFO =>
+        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        logInfo(param_1)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: log]: ${assertion.name}")
     }
   }

@@ -26,30 +26,30 @@ class ResponseAssertionsTest extends FunSuite {
     validateContent
    */
   test("validateContent - valid status code string") {
-    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, param_1 = "200")
+    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "200"))
     ResponseAssertion.validateContent(assertion)
   }
 
   test("validateContent - invalid status code string") {
     intercept[ContentValidationFailed] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, param_1 = "not an integer"))
+      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "not an integer")))
     }
   }
 
   test("validateContent - body is not empty") {
-    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, param_1 = "test content")
+    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, Map("param_1" -> "test content"))
     ResponseAssertion.validateContent(assertion)
   }
 
   test("validateContent - body is empty") {
     intercept[ContentValidationFailed] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, param_1 = ""))
+      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, Map("param_1" -> "")))
     }
   }
 
   test("validateContent - unsupported assertion") {
     intercept[UndefinedAssertionType] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = "unsupported", param_1 = "value"))
+      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = "unsupported", Map("param_1" -> "value")))
     }
   }
 
@@ -57,34 +57,34 @@ class ResponseAssertionsTest extends FunSuite {
     performAssertions
    */
   test("performAssertions - status code assertion - equals") {
-    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", param_1 = "200")
+    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", Map("param_1" -> "200"))
     val response = Response(200, "Dummy Body", Map.empty)
 
     assert(ResponseAssertion.performAssertion(response, statusCodeAssertion))
   }
 
   test("performAssertions - status code assertion - not equals") {
-    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", param_1 = "200")
+    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", Map("param_1" -> "200"))
     val response = Response(500, "Dummy Body", Map.empty)
 
     assert(!ResponseAssertion.performAssertion(response, statusCodeAssertion))
   }
 
   test("performAssertions - body contains assertion") {
-    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", param_1 = "dummy")
+    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", Map("param_1" -> "dummy"))
     val response = Response(200, "This is a dummy body", Map.empty)
     assert(ResponseAssertion.performAssertion(response, bodyContainsAssertion))
   }
 
   test("performAssertions - body does not contains assertion") {
-    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", param_1 = "dummies")
+    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", Map("param_1" -> "dummies"))
     val response = Response(200, "This is a dummy body", Map.empty)
 
     assert(!ResponseAssertion.performAssertion(response, bodyContainsAssertion))
   }
 
   test("performAssertions - unsupported assertion") {
-    val unsupportedAssertion = Assertion(group = Response.GROUP_ASSERT, name = "unsupported-assertion", param_1 = "value")
+    val unsupportedAssertion = Assertion(group = Response.GROUP_ASSERT, name = "unsupported-assertion", Map("param_1" -> "value"))
     val response = Response(200, "Dummy Body", Map.empty)
 
     interceptMessage[IllegalArgumentException]("Unsupported assertion[group: assert]: unsupported-assertion") {

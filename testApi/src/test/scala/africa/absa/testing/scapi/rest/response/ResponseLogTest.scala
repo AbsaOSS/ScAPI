@@ -26,13 +26,13 @@ class ResponseLogTest extends FunSuite {
     validateContent
    */
   test("validateContent - INFO supported") {
-    val assertionInfo = Assertion(Response.GROUP_LOG, ResponseLog.INFO, "Non-empty string")
+    val assertionInfo = Assertion(Response.GROUP_LOG, ResponseLog.INFO, Map("param_1" -> "Non-empty string"))
     // no exception thrown, meaning validation passed
     ResponseLog.validateContent(assertionInfo)
   }
 
   test("validateContent - not supported validation type") {
-    val assertion = Assertion(Response.GROUP_LOG, "not_info", "Some string")
+    val assertion = Assertion(Response.GROUP_LOG, "not_info", Map("param_1" -> "Some string"))
     intercept[UndefinedAssertionType] {
       ResponseLog.validateContent(assertion)
     }
@@ -43,13 +43,13 @@ class ResponseLogTest extends FunSuite {
    */
 
   test("performAssertion - INFO supported") {
-    val assertion = Assertion(Response.GROUP_LOG, ResponseLog.INFO, "info message")
+    val assertion = Assertion(Response.GROUP_LOG, ResponseLog.INFO, Map("param_1" -> "info message"))
     val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
     assertEquals(ResponseLog.performAssertion(response, assertion), true)
   }
 
   test("performAssertion - not supported validation type") {
-    val assertion = Assertion(Response.GROUP_LOG, "not_info", "info message")
+    val assertion = Assertion(Response.GROUP_LOG, "not_info", Map("param_1" -> "info message"))
     val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
     intercept[IllegalArgumentException] {
       ResponseLog.performAssertion(response, assertion)

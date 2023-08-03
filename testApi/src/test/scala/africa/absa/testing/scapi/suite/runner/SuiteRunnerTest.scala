@@ -31,7 +31,7 @@ class SuiteRunnerTest extends FunSuite {
   val header: Header = Header(name = RequestHeaders.AUTHORIZATION, value = "Basic abcdefg")
   val action: Action = Action(methodName = "get", url = "nice url")
   val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
-  val assertion: Assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, param_1 = "200")
+  val assertion: Assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "200"))
   val method: Method = Method(name = "test", headers = Set(header), actions = Set(action), assertions = Set(assertion))
   val methodNotSupported: Method = Method(name = "test", headers = Set(header), actions = Set(actionNotSupported), assertions = Set(assertion))
 

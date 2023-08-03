@@ -54,7 +54,13 @@ object ResponseExtractJson extends ResponsePerformer {
    */
   def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
-      case STRING_FROM_LIST => stringFromList(response, assertion.param_1, assertion.param_2.get.toInt, assertion.param_3.get, assertion.param_4.get)
+      case STRING_FROM_LIST =>
+        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        val param_2 = assertion.params.get("param_2").map(_.toInt).getOrElse(throw new IllegalArgumentException("param_2 is missing"))
+        val param_3 = assertion.params.getOrElse("param_3", throw new IllegalArgumentException("param_3 is missing"))
+        val param_4 = assertion.params.getOrElse("param_4", throw new IllegalArgumentException("param_4 is missing"))
+
+        stringFromList(response, param_1, param_2, param_3, param_4)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${assertion.name}")
     }
   }
@@ -111,13 +117,17 @@ object ResponseExtractJson extends ResponsePerformer {
    * @param assertion The Assertion instance containing the assertion details.
    */
   def validateStringFromList(assertion: Assertion): Unit = {
-    ContentValidator.validateNotNone(assertion.param_2, s"ExtractJson.$STRING_FROM_LIST.param_2")
-    ContentValidator.validateNotNone(assertion.param_3, s"ExtractJson.$STRING_FROM_LIST.param_3")
+    val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+    val param_2 = assertion.params.getOrElse("param_2", throw new IllegalArgumentException("param_2 is missing"))
+    val param_3 = assertion.params.getOrElse("param_3", throw new IllegalArgumentException("param_3 is missing"))
+    val param_4 = assertion.params.getOrElse("param_4", throw new IllegalArgumentException("param_4 is missing"))
 
-    ContentValidator.validateNonEmptyString(assertion.param_1, s"ExtractJson.$STRING_FROM_LIST.param_1")
-    ContentValidator.validateNonEmptyString(assertion.param_2.get, s"ExtractJson.$STRING_FROM_LIST.param_2")
-    ContentValidator.validateNonEmptyString(assertion.param_3.get, s"ExtractJson.$STRING_FROM_LIST.param_3")
+    ContentValidator.validateNonEmptyString(param_1, s"ExtractJson.$STRING_FROM_LIST.param_1")
+    ContentValidator.validateNonEmptyString(param_2, s"ExtractJson.$STRING_FROM_LIST.param_2")
+    ContentValidator.validateNonEmptyString(param_3, s"ExtractJson.$STRING_FROM_LIST.param_3")
+    ContentValidator.validateNonEmptyString(param_4, s"ExtractJson.$STRING_FROM_LIST.param_4")
 
-    ContentValidator.validateIntegerString(assertion.param_2.get, s"ExtractJson.$STRING_FROM_LIST.param_2")
+    ContentValidator.validateIntegerString(param_2, s"ExtractJson.$STRING_FROM_LIST.param_2")
   }
+
 }

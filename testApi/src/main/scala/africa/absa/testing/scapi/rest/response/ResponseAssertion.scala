@@ -37,11 +37,20 @@ object ResponseAssertion extends ResponsePerformer {
    */
   def validateContent(assertion: Assertion): Unit = {
     assertion.name.toLowerCase match {
-      case STATUS_CODE => ContentValidator.validateIntegerString(assertion.param_1, s"ResponseAssertion.$STATUS_CODE.param_1")
-      case BODY_CONTAINS => ContentValidator.validateNonEmptyString(assertion.param_1, s"ResponseAssertion.$BODY_CONTAINS.param_1")
+      case STATUS_CODE =>
+        assertion.params.get("param_1") match {
+          case param_1 => ContentValidator.validateIntegerString(param_1.get, s"ResponseAssertion.$STATUS_CODE.param_1")
+          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $STATUS_CODE")
+        }
+      case BODY_CONTAINS =>
+        assertion.params.get("param_1") match {
+          case param_1 => ContentValidator.validateNonEmptyString(param_1.get, s"ResponseAssertion.$BODY_CONTAINS.param_1")
+          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $BODY_CONTAINS")
+        }
       case _ => throw UndefinedAssertionType(assertion.name)
     }
   }
+
 
   /**
    * Performs assertions on a response depending on the type of assertion provided.
@@ -53,8 +62,12 @@ object ResponseAssertion extends ResponsePerformer {
    */
   def performAssertion(response: Response, assertion: Assertion): Boolean = {
     assertion.name match {
-      case STATUS_CODE => assertStatusCode(response, assertion.param_1)
-      case BODY_CONTAINS => assertBodyContains(response, assertion.param_1)
+      case STATUS_CODE =>
+        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        assertStatusCode(response, param_1)
+      case BODY_CONTAINS =>
+        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        assertBodyContains(response, param_1)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: assert]: ${assertion.name}")
     }
   }
