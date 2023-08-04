@@ -18,6 +18,7 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.UndefinedAssertionType
 import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 /**
@@ -87,8 +88,9 @@ object ResponseAssertion extends ResponsePerformer {
     val iExpectedCode: Int = expectedCode.toInt
 
     val isSuccess: Boolean = response.statusCode == iExpectedCode
-    if (!isSuccess)
-      println(s"Expected $iExpectedCode, but got ${response.statusCode}") // TODO - replace by logger call in Issue #11
+    if (!isSuccess) {
+      Logger.error(s"Expected $iExpectedCode, but got ${response.statusCode}")
+    }
     isSuccess
   }
 
@@ -102,7 +104,7 @@ object ResponseAssertion extends ResponsePerformer {
   def assertBodyContains(response: Response, expectedContent: String): Boolean = {
     val isSuccess: Boolean = response.body.contains(expectedContent)
     if (!isSuccess)
-      println(s"Expected body to contain $expectedContent") // TODO - replace by logger call in Issue #11
+        Logger.error(s"Expected body to contain $expectedContent")
     isSuccess
   }
 }

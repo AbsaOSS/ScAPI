@@ -18,6 +18,7 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.UndefinedAssertionType
 import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
@@ -87,7 +88,7 @@ object ResponseExtractJson extends ResponsePerformer {
       val objects = jsonAst match {
         case JsArray(array) => array
         case _ =>
-          println("Expected a JSON array") // TODO - replace by logger call in Issue #11
+          Logger.error("Expected a JSON array")
           return false
       }
 
@@ -96,7 +97,7 @@ object ResponseExtractJson extends ResponsePerformer {
         case Seq(JsString(value)) => value
         case Seq(JsNumber(value)) => value.toString()
         case _ =>
-          println(s"Expected '$jsonKey' field not found in provided json.") // TODO - replace by logger call in Issue #11
+          Logger.error(s"Expected '$jsonKey' field not found in provided json.")
           return false
       }
 
@@ -104,7 +105,7 @@ object ResponseExtractJson extends ResponsePerformer {
       true
     } catch {
       case e: spray.json.JsonParser.ParsingException =>
-        println(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
+        Logger.error(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
         false
     }
   }

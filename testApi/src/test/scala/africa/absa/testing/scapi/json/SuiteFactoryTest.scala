@@ -16,22 +16,40 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.logging.functions.Scribe
-import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
+import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import munit.FunSuite
-import scribe.format.Formatter
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.LoggerContext
+import org.apache.logging.log4j.core.appender.OutputStreamAppender
+import org.apache.logging.log4j.core.layout.PatternLayout
+
+import java.io.ByteArrayOutputStream
 
 class SuiteFactoryTest extends FunSuite {
-  implicit val testLoggingFunctions: TestScribe = new TestScribe(SuiteFactory.getClass.toString)
 
-  class TestScribe(logOrigin: String, logLevel: String = Scribe.INFO, formatter: Option[Formatter] = None) extends Scribe(logOrigin, logLevel, formatter) {
-    var logs = List.empty[String]
+  private var ctx: LoggerContext = _
+  private var appender: OutputStreamAppender = _
+  private var out: ByteArrayOutputStream = _
 
-    override def error(message: String, t: Throwable = None.orNull): Unit = {
-      logs = message :: logs
-      super.error(message)
-    }
+  private def initTestLogger(): Unit = {
+    ctx = (LogManager.getContext(false).asInstanceOf[LoggerContext])
+    val config = ctx.getConfiguration
+    val layout = PatternLayout.createDefaultLayout(config)
+    out = new ByteArrayOutputStream()
+    appender = OutputStreamAppender.createAppender(layout, null, out, "Capturing", false, true)
+    appender.start()
+    config.addAppender(appender)
+    config.getRootLogger.addAppender(appender, null, null)
+    ctx.updateLoggers()
+  }
+
+  private def stopTestLogger(): Unit = {
+    val config = ctx.getConfiguration
+    config.getRootLogger.removeAppender("Capturing")
+    ctx.updateLoggers()
+    appender.stop()
+    out.close()
   }
 
   /*
@@ -45,13 +63,19 @@ class SuiteFactoryTest extends FunSuite {
     val environment: Environment = Environment(constants, properties)
     val testRootPath: String = getClass.getResource("/project_with_issues").getPath
 
-    val caught = intercept[ProjectLoadFailed] {
-      SuiteFactory.fromFiles(environment, testRootPath, "(.*)", "json")
-    }
+    initTestLogger()
 
-    assert(caught.isInstanceOf[ProjectLoadFailed])
-    assert(testLoggingFunctions.logs.head.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
-    assert(testLoggingFunctions.logs(1).contains("Not all suites loaded. Failed suites:"))
+    try {
+      val caught = intercept[ProjectLoadFailed] {
+        SuiteFactory.fromFiles(environment, testRootPath, "(.*)", "json")
+      }
+
+      assert(caught.isInstanceOf[ProjectLoadFailed])
+      assert(out.toString.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
+      assert(out.toString.contains("Not all suites loaded. Failed suites:"))
+    } finally {
+      stopTestLogger()
+    }
   }
 
   /*

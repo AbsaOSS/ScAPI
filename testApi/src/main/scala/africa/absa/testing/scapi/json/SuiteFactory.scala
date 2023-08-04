@@ -18,7 +18,7 @@ package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi._
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
@@ -42,8 +42,7 @@ object SuiteFactory {
    * @param format       The format of suite JSON files.
    * @return Set of Suite instances.
    */
-  def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String)
-               (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
+  def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String): Set[SuiteBundle] = {
     // NOTE: format not used as json is only supported format in time od development
 
     val suiteLoadingResults: Map[String, Try[SuiteBundle]] = {
@@ -56,7 +55,7 @@ object SuiteFactory {
     }
 
     if (suiteLoadingResults.values.forall(_.isSuccess)) {
-      loggingFunctions.info("All suites loaded.")
+      Logger.info("All suites loaded.")
       val suiteBundles: Set[SuiteBundle] = suiteLoadingResults.values.collect {
         case Success(suiteBundle) => suiteBundle
       }.toSet
@@ -68,9 +67,9 @@ object SuiteFactory {
         case (key, Failure(exception)) => (key, s"Message: ${exception.getMessage}\nStackTrace:\n${exception.getStackTrace.mkString("\n")}")
       }
 
-      loggingFunctions.error("Not all suites loaded. Failed suites:")
+      Logger.error("Not all suites loaded. Failed suites:")
       failedSuites.foreach { case (key, value) =>
-        loggingFunctions.error(s"$key => $value")
+        Logger.error(s"$key => $value")
       }
       throw ProjectLoadFailed()
     }
@@ -87,8 +86,7 @@ object SuiteFactory {
    * @param suiteBundles The set of SuiteBundles to be filtered.
    * @return A set of filtered SuiteBundles based on 'only' attribute.
    */
-  def filterOnlyOrAll(suiteBundles: Set[SuiteBundle])
-                     (implicit loggingFunctions: Scribe): Set[SuiteBundle] = {
+  def filterOnlyOrAll(suiteBundles: Set[SuiteBundle]): Set[SuiteBundle] = {
     val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[SuiteBundle], List.empty[SuiteBundle])) {
       case ((onlySuites, normalSuites), suiteBundle) =>
         val suite = suiteBundle.suite
@@ -97,7 +95,7 @@ object SuiteFactory {
           case 0 => (onlySuites, suiteBundle :: normalSuites) // No 'only' test
           case 1 => (suiteBundle.copy(suite = suite.copy(tests = onlyTests)) :: onlySuites, normalSuites) // Exactly one 'only' test
           case _ =>
-            loggingFunctions.error(s"Suite ${suite.endpoint} has more than one test marked as only.")
+            Logger.error(s"Suite ${suite.endpoint} has more than one test marked as only.")
             (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
         }
     }
@@ -107,7 +105,7 @@ object SuiteFactory {
       case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
       case _ => // More than one 'only' test across all suites is an error
         val testNames = suitesWithOnlyTest.flatMap(suiteBundle => suiteBundle.suite.tests.map(test => s"${suiteBundle.suite.endpoint}.${test.name}")).mkString(", ")
-        loggingFunctions.error(s"Detected more than one test with defined only option. Tests: $testNames")
+        Logger.error(s"Detected more than one test with defined only option. Tests: $testNames")
         Set.empty[SuiteBundle]
     }
   }
@@ -128,8 +126,7 @@ object SuiteFactory {
    * @param environmentMap The map containing environment variables.
    * @return A SuiteBundle instance.
    */
-  def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String])
-                         (implicit loggingFunctions: Scribe): SuiteBundle = {
+  def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String]): SuiteBundle = {
     val (suiteFilePath, suiteFileName) = FileUtils.splitPathAndFileName(suitePath)
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
@@ -258,8 +255,7 @@ object SuiteFactory {
    *
    * @param suiteBundles The set of SuiteBundles to be validated.
    */
-  def validateSuiteContent(suiteBundles: Set[SuiteBundle])
-                          (implicit loggingFunctions: Scribe): Unit = suiteBundles.foreach(validateSuiteContent)
+  def validateSuiteContent(suiteBundles: Set[SuiteBundle]): Unit = suiteBundles.foreach(validateSuiteContent)
 
   /**
    * This method validates the content of a SuiteBundle.
@@ -267,9 +263,8 @@ object SuiteFactory {
    *
    * @param suiteBundle The SuiteBundle to be validated.
    */
-  def validateSuiteContent(suiteBundle: SuiteBundle)
-                          (implicit loggingFunctions: Scribe): Unit = {
-    loggingFunctions.debug(s"Validation content of suite: ${suiteBundle.suite.endpoint}")
+  def validateSuiteContent(suiteBundle: SuiteBundle): Unit = {
+    Logger.debug(s"Validation content of suite: ${suiteBundle.suite.endpoint}")
     suiteBundle.suite.tests.foreach(test => {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
       RequestBody.validateContent(test.actions.head.body)

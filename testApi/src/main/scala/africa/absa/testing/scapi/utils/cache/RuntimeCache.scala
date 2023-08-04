@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.utils.cache
 
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 
 import scala.collection.mutable
 
@@ -35,14 +35,6 @@ case object TestLevel extends RuntimeCacheLevel
  */
 object RuntimeCache {
   private val cache: mutable.Map[String, (String, RuntimeCacheLevel)] = mutable.Map.empty[String, (String, RuntimeCacheLevel)]
-  private var loggingFunctions: Option[Scribe] = None
-
-  /**
-   * Initializes logging functions.
-   *
-   * @param loggingFunctions the logging object to use
-   */
-  def initLogging(loggingFunctions: Scribe): Unit = this.loggingFunctions = Some(loggingFunctions)
 
   /**
    * Stores a key-value pair with a given expiration level.
@@ -55,7 +47,7 @@ object RuntimeCache {
     if (!cache.contains(key)) {
       cache.put(key, (value, level))
     } else {
-      println(s"Error - Put already existing key into cache is not allowed. No change applied.") // TODO - replace by logger call in Issue #11
+      Logger.error(s"Error - Put already existing key into cache is not allowed. No change applied.")
     }
   }
 
@@ -139,8 +131,7 @@ object RuntimeCache {
       case "suite" => SuiteLevel
       case "test" => TestLevel
       case _ => {
-        if (loggingFunctions.nonEmpty)
-          this.loggingFunctions.get.warning(s"Not known expiration cache level: '$level'. Used default TEST level.")
+        Logger.warn(s"Not known expiration cache level: '$level'. Used default TEST level.")
         TestLevel
       }
     }

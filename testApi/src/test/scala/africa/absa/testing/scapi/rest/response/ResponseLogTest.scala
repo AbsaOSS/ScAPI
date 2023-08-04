@@ -62,6 +62,5 @@ class ResponseLogTest extends FunSuite {
 
   test("logInfo") {
     assertEquals(ResponseLog.logInfo("log message"), true)
-    // // TODO - review this test Issue #11
   }
 }

@@ -17,14 +17,14 @@
 package africa.absa.testing.scapi.suite.runner
 
 import africa.absa.testing.scapi.json.{Action, Assertion, Environment, Header}
-import africa.absa.testing.scapi.logging.LoggerConfig
-import africa.absa.testing.scapi.logging.functions.Scribe
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
 import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertion}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
+import org.apache.logging.log4j.Level
 
 class SuiteRunnerTest extends FunSuite {
 
@@ -91,10 +91,7 @@ class SuiteRunnerTest extends FunSuite {
   override def beforeEach(context: BeforeEach): Unit = {
     RuntimeCache.reset()
 
-    LoggerConfig.logLevel = Scribe.DEBUG
-    implicit val loggingFunctions: Scribe = Scribe(this.getClass, LoggerConfig.logLevel)
-
-    RuntimeCache.initLogging(loggingFunctions)
+    Logger.setLevel(Level.DEBUG)
 
     super.beforeEach(context) // important to call this
   }
