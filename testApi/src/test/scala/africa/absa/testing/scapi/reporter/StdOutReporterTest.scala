@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream
 
 class StdOutReporterTest extends FunSuite {
 
-  val successTestResults: Set[SuiteResults] = Set(
+  val successTestResults: List[SuiteResults] = List(
     SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
       suiteName = "Suite 1",
       name = "Test 1",
@@ -45,7 +45,7 @@ class StdOutReporterTest extends FunSuite {
       categories = Some("Category 3"))
   )
 
-  val mixedSuccessTestResults: Set[SuiteResults] = Set(
+  val mixedSuccessTestResults: List[SuiteResults] = List(
     SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
       suiteName = "Suite 1",
       name = "Test 1",
@@ -74,7 +74,7 @@ class StdOutReporterTest extends FunSuite {
     val baos = new ByteArrayOutputStream()
 
     Console.withOut(baos) {
-      StdOutReporter.printReport(Set.empty)
+      StdOutReporter.printReport(List.empty)
     }
 
     // Get the output as a string

@@ -27,7 +27,7 @@ object StdOutReporter {
    *
    * @param testResults The set of test suite results to be reported.
    */
-  def printReport(testResults: Set[SuiteResults]): Unit = {
+  def printReport(testResults: List[SuiteResults]): Unit = {
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {
         case Some(text) => s"${repeatChar.toString * ((maxChars - text.length - 2) / 2)} $text ${repeatChar.toString * ((maxChars - text.length - 2) / 2)}"
@@ -58,16 +58,19 @@ object StdOutReporter {
 
     printHeader("Simple Text Report")
 
-    val successCount = testResults.count(_.status == SuiteResults.Success)
-    val failureCount = testResults.size - successCount
+    val successCount = testResults.count(r => r.status == SuiteResults.Success && r.resultType == SuiteResults.RESULT_TYPE_TEST)
+    val failureCount = testResults.count(r => r.status == SuiteResults.Failure && r.resultType == SuiteResults.RESULT_TYPE_TEST)
 
-    println(s"Number of tests run: ${testResults.size}")
+    println(s"Number of tests run: ${successCount + failureCount}")
     println(s"Number of successful tests: $successCount")
     println(s"Number of failed tests: $failureCount")
 
     if (testResults.nonEmpty) {
-      val suiteSummary = testResults.groupBy(_.suiteName).map {
-        case (suiteName, results) => (suiteName, results.size, results.count(_.status == SuiteResults.Success))
+      val suiteSummary = testResults
+        .filter(_.resultType == SuiteResults.RESULT_TYPE_TEST)
+        .groupBy(_.suiteName).map {
+          case (suiteName, results) =>
+            (suiteName, results.size, results.count(_.status == SuiteResults.Success))
       }
 
       printInnerHeader("Suites Summary")
@@ -80,7 +83,7 @@ object StdOutReporter {
       printTableRowSplitter()
       println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
-      val resultsList = testResults.toList.sortBy(_.suiteName)
+      val resultsList = testResults.filter(_.resultType == SuiteResults.RESULT_TYPE_TEST)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
         println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(result.suiteName, result.name, duration, result.status, result.categories.getOrElse("")))
@@ -91,7 +94,7 @@ object StdOutReporter {
 
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
-        testResults.filter(_.status == SuiteResults.Failure).toList.sortBy(_.name).foreach { result =>
+        testResults.filter(_.status == SuiteResults.Failure).sortBy(_.name).foreach { result =>
           println(s"Suite: ${result.suiteName}")
           println(s"Test: ${result.name}")
           println(s"Error: ${result.errMessage.getOrElse("No details available")}")

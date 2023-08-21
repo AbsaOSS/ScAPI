@@ -101,7 +101,7 @@ class SuiteRunnerTest extends FunSuite {
    */
 
   test("runSuite - SuiteBefore exists") {
-    val suiteResults: Set[SuiteResults] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
+    val suiteResults: List[SuiteResults] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: SuiteResults = suiteResults.find(result =>
       result.resultType == SuiteResults.RESULT_TYPE_BEFORE_METHOD && result.suiteName == "endpoint2").get
@@ -112,7 +112,7 @@ class SuiteRunnerTest extends FunSuite {
   }
 
   test("runSuite - SuiteBefore empty") {
-    val suiteResults: Set[SuiteResults] = SuiteRunner.runSuites(suitesBundleNoBefore, environment, () => new RestClient(FakeScAPIRequestSender))
+    val suiteResults: List[SuiteResults] = SuiteRunner.runSuites(suitesBundleNoBefore, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: Option[SuiteResults] = suiteResults.find(result =>
       result.resultType == SuiteResults.RESULT_TYPE_BEFORE_METHOD && result.suiteName == "endpoint2")
@@ -122,7 +122,7 @@ class SuiteRunnerTest extends FunSuite {
   }
 
   test("runSuite - SuiteAfter exists") {
-    val suiteResults: Set[SuiteResults] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
+    val suiteResults: List[SuiteResults] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResults = suiteResults.find(result =>
       result.resultType == SuiteResults.RESULT_TYPE_AFTER_METHOD && result.suiteName == "endpoint2").get
@@ -133,7 +133,7 @@ class SuiteRunnerTest extends FunSuite {
   }
 
   test("runSuite - SuiteAfter empty") {
-    val suiteResults: Set[SuiteResults] = SuiteRunner.runSuites(suitesBundleNoAfter, environment, () => new RestClient(FakeScAPIRequestSender))
+    val suiteResults: List[SuiteResults] = SuiteRunner.runSuites(suitesBundleNoAfter, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: Option[SuiteResults] = suiteResults.find(result =>
       result.resultType == SuiteResults.RESULT_TYPE_AFTER_METHOD && result.suiteName == "endpoint2")
@@ -143,7 +143,7 @@ class SuiteRunnerTest extends FunSuite {
   }
 
   test("runSuite - SuiteAfter empty methods") {
-    val suiteResults: Set[SuiteResults] = SuiteRunner.runSuites(suitesBundleAfterMethodNotSupported, environment, () => new RestClient(FakeScAPIRequestSender))
+    val suiteResults: List[SuiteResults] = SuiteRunner.runSuites(suitesBundleAfterMethodNotSupported, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResults = suiteResults.find(result =>
       result.resultType == SuiteResults.RESULT_TYPE_AFTER_METHOD && result.suiteName == "endpoint2").get

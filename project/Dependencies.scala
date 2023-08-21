@@ -42,7 +42,7 @@ object Dependencies {
     "org.apache.logging.log4j"  % "log4j-api"               % loggerVersion,
 
     // test
-    "org.scalameta"       %% "munit"                  % munitVersion          % Test
+    "org.scalameta"             %% "munit"                  % munitVersion          % Test
 
   )
 }
