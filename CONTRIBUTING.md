@@ -24,7 +24,7 @@
   * Commit messages should start with a reference to the GitHub Issue and provide a brief description in the imperative mood:
     * **"#42 Answer the ultimate question"**
   * Don't forget to write tests for your work.
-* After finishing everything, push to your forked repo and open a Pull Request to our `develop` branch:
+* After finishing everything, push to your forked repo and open a Pull Request to our `master` branch:
   * Pull Request titles should start with the Github Issue number:
     * **"42 Life, the universe and everything"**
   * Ensure the Pull Request description clearly describes the solution.
