@@ -23,8 +23,8 @@ import munit.FunSuite
 
 class ResponseExtractTest extends FunSuite {
 
-  val assertionStringFromList: ResponseAction = ResponseAction(method = s"${Response.GROUP_EXTRACT_JSON}.${ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "question_id", "param_2" -> "1", "param_3" -> "id", "param_4" -> "suite"))
-  val assertionUnsupported: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.Unsupported", Map("param_1" -> "key", "param_2" -> "200", "param_3" -> "jsonKey", "param_4" -> "Test"))
+  val assertionStringFromList: ResponseAction = ResponseAction(method = s"${Response.GROUP_EXTRACT_JSON}.${ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "question_id", "listIndex" -> "1", "jsonKey" -> "id", "cacheLevel" -> "suite"))
+  val assertionUnsupported: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.Unsupported", Map("cacheKey" -> "key", "listIndex" -> "200", "jsonKey" -> "jsonKey", "cacheLevel" -> "Test"))
 
   val responseWithID: Response = Response(
     200,
@@ -121,48 +121,48 @@ class ResponseExtractTest extends FunSuite {
   // positive test "stringFromList - correct parameters" - tested during "validateContent - STRING_FROM_LIST"
 
   test("validateStringFromList - None parameters") {
-    val assertion1None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> "", "param_3" -> ""))
-    val assertion2None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> ""))
-    val assertion3None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> ""))
+    val assertion1None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> ""))
+    val assertion2None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> ""))
+    val assertion3None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> ""))
     val assertion4None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map())
 
-    interceptMessage[IllegalArgumentException]("param_1 is missing") {
+    interceptMessage[IllegalArgumentException]("Missing required 'cacheKey' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion4None)
     }
-    interceptMessage[IllegalArgumentException]("param_2 is missing") {
+    interceptMessage[IllegalArgumentException]("Missing required 'listIndex' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion3None)
     }
-    interceptMessage[IllegalArgumentException]("param_3 is missing") {
+    interceptMessage[IllegalArgumentException]("Missing required 'jsonKey' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion2None)
     }
-    interceptMessage[IllegalArgumentException]("param_4 is missing") {
+    interceptMessage[IllegalArgumentException]("Missing required 'cacheLevel' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion1None)
     }
   }
 
   test("validateStringFromList - empty parameters") {
-    val assertionParam1: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
-    val assertionParam2: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
-    val assertionParam3: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "", "param_4" -> ""))
-    val assertionParam4: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "y", "param_4" -> ""))
+    val assertionParam1: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam2: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam3: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam4: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> ""))
 
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.param_1' is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheKey' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam1)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.param_2' is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.listIndex' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam2)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.param_3' is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.jsonKey' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam3)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.param_4' is empty.") {
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheLevel' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam4)
     }
   }
 
   test("validateStringFromList - not integer in string") {
-    val assertion: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "key", "param_2" -> "x", "param_3" -> "y", "param_4" -> "y"))
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: 'x': Received value of 'ExtractJson.string-from-list.param_2' cannot be parsed to an integer: For input string: \"x\"") {
+    val assertion: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "key", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> "y"))
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: 'x': Received value of 'ExtractJson.string-from-list.listIndex' cannot be parsed to an integer: For input string: \"x\"") {
       ExtractJsonResponseAction.validateStringFromList(assertion)
     }
 

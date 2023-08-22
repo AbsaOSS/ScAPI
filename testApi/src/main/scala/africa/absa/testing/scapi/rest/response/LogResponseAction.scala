@@ -56,8 +56,8 @@ object LogResponseAction extends ResponsePerformer {
   def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
     responseAction.name match {
       case INFO =>
-        val body = responseAction.params("body")
-        logInfo(body)
+        val message = responseAction.params("message")
+        logInfo(message)
       case _ => throw new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}")
     }
   }
