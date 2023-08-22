@@ -109,13 +109,12 @@
         }
       },
       "patternProperties": {
-        "^param_[0-9]+$": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
           "type": "string"
         }
       },
       "required": [
-        "method",
-        "param_1"
+        "method"
       ],
       "title": "ResponseAction"
     },

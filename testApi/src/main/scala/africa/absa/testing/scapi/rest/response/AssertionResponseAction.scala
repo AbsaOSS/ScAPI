@@ -39,22 +39,21 @@ object AssertionResponseAction extends ResponsePerformer {
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
       case STATUS_CODE =>
-        responseAction.params.get("param_1") match {
-          case param_1 => ContentValidator.validateIntegerString(param_1.get, s"ResponseAssertion.$STATUS_CODE.param_1")
-          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $STATUS_CODE")
+        responseAction.params.get("code") match {
+          case code => ContentValidator.validateIntegerString(code.get, s"ResponseAssertion.$STATUS_CODE.code")
+          case None => throw new IllegalArgumentException(s"Missing required 'code' parameter for assertion $STATUS_CODE logic.")
         }
       case BODY_CONTAINS =>
-        responseAction.params.get("param_1") match {
-          case param_1 => ContentValidator.validateNonEmptyString(param_1.get, s"ResponseAssertion.$BODY_CONTAINS.param_1")
-          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $BODY_CONTAINS")
+        responseAction.params.get("body") match {
+          case body => ContentValidator.validateNonEmptyString(body.get, s"ResponseAssertion.$BODY_CONTAINS.body")
+          case None => throw new IllegalArgumentException(s"Missing required 'body' parameter for assertion $BODY_CONTAINS logic.")
         }
       case _ => throw UndefinedResponseActionType(responseAction.name)
     }
   }
 
-
   /**
-   * Performs assertion actions on a response depending on the type of assertion action provided.
+   * Performs assertion actions on a response depending on the type of assertion method provided.
    *
    * @param response  The response to perform the assertions on.
    * @param responseAction The assertion response action to perform on the response.
@@ -64,12 +63,12 @@ object AssertionResponseAction extends ResponsePerformer {
   def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
     responseAction.name match {
       case STATUS_CODE =>
-        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
-        assertStatusCode(response, param_1)
+        val code = responseAction.params("code")
+        assertStatusCode(response, code)
       case BODY_CONTAINS =>
-        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
-        assertBodyContains(response, param_1)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: assert]: ${responseAction.name}")
+        val body = responseAction.params("body")
+        assertBodyContains(response, body)
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion method [group: assert]: ${responseAction.name}")
     }
   }
 
