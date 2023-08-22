@@ -16,53 +16,53 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedAssertionType
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
 
 /**
- * ResponseExtractJson is an object that extends ResponsePerformer.
+ * ExtractJsonResponseAction is an object that extends ResponsePerformer.
  * It is designed to extract specific data from a JSON response and perform validations.
  */
-object ResponseExtractJson extends ResponsePerformer {
+object ExtractJsonResponseAction extends ResponsePerformer {
 
   val STRING_FROM_LIST = "string-from-list"
 
   /**
-   * This method validates the assertion's content based on the assertion's name.
-   * It supports the STRING_FROM_LIST type of assertion.
+   * This method validates the response action's content based on the response action's name.
+   * It supports the STRING_FROM_LIST type of response action.
    *
-   * @param assertion The Assertion instance to be validated.
-   * @throws UndefinedAssertionType if an unsupported assertion type is encountered.
+   * @param responseAction The ResponseAction instance to be validated.
+   * @throws UndefinedResponseActionType if an unsupported assertion type is encountered.
    */
-  def validateContent(assertion: Assertion): Unit = {
-    assertion.name.toLowerCase match {
-      case STRING_FROM_LIST => validateStringFromList(assertion)
-      case _ => throw UndefinedAssertionType(assertion.name)
+  def validateContent(responseAction: ResponseAction): Unit = {
+    responseAction.name.toLowerCase match {
+      case STRING_FROM_LIST => validateStringFromList(responseAction)
+      case _ => throw UndefinedResponseActionType(responseAction.name)
     }
   }
 
   /**
-   * This method performs assertions on a given response based on the assertion's name.
-   * It supports the STRING_FROM_LIST type of assertion.
+   * This method performs response actions on a given response based on the response action's name.
+   * It supports the STRING_FROM_LIST type of response action.
    *
-   * @param response  The Response instance to perform assertions on.
-   * @param assertion The Assertion instance containing the assertion details.
-   * @throws IllegalArgumentException if an unsupported assertion group is encountered.
+   * @param response  The Response instance to perform response action on.
+   * @param responseAction The ResponseAction instance containing the response action details.
+   * @throws IllegalArgumentException if an unsupported response action name is encountered.
    */
-  def performAssertion(response: Response, assertion: Assertion): Boolean = {
-    assertion.name match {
+  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
+    responseAction.name match {
       case STRING_FROM_LIST =>
-        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
-        val param_2 = assertion.params.get("param_2").map(_.toInt).getOrElse(throw new IllegalArgumentException("param_2 is missing"))
-        val param_3 = assertion.params.getOrElse("param_3", throw new IllegalArgumentException("param_3 is missing"))
-        val param_4 = assertion.params.getOrElse("param_4", throw new IllegalArgumentException("param_4 is missing"))
+        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        val param_2 = responseAction.params.get("param_2").map(_.toInt).getOrElse(throw new IllegalArgumentException("param_2 is missing"))
+        val param_3 = responseAction.params.getOrElse("param_3", throw new IllegalArgumentException("param_3 is missing"))
+        val param_4 = responseAction.params.getOrElse("param_4", throw new IllegalArgumentException("param_4 is missing"))
 
         stringFromList(response, param_1, param_2, param_3, param_4)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${assertion.name}")
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
     }
   }
 
@@ -111,13 +111,13 @@ object ResponseExtractJson extends ResponsePerformer {
   }
 
   /**
-   * This method validates the parameters of the STRING_FROM_LIST type of assertion.
+   * This method validates the parameters of the STRING_FROM_LIST type of response action.
    * It ensures none of the required parameters are None and validates that they are non-empty strings.
    * Additionally, it ensures param_2 is a valid integer.
    *
-   * @param assertion The Assertion instance containing the assertion details.
+   * @param assertion The ResponseAction instance containing the response action details.
    */
-  def validateStringFromList(assertion: Assertion): Unit = {
+  def validateStringFromList(assertion: ResponseAction): Unit = {
     val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
     val param_2 = assertion.params.getOrElse("param_2", throw new IllegalArgumentException("param_2 is missing"))
     val param_3 = assertion.params.getOrElse("param_3", throw new IllegalArgumentException("param_3 is missing"))

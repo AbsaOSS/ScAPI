@@ -20,7 +20,7 @@
           "url": "{{ env.url }}/path/question"
         }
       ],
-      "assertions": [
+      "responseActions": [
         {
           "group": "assert",
           "name": "status-code",

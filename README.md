@@ -1,7 +1,7 @@
 # ScAPI
 
 ### How to run api tests
-TBD - work in progress
+TODO - work in progress
 
 ### How to run unit tests
 Run unit tests from path `{project-root}`

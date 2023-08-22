@@ -35,8 +35,8 @@ case class SuiteLoadFailed(detail: String) extends Exception(s"Problems during p
 case class UndefinedHeaderType(undefinedType: String)
   extends Exception(s"Undefined Header content type: '$undefinedType'")
 
-case class UndefinedAssertionType(undefinedType: String)
-  extends Exception(s"Undefined Assertion content type: '$undefinedType'")
+case class UndefinedResponseActionType(undefinedType: String)
+  extends Exception(s"Undefined response action content type: '$undefinedType'")
 
 case class ContentValidationFailed(value: String, message: String)
   extends Exception(s"Content validation failed for value: '$value': $message")

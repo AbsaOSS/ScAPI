@@ -27,7 +27,7 @@
           ]
         }
       ],
-      "assertions": [
+      "responseActions": [
         {
           "group": "assert",
           "name": "status-code",

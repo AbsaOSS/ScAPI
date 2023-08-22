@@ -20,7 +20,7 @@
           "url": "{{ env.url }}/GUI/user"
         }
       ],
-      "assertions": [
+      "responseActions": [
         {
           "group": "assert",
           "name": "status-code",

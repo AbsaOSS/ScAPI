@@ -16,60 +16,60 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedAssertionType
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 /**
- * Object that validates and performs various assertions on the response received.
+ * Object that validates and performs various assertion response actions on the response received.
  * It extends the functionality of ResponsePerformer.
  */
-object ResponseAssertion extends ResponsePerformer {
+object AssertionResponseAction extends ResponsePerformer {
 
   val STATUS_CODE = "status-code"
   val BODY_CONTAINS = "body-contains"
 
   /**
-   * Validates the content of an assertion object depending on its type.
+   * Validates the content of an assertion response action object depending on its type.
    *
-   * @param assertion The assertion object to be validated.
-   * @throws UndefinedAssertionType If the assertion type is not recognized.
+   * @param responseAction The response action object to be validated.
+   * @throws UndefinedResponseActionType If the response action type is not recognized.
    */
-  def validateContent(assertion: Assertion): Unit = {
-    assertion.name.toLowerCase match {
+  def validateContent(responseAction: ResponseAction): Unit = {
+    responseAction.name.toLowerCase match {
       case STATUS_CODE =>
-        assertion.params.get("param_1") match {
+        responseAction.params.get("param_1") match {
           case param_1 => ContentValidator.validateIntegerString(param_1.get, s"ResponseAssertion.$STATUS_CODE.param_1")
           case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $STATUS_CODE")
         }
       case BODY_CONTAINS =>
-        assertion.params.get("param_1") match {
+        responseAction.params.get("param_1") match {
           case param_1 => ContentValidator.validateNonEmptyString(param_1.get, s"ResponseAssertion.$BODY_CONTAINS.param_1")
           case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $BODY_CONTAINS")
         }
-      case _ => throw UndefinedAssertionType(assertion.name)
+      case _ => throw UndefinedResponseActionType(responseAction.name)
     }
   }
 
 
   /**
-   * Performs assertions on a response depending on the type of assertion provided.
+   * Performs assertion actions on a response depending on the type of assertion action provided.
    *
    * @param response  The response to perform the assertions on.
-   * @param assertion The assertion to perform on the response.
+   * @param responseAction The assertion response action to perform on the response.
    * @return Boolean value indicating whether the assertion passed or failed.
    * @throws IllegalArgumentException If the assertion type is not supported.
    */
-  def performAssertion(response: Response, assertion: Assertion): Boolean = {
-    assertion.name match {
+  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
+    responseAction.name match {
       case STATUS_CODE =>
-        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
         assertStatusCode(response, param_1)
       case BODY_CONTAINS =>
-        val param_1 = assertion.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
+        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
         assertBodyContains(response, param_1)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: assert]: ${assertion.name}")
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: assert]: ${responseAction.name}")
     }
   }
 

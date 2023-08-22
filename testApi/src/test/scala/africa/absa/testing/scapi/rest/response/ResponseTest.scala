@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.json.ResponseAction
 import munit.FunSuite
 
 class ResponseTest extends FunSuite {
@@ -26,7 +26,7 @@ class ResponseTest extends FunSuite {
    */
 
   test("validate - unsupported group") {
-    val unsupportedAssertion = Assertion("unsupportedGroup", "not needed", Map("param 1" -> ""))
+    val unsupportedAssertion = ResponseAction("unsupportedGroup", "not needed", Map("param 1" -> ""))
 
     intercept[IllegalArgumentException] {
       Response.validate(unsupportedAssertion)
@@ -38,7 +38,7 @@ class ResponseTest extends FunSuite {
    */
 
   test("perform - unsupported group") {
-    val unsupportedAssertion = Assertion("unsupportedGroup", "not needed", Map("param 1" -> ""))
+    val unsupportedAssertion = ResponseAction("unsupportedGroup", "not needed", Map("param 1" -> ""))
     val response = Response(200, "OK", Map.empty)
 
     intercept[IllegalArgumentException] {

@@ -23,5 +23,5 @@ trait Requestable {
 
   def actions: Set[Action]
 
-  def assertions: Set[Assertion]
+  def responseActions: Set[ResponseAction]
 }

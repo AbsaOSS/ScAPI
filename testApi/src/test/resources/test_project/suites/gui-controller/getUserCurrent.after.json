@@ -19,7 +19,7 @@
           "url": "{{ env.url }}/AULGUI/user"
         }
       ],
-      "assertions": [
+      "responseActions": [
         {
           "group": "assert",
           "name": "statusCode",

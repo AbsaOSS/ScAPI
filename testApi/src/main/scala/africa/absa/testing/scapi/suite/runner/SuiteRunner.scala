@@ -87,7 +87,7 @@ object SuiteRunner {
       val response: Response = sendRequest(method, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
-        assertions = method.assertions
+        responseAction = method.responseActions
       )
 
       val testEndTime: Long = System.currentTimeMillis()
@@ -120,7 +120,7 @@ object SuiteRunner {
       val response: Response = sendRequest(test, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
-        assertions = test.assertions
+        responseAction = test.responseActions
       )
 
       val testEndTime: Long = System.currentTimeMillis()
@@ -158,7 +158,7 @@ object SuiteRunner {
       val response: Response = sendRequest(method, environment, restClientCreator)
       val isSuccess: Boolean = Response.perform(
         response = response,
-        assertions = method.assertions
+        responseAction = method.responseActions
       )
 
       val testEndTime: Long = System.currentTimeMillis()

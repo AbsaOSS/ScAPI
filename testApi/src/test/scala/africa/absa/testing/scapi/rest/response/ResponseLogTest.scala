@@ -16,8 +16,8 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedAssertionType
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.json.ResponseAction
 import munit.FunSuite
 
 class ResponseLogTest extends FunSuite {
@@ -26,33 +26,33 @@ class ResponseLogTest extends FunSuite {
     validateContent
    */
   test("validateContent - INFO supported") {
-    val assertionInfo = Assertion(Response.GROUP_LOG, ResponseLog.INFO, Map("param_1" -> "Non-empty string"))
+    val responseActionInfo = ResponseAction(Response.GROUP_LOG, LogResponseAction.INFO, Map("param_1" -> "Non-empty string"))
     // no exception thrown, meaning validation passed
-    ResponseLog.validateContent(assertionInfo)
+    LogResponseAction.validateContent(responseActionInfo)
   }
 
   test("validateContent - not supported validation type") {
-    val assertion = Assertion(Response.GROUP_LOG, "not_info", Map("param_1" -> "Some string"))
-    intercept[UndefinedAssertionType] {
-      ResponseLog.validateContent(assertion)
+    val responseAction = ResponseAction(Response.GROUP_LOG, "not_info", Map("param_1" -> "Some string"))
+    intercept[UndefinedResponseActionType] {
+      LogResponseAction.validateContent(responseAction)
     }
   }
 
   /*
-    performAssertion
+    performResponseAction
    */
 
   test("performAssertion - INFO supported") {
-    val assertion = Assertion(Response.GROUP_LOG, ResponseLog.INFO, Map("param_1" -> "info message"))
+    val assertion = ResponseAction(Response.GROUP_LOG, LogResponseAction.INFO, Map("param_1" -> "info message"))
     val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
-    assertEquals(ResponseLog.performAssertion(response, assertion), true)
+    assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
   }
 
   test("performAssertion - not supported validation type") {
-    val assertion = Assertion(Response.GROUP_LOG, "not_info", Map("param_1" -> "info message"))
+    val assertion = ResponseAction(Response.GROUP_LOG, "not_info", Map("param_1" -> "info message"))
     val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
     intercept[IllegalArgumentException] {
-      ResponseLog.performAssertion(response, assertion)
+      LogResponseAction.performResponseAction(response, assertion)
     }
   }
 
@@ -61,6 +61,6 @@ class ResponseLogTest extends FunSuite {
    */
 
   test("logInfo") {
-    assertEquals(ResponseLog.logInfo("log message"), true)
+    assertEquals(LogResponseAction.logInfo("log message"), true)
   }
 }

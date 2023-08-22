@@ -16,12 +16,12 @@
 
 package africa.absa.testing.scapi.suite.runner
 
-import africa.absa.testing.scapi.json.{Action, Assertion, Environment, Header}
+import africa.absa.testing.scapi.json.{Action, Environment, Header, ResponseAction}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
-import africa.absa.testing.scapi.rest.response.{Response, ResponseAssertion}
+import africa.absa.testing.scapi.rest.response.{AssertionResponseAction, Response}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 import org.apache.logging.log4j.Level
@@ -31,22 +31,22 @@ class SuiteRunnerTest extends FunSuite {
   val header: Header = Header(name = RequestHeaders.AUTHORIZATION, value = "Basic abcdefg")
   val action: Action = Action(methodName = "get", url = "nice url")
   val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
-  val assertion: Assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "200"))
-  val method: Method = Method(name = "test", headers = Set(header), actions = Set(action), assertions = Set(assertion))
-  val methodNotSupported: Method = Method(name = "test", headers = Set(header), actions = Set(actionNotSupported), assertions = Set(assertion))
+  val assertion: ResponseAction = ResponseAction(group = Response.GROUP_ASSERT, name = AssertionResponseAction.STATUS_CODE, Map("param_1" -> "200"))
+  val method: Method = Method(name = "test", headers = Set(header), actions = Set(action), responseActions = Set(assertion))
+  val methodNotSupported: Method = Method(name = "test", headers = Set(header), actions = Set(actionNotSupported), responseActions = Set(assertion))
 
   val suitesBundles: Set[SuiteBundle] = Set(
     SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
       SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-        headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(true)),
+        headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(true)),
       SuiteTestScenario(name = "test2", categories = Set("SMOKE"),
-        headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(true))
+        headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(true))
     ))),
     SuiteBundle(
       suiteBefore = Some(SuiteBefore(name = "suiteBefore", methods = Set(method))),
       suite = Suite(endpoint = "endpoint2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(false)),
+          headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(method))),
     ))
@@ -55,7 +55,7 @@ class SuiteRunnerTest extends FunSuite {
     SuiteBundle(
       suite = Suite(endpoint = "endpoint2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(false)),
+          headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(method))),
     ))
@@ -64,7 +64,7 @@ class SuiteRunnerTest extends FunSuite {
     SuiteBundle(
       suite = Suite(endpoint = "endpoint2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(false)),
+          headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(methodNotSupported))),
     ))
@@ -74,7 +74,7 @@ class SuiteRunnerTest extends FunSuite {
       suiteBefore = Some(SuiteBefore(name = "suiteBefore", methods = Set(method))),
       suite = Suite(endpoint = "endpoint2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), assertions = Set(assertion), only = Some(false)),
+          headers = Set(header), actions = Set(action), responseActions = Set(assertion), only = Some(false)),
     ))))
 
   val constants: Map[String, String] = Map(

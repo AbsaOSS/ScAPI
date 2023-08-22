@@ -42,10 +42,10 @@
             "$ref": "#/definitions/Action"
           }
         },
-        "assertions": {
+        "responseActions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Assertion"
+            "$ref": "#/definitions/ResponseAction"
           }
         }
       },
@@ -53,7 +53,7 @@
         "name",
         "headers",
         "actions",
-        "assertions"
+        "responseActions"
       ],
       "title": "Method"
     },
@@ -100,7 +100,7 @@
       ],
       "title": "Action"
     },
-    "Assertion": {
+    "ResponseAction": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -121,7 +121,7 @@
         "name",
         "param_1"
       ],
-      "title": "Assertion"
+      "title": "ResponseAction"
     },
     "Param": {
       "type": "object",
