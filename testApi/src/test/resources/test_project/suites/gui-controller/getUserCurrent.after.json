@@ -21,8 +21,7 @@
       ],
       "responseActions": [
         {
-          "group": "assert",
-          "name": "statusCode",
+          "method": "assert.statusCode",
           "param_1": "200"
         }
       ]

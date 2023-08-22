@@ -325,16 +325,15 @@ object ResponseActionJsonProtocol extends DefaultJsonProtocol {
 
   implicit object ResponseActionJsonFormat extends RootJsonFormat[ResponseAction] {
     def write(a: ResponseAction): JsObject = JsObject(
-      ("group" -> JsString(a.group)) +:
-        ("name" -> JsString(a.name)) +:
+      ("method" -> JsString(a.method)) +:
         a.params.view.mapValues(JsString(_)).toSeq: _*
     )
 
     def read(value: JsValue): ResponseAction = {
-      value.asJsObject.getFields("group", "name") match {
-        case Seq(JsString(group), JsString(name)) =>
+      value.asJsObject.getFields("method") match {
+        case Seq(JsString(method)) =>
           val params = value.asJsObject.fields.view.filterKeys(_.startsWith("param_")).toMap
-          ResponseAction(group, name, params.map { case (k, v) => k -> v.convertTo[String] })
+          ResponseAction(method, params.map { case (k, v) => k -> v.convertTo[String] })
         case _ => throw DeserializationException("Assertion expected")
       }
     }

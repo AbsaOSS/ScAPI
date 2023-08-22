@@ -203,13 +203,17 @@ case class Action private(methodName: String, url: String, body: Option[String] 
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
  * @constructor create a new ResponseAction with a name and value.
- * @param name the name of the response action.
+ * @param method the "group and name" of the response action.
  * @param params the map containing the parameters of the response action. Each key-value pair in the map
  * represents a parameter name and its corresponding value.
  */
-case class ResponseAction private(group: String,
-                                  name: String,
+case class ResponseAction private(method: String,
                                   params: Map[String, String]) extends ReferenceResolver {
+
+  private def splitter: Seq[String] = method.split("\\.").toSeq
+
+  def group : String = splitter.head
+  def name : String = splitter.tail.head
 
   /**
    * Method to resolve references.

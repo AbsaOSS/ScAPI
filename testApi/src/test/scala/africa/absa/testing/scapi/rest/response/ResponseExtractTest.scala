@@ -23,8 +23,8 @@ import munit.FunSuite
 
 class ResponseExtractTest extends FunSuite {
 
-  val assertionStringFromList: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "question_id", "param_2" -> "1", "param_3" -> "id", "param_4" -> "suite"))
-  val assertionUnsupported: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, "Unsupported", Map("param_1" -> "key", "param_2" -> "200", "param_3" -> "jsonKey", "param_4" -> "Test"))
+  val assertionStringFromList: ResponseAction = ResponseAction(method = s"${Response.GROUP_EXTRACT_JSON}.${ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "question_id", "param_2" -> "1", "param_3" -> "id", "param_4" -> "suite"))
+  val assertionUnsupported: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.Unsupported", Map("param_1" -> "key", "param_2" -> "200", "param_3" -> "jsonKey", "param_4" -> "Test"))
 
   val responseWithID: Response = Response(
     200,
@@ -121,10 +121,10 @@ class ResponseExtractTest extends FunSuite {
   // positive test "stringFromList - correct parameters" - tested during "validateContent - STRING_FROM_LIST"
 
   test("validateStringFromList - None parameters") {
-    val assertion1None: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "", "param_2" -> "", "param_3" -> ""))
-    val assertion2None: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "", "param_2" -> ""))
-    val assertion3None: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> ""))
-    val assertion4None: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map())
+    val assertion1None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> "", "param_3" -> ""))
+    val assertion2None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> ""))
+    val assertion3None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> ""))
+    val assertion4None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map())
 
     interceptMessage[IllegalArgumentException]("param_1 is missing") {
       ExtractJsonResponseAction.validateStringFromList(assertion4None)
@@ -141,10 +141,10 @@ class ResponseExtractTest extends FunSuite {
   }
 
   test("validateStringFromList - empty parameters") {
-    val assertionParam1: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
-    val assertionParam2: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "1", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
-    val assertionParam3: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "", "param_4" -> ""))
-    val assertionParam4: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "y", "param_4" -> ""))
+    val assertionParam1: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
+    val assertionParam2: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "", "param_3" -> "", "param_4" -> ""))
+    val assertionParam3: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "", "param_4" -> ""))
+    val assertionParam4: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "1", "param_2" -> "x", "param_3" -> "y", "param_4" -> ""))
 
     interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.param_1' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam1)
@@ -161,7 +161,7 @@ class ResponseExtractTest extends FunSuite {
   }
 
   test("validateStringFromList - not integer in string") {
-    val assertion: ResponseAction = ResponseAction(Response.GROUP_EXTRACT_JSON, ExtractJsonResponseAction.STRING_FROM_LIST, Map("param_1" -> "key", "param_2" -> "x", "param_3" -> "y", "param_4" -> "y"))
+    val assertion: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("param_1" -> "key", "param_2" -> "x", "param_3" -> "y", "param_4" -> "y"))
     interceptMessage[ContentValidationFailed]("Content validation failed for value: 'x': Received value of 'ExtractJson.string-from-list.param_2' cannot be parsed to an integer: For input string: \"x\"") {
       ExtractJsonResponseAction.validateStringFromList(assertion)
     }

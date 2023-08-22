@@ -114,10 +114,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "group": {
-          "type": "string"
-        },
-        "name": {
+        "method": {
           "type": "string"
         }
       },
@@ -127,8 +124,7 @@
         }
       },
       "required": [
-        "group",
-        "name",
+        "method",
         "param_1"
       ],
       "title": "ResponseAction"
