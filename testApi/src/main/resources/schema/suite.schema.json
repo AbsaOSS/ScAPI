@@ -2,60 +2,70 @@
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$ref": "#/definitions/suite",
 
+  "version" : "1.0.0",
   "definitions": {
     "suite": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "endpoint": {
-          "type": "string"
+          "type": "string",
+          "description": "The user endpoint name which suite cover by tests."
         },
         "tests": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Test"
-          }
+          },
+          "description": "An array of test objects."
         }
       },
       "required": [
         "endpoint",
         "tests"
       ],
-      "title": "suite"
+      "title": "suite",
+      "description": "Defines a suite of tests."
     },
     "Test": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "only": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Indicates if only this test should be run."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the test."
         },
         "categories": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Categories associated with the test."
         },
         "headers": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Header"
-          }
+          },
+          "description": "Headers to be sent with the test request."
         },
         "actions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Action"
-          }
+          },
+          "description": "Actions to be performed during the test."
         },
         "responseActions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ResponseAction"
-          }
+          },
+          "description": "Actions to be performed on the response of the test."
         }
       },
       "required": [
@@ -65,57 +75,67 @@
         "actions",
         "responseActions"
       ],
-      "title": "Test"
+      "title": "Test",
+      "description": "Defines a single test within a suite."
     },
     "Header": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the header."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the header."
         }
       },
       "required": [
         "name",
         "value"
       ],
-      "title": "Header"
+      "title": "Header",
+      "description": "Defines a header to be sent with a test request."
     },
     "Action": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "methodName": {
-          "type": "string"
+          "type": "string",
+          "description": "The HTTP method name for the action."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "The URL for the action."
         },
         "body": {
-          "type": ["string", "null"]
+          "type": ["string", "null"],
+          "description": "The body content for the action."
         },
         "params": {
           "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Param"
-          }
+          },
+          "description": "Parameters for the action."
         }
       },
       "required": [
         "methodName",
         "url"
       ],
-      "title": "Action"
+      "title": "Action",
+      "description": "Defines an action to be performed during a test."
     },
     "ResponseAction": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "method": {
-          "type": "string"
+          "type": "string",
+          "enum": ["assert.status-code", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "description": "The method to be used for the response action."
         }
       },
       "patternProperties": {
@@ -123,27 +143,103 @@
           "type": "string"
         }
       },
+      "dependencies": {
+        "method": {
+          "oneOf": [
+            {
+              "properties": {
+                "method": {
+                  "const": "log.info"
+                }
+              },
+              "required": ["message"]
+            },
+            {
+              "properties": {
+                "method": {
+                  "const": "assert.status-code"
+                }
+              },
+              "required": ["code"]
+            },
+            {
+              "properties": {
+                "method": {
+                  "const": "assert.body-contains"
+                }
+              },
+              "required": ["body"]
+            },
+            {
+              "properties": {
+                "method": {
+                  "const": "extractJson.string-from-list"
+                }
+              },
+              "required": ["cacheKey", "listIndex", "jsonKey", "cacheLevel"]
+            },
+            {
+              "not": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "method": {
+                        "const": "log.info"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "method": {
+                        "const": "assert.status-code"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "method": {
+                        "const": "assert.body-contains"
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "method": {
+                        "const": "extractJson.string-from-list"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
       "required": [
         "method"
       ],
-      "title": "ResponseAction"
+      "title": "ResponseAction",
+      "description": "Defines an action to be performed on the response of a test."
     },
     "Param": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the parameter."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the parameter."
         }
       },
       "required": [
         "name",
         "value"
       ],
-      "title": "Param"
+      "title": "Param",
+      "description": "Defines a parameter for an action."
     }
   }
 }

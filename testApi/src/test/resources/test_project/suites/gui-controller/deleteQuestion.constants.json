@@ -1,4 +1,5 @@
 {
+  "version" : "1.0.0",
   "constants" : {
     "header_auth": "Authorization",
     "header_basic_token": "Basic {{ env.basic_token }}",

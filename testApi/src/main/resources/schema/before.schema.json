@@ -2,51 +2,59 @@
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$ref": "#/definitions/suiteBefore",
 
+  "version" : "1.0.0",
   "definitions": {
     "suiteBefore": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the suite."
         },
         "methods": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Method"
-          }
+          },
+          "description": "An array of method objects associated with the suite."
         }
       },
       "required": [
         "name",
         "methods"
       ],
-      "title": "SuiteBefore"
+      "title": "SuiteBefore",
+      "description": "Defines a suite with its associated methods."
     },
-    "Method" : {
+    "Method": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the method."
         },
         "headers": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Header"
-          }
+          },
+          "description": "Headers to be sent with the method request."
         },
         "actions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Action"
-          }
+          },
+          "description": "Actions to be performed during the method execution."
         },
         "responseActions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ResponseAction"
-          }
+          },
+          "description": "Actions to be performed on the response of the method."
         }
       },
       "required": [
@@ -55,57 +63,68 @@
         "actions",
         "responseActions"
       ],
-      "title": "Method"
+      "title": "Method",
+      "description": "Defines a single method within a suite."
     },
     "Header": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the header."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the header."
         }
       },
       "required": [
         "name",
         "value"
       ],
-      "title": "Header"
+      "title": "Header",
+      "description": "Defines a header to be sent with a method request."
     },
     "Action": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "methodName": {
-          "type": "string"
+          "type": "string",
+          "description": "The HTTP method name for the action."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "The URL for the action."
         },
         "body": {
-          "type": ["string", "null"]
+          "type": ["string", "null"],
+          "description": "The body content for the action."
         },
         "params": {
           "type": ["array", "null"],
           "items": {
             "$ref": "#/definitions/Param"
-          }
+          },
+          "description": "Parameters for the action."
         }
       },
       "required": [
         "methodName",
         "url"
       ],
-      "title": "Action"
+      "title": "Action",
+      "description": "Defines an action to be performed during a method."
     },
     "ResponseAction": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "method": {
-          "type": "string"
+          "type": "string",
+          "enum": ["assert.status-code", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "description": "The method to be used for the response action."
         }
       },
       "patternProperties": {
@@ -116,24 +135,28 @@
       "required": [
         "method"
       ],
-      "title": "ResponseAction"
+      "title": "ResponseAction",
+      "description": "Defines an action to be performed on the response of a method."
     },
     "Param": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the parameter."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value of the parameter."
         }
       },
       "required": [
         "name",
         "value"
       ],
-      "title": "Param"
+      "title": "Param",
+      "description": "Defines a parameter for an action."
     }
   }
 }
