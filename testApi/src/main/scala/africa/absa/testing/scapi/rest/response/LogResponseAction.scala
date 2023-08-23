@@ -27,7 +27,10 @@ import africa.absa.testing.scapi.utils.validation.ContentValidator
  */
 object LogResponseAction extends ResponsePerformer {
 
+  val ERROR= "error"
+  val WARN = "warn"
   val INFO = "info"
+  val DEBUG = "debug"
 
   /**
    * Validates the content of an log response action object depending on its type.
@@ -37,10 +40,10 @@ object LogResponseAction extends ResponsePerformer {
    */
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
-      case INFO =>
+      case ERROR | WARN | INFO | DEBUG =>
         responseAction.params.get("message") match {
-          case message => ContentValidator.validateNonEmptyString(message.get, s"ResponseLog.$INFO.message")
-          case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion $INFO logic.")
+          case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
+          case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion ${responseAction.name} logic.")
         }
       case _ => throw UndefinedResponseActionType(responseAction.name)
     }
@@ -54,10 +57,13 @@ object LogResponseAction extends ResponsePerformer {
    * @throws IllegalArgumentException if the response action's name is not recognized.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
+    val message = responseAction.params.getOrElse("message", throw new IllegalArgumentException("Missing 'message' parameter"))
+
     responseAction.name match {
-      case INFO =>
-        val message = responseAction.params("message")
-        logInfo(message)
+      case ERROR => logError(message)
+      case WARN => logWarn(message)
+      case INFO => logInfo(message)
+      case DEBUG => logDebug(message)
       case _ => throw new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}")
     }
   }
@@ -65,6 +71,26 @@ object LogResponseAction extends ResponsePerformer {
   /*
     dedicated actions
    */
+
+  /**
+   * This method logs a message at the ERROR level.
+   *
+   * @param message The message to be logged.
+   */
+  def logError(message: String): Boolean = {
+    Logger.error(message)
+    true
+  }
+
+  /**
+   * This method logs a message at the WARN level.
+   *
+   * @param message The message to be logged.
+   */
+  def logWarn(message: String): Boolean = {
+    Logger.warn(message)
+    true
+  }
 
   /**
    * This method logs a message at the INFO level.
@@ -75,4 +101,15 @@ object LogResponseAction extends ResponsePerformer {
     Logger.info(message)
     true
   }
+
+  /**
+   * This method logs a message at the DEBUG level.
+   *
+   * @param message The message to be logged.
+   */
+  def logDebug(message: String): Boolean = {
+    Logger.debug(message)
+    true
+  }
+
 }
