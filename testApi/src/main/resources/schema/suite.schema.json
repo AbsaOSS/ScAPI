@@ -134,7 +134,7 @@
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["assert.status-code", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "enum": ["assert.status-code-equals", "assert.body-contains", "log.info", "extractJson.string-from-list"],
           "description": "The method to be used for the response action."
         }
       },
@@ -157,7 +157,7 @@
             {
               "properties": {
                 "method": {
-                  "const": "assert.status-code"
+                  "const": "assert.status-code-equals"
                 }
               },
               "required": ["code"]
@@ -191,7 +191,7 @@
                   {
                     "properties": {
                       "method": {
-                        "const": "assert.status-code"
+                        "const": "assert.status-code-equals"
                       }
                     }
                   },

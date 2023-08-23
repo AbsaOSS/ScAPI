@@ -123,7 +123,7 @@
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["assert.status-code", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "enum": ["assert.status-code-equals", "assert.body-contains", "log.info", "extractJson.string-from-list"],
           "description": "The method to be used for the response action."
         }
       },

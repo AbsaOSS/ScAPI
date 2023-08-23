@@ -25,20 +25,25 @@ class ResponseAssertionsTest extends FunSuite {
   /*
     validateContent
    */
+
+  // status-code-...
+
   test("validateContent - valid status code string") {
-    val assertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE}", Map("code" -> "200"))
-    AssertionResponseAction.validateContent(assertion)
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_EQUALS}", Map("code" -> "200"))
+    AssertionResponseAction.validateContent(responseAction)
   }
 
   test("validateContent - invalid status code string") {
     intercept[ContentValidationFailed] {
-      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE}", Map("code" -> "not an integer")))
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_EQUALS}", Map("code" -> "not an integer")))
     }
   }
 
+  // body-...
+
   test("validateContent - body is not empty") {
-    val assertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("body" -> "test content"))
-    AssertionResponseAction.validateContent(assertion)
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("body" -> "test content"))
+    AssertionResponseAction.validateContent(responseAction)
   }
 
   test("validateContent - body is empty") {
@@ -46,6 +51,7 @@ class ResponseAssertionsTest extends FunSuite {
       AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("body" -> "")))
     }
   }
+
 
   test("validateContent - unsupported response action") {
     intercept[UndefinedResponseActionType] {
@@ -56,39 +62,106 @@ class ResponseAssertionsTest extends FunSuite {
   /*
     performResponseAction
    */
+
+  // status-code-...
+
   test("performAssertions - status code assertion - equals") {
-    val statusCodeAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.status-code", Map("code" -> "200"))
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_EQUALS}", Map("code" -> "200"))
     val response = Response(200, "Dummy Body", Map.empty)
 
-    assert(AssertionResponseAction.performResponseAction(response, statusCodeAssertion))
+    assert(AssertionResponseAction.performResponseAction(response, statusCodeResponseAction))
   }
 
   test("performAssertions - status code assertion - not equals") {
-    val statusCodeAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.status-code", Map("code" -> "200"))
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_EQUALS}", Map("code" -> "200"))
     val response = Response(500, "Dummy Body", Map.empty)
 
-    assert(!AssertionResponseAction.performResponseAction(response, statusCodeAssertion))
+    assert(!AssertionResponseAction.performResponseAction(response, statusCodeResponseAction))
   }
 
+  test("performAssertions - status code - is success") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_SUCCESS}", Map())
+    val response200 = Response(200, "Dummy Body", Map.empty)
+    val response299 = Response(299, "Dummy Body", Map.empty)
+
+    assert(AssertionResponseAction.performResponseAction(response200, statusCodeResponseAction))
+    assert(AssertionResponseAction.performResponseAction(response299, statusCodeResponseAction))
+  }
+
+  test("performAssertions - status code - is not success") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_SUCCESS}", Map())
+    val response199 = Response(199, "Dummy Body", Map.empty)
+    val response300 = Response(300, "Dummy Body", Map.empty)
+    val response500 = Response(500, "Dummy Body", Map.empty)
+
+    assert(!AssertionResponseAction.performResponseAction(response199, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response300, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response500, statusCodeResponseAction))
+  }
+
+  test("performAssertions - status code - is client error") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_CLIENT_ERROR}", Map())
+    val response400 = Response(400, "Dummy Body", Map.empty)
+    val response499 = Response(499, "Dummy Body", Map.empty)
+
+    assert(AssertionResponseAction.performResponseAction(response400, statusCodeResponseAction))
+    assert(AssertionResponseAction.performResponseAction(response499, statusCodeResponseAction))
+  }
+
+  test("performAssertions - status code - is not client error") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_CLIENT_ERROR}", Map())
+    val response399 = Response(399, "Dummy Body", Map.empty)
+    val response500 = Response(500, "Dummy Body", Map.empty)
+    val response200 = Response(200, "Dummy Body", Map.empty)
+
+    assert(!AssertionResponseAction.performResponseAction(response399, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response500, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response200, statusCodeResponseAction))
+  }
+
+  test("performAssertions - status code - is server error") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_SERVER_ERROR}", Map())
+    val response500 = Response(500, "Dummy Body", Map.empty)
+    val response599 = Response(599, "Dummy Body", Map.empty)
+
+    assert(AssertionResponseAction.performResponseAction(response500, statusCodeResponseAction))
+    assert(AssertionResponseAction.performResponseAction(response599, statusCodeResponseAction))
+  }
+
+  test("performAssertions - status code - is not server error") {
+    val statusCodeResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_IS_SERVER_ERROR}", Map())
+    val response499 = Response(499, "Dummy Body", Map.empty)
+    val response600 = Response(600, "Dummy Body", Map.empty)
+    val response200 = Response(200, "Dummy Body", Map.empty)
+
+    assert(!AssertionResponseAction.performResponseAction(response499, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response600, statusCodeResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response200, statusCodeResponseAction))
+  }
+
+
+  // body-...
+
   test("performAssertions - body contains assertion") {
-    val bodyContainsAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummy"))
+    val bodyContainsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummy"))
     val response = Response(200, "This is a dummy body", Map.empty)
-    assert(AssertionResponseAction.performResponseAction(response, bodyContainsAssertion))
+    assert(AssertionResponseAction.performResponseAction(response, bodyContainsResponseAction))
   }
 
   test("performAssertions - body does not contains assertion") {
-    val bodyContainsAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummies"))
+    val bodyContainsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummies"))
     val response = Response(200, "This is a dummy body", Map.empty)
 
-    assert(!AssertionResponseAction.performResponseAction(response, bodyContainsAssertion))
+    assert(!AssertionResponseAction.performResponseAction(response, bodyContainsResponseAction))
   }
 
+
   test("performAssertions - unsupported assertion") {
-    val unsupportedAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.unsupported-assertion", Map("nonsense" -> "value"))
+    val unsupportedResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.unsupported-assertion", Map("nonsense" -> "value"))
     val response = Response(200, "Dummy Body", Map.empty)
 
     interceptMessage[IllegalArgumentException]("Unsupported assertion method [group: assert]: unsupported-assertion") {
-      AssertionResponseAction.performResponseAction(response, unsupportedAssertion)
+      AssertionResponseAction.performResponseAction(response, unsupportedResponseAction)
     }
   }
 }
