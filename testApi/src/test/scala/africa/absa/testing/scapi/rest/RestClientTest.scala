@@ -30,7 +30,7 @@ class RestClientTest extends FunSuite {
       assert(data == "testData")
       assert(params == Map("param1" -> "value1"))
 
-      Response(200, "test response", Map.empty[String, Seq[String]])
+      Response(200, "test response", "", "", Map.empty[String, Seq[String]], Map.empty, 100)
     }
 
     override def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {

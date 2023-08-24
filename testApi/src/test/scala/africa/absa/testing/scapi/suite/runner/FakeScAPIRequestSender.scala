@@ -26,7 +26,12 @@ object FakeScAPIRequestSender extends RequestSender {
   var mockResponse: Response = Response(
     200,
     "[{\"id\":\"efa01eeb-34cb-42da-b150-ca6dbe52xxx1\",\"domainName\":\"Domain1\"},{\"id\":\"382be85a-1f00-4c15-b607-cbda03ccxxx2\",\"domainName\":\"Domain2\"},{\"id\":\"65173a5b-b13c-4db0-bd1b-24b3e3abxxx3\",\"domainName\":\"Domain3\"}]",
-    Map("Content-Type" -> Seq("application/json")))
+    "no url",
+    "fake status messsage",
+    Map("Content-Type" -> Seq("application/json")),
+    Map.empty,
+    100
+  )
 
   override def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
     mockResponse

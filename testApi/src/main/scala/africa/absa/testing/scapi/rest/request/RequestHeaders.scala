@@ -35,7 +35,7 @@ object RequestHeaders {
    * @param headersSet A set of Header objects to be processed.
    * @return A Map where the key is the header name (lowercase) and the value is the resolved header value.
    */
-  def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
+  def buildHeaders(headersSet: Seq[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {
       (acc, header) => header.name.toLowerCase match {
         case CONTENT_TYPE => acc + (header.name -> RuntimeCache.resolve(header.value))

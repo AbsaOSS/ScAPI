@@ -32,21 +32,21 @@ class SuiteRunnerTest extends FunSuite {
   val action: Action = Action(methodName = "get", url = "nice url")
   val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
   val responseAction: ResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE_EQUALS}", Map("code" -> "200"))
-  val method: Method = Method(name = "test", headers = Set(header), actions = Set(action), responseActions = Set(responseAction))
-  val methodNotSupported: Method = Method(name = "test", headers = Set(header), actions = Set(actionNotSupported), responseActions = Set(responseAction))
+  val method: Method = Method(name = "test", headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction))
+  val methodNotSupported: Method = Method(name = "test", headers = Seq(header), actions = Seq(actionNotSupported), responseActions = Seq(responseAction))
 
   val suitesBundles: Set[SuiteBundle] = Set(
     SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
-      SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-        headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(true)),
-      SuiteTestScenario(name = "test2", categories = Set("SMOKE"),
-        headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(true))
+      SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
+        headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(true)),
+      SuiteTestScenario(name = "test2", categories = Seq("SMOKE"),
+        headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(true))
     ))),
     SuiteBundle(
       suiteBefore = Some(SuiteBefore(name = "suiteBefore", methods = Set(method))),
       suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
+          headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(method))),
     ))
@@ -54,8 +54,8 @@ class SuiteRunnerTest extends FunSuite {
   val suitesBundleNoBefore: Set[SuiteBundle] = Set(
     SuiteBundle(
       suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
+          headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(method))),
     ))
@@ -63,8 +63,8 @@ class SuiteRunnerTest extends FunSuite {
   val suitesBundleAfterMethodNotSupported: Set[SuiteBundle] = Set(
     SuiteBundle(
       suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
+          headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(false)),
     )),
       suiteAfter = Some(SuiteAfter(name = "suiteAfter", methods = Set(methodNotSupported))),
     ))
@@ -73,8 +73,8 @@ class SuiteRunnerTest extends FunSuite {
     SuiteBundle(
       suiteBefore = Some(SuiteBefore(name = "suiteBefore", methods = Set(method))),
       suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"),
-          headers = Set(header), actions = Set(action), responseActions = Set(responseAction), only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
+          headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction), only = Some(false)),
     ))))
 
   val constants: Map[String, String] = Map(

@@ -19,9 +19,9 @@ package africa.absa.testing.scapi.json
 trait Requestable {
   def name: String
 
-  def headers: Set[Header]
+  def headers: Seq[Header]
 
-  def actions: Set[Action]
+  def actions: Seq[Action]
 
-  def responseActions: Set[ResponseAction]
+  def responseActions: Seq[ResponseAction]
 }

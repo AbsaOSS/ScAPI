@@ -23,6 +23,23 @@ import africa.absa.testing.scapi.rest.response.Response
  * It provides the capability to send different types of HTTP requests including GET, POST, PUT, and DELETE.
  */
 object ScAPIRequestSender extends RequestSender {
+
+  private def sendRequest(requestFunc: => requests.Response, url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
+    val startTime = System.nanoTime()
+    val response = requestFunc
+    val endTime = System.nanoTime()
+
+    Response(
+      response.statusCode,
+      response.text(),
+      url = response.url,
+      statusMessage = response.statusMessage,
+      response.headers,
+      cookies = response.cookies.view.mapValues(cookie => cookie.toString).toMap,
+      (endTime - startTime) / 1_000_000
+    )
+  }
+
   /**
    * Sends a GET request to the provided URL with the given headers, SSL certificate verification setting, data, and parameters.
    *
@@ -34,8 +51,7 @@ object ScAPIRequestSender extends RequestSender {
    * @return Response Returns the response from the GET request.
    */
   override def get(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
-    val response = requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params)
-    Response(response.statusCode, response.text(), response.headers.toMap)
+    sendRequest(requests.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params), url, headers, verifySslCerts, data, params)
   }
 
   /**
@@ -49,8 +65,7 @@ object ScAPIRequestSender extends RequestSender {
    * @return Response Returns the response from the POST request.
    */
   override def post(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
-    val response = requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params)
-    Response(response.statusCode, response.text(), response.headers.toMap)
+    sendRequest(requests.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params), url, headers, verifySslCerts, data, params)
   }
 
   /**
@@ -64,8 +79,7 @@ object ScAPIRequestSender extends RequestSender {
    * @return Response Returns the response from the PUT request.
    */
   override def put(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
-    val response = requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params)
-    Response(response.statusCode, response.text(), response.headers.toMap)
+    sendRequest(requests.put(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params), url, headers, verifySslCerts, data, params)
   }
 
   /**
@@ -79,7 +93,6 @@ object ScAPIRequestSender extends RequestSender {
    * @return Response Returns the response from the DELETE request.
    */
   override def delete(url: String, headers: Map[String, String], verifySslCerts: Boolean, data: String, params: Map[String, String]): Response = {
-    val response = requests.delete(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params)
-    Response(response.statusCode, response.text(), response.headers.toMap)
+    sendRequest(requests.delete(url = url, headers = headers, verifySslCerts = verifySslCerts, data = data, params = params), url, headers, verifySslCerts, data, params)
   }
 }

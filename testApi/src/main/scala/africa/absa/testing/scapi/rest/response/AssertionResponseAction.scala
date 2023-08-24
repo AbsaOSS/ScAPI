@@ -20,6 +20,8 @@ import africa.absa.testing.scapi.UndefinedResponseActionType
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
+import spray.json._
+import scala.xml.XML
 
 /**
  * Object that validates and performs various assertion response actions on the response received.
@@ -27,11 +29,27 @@ import africa.absa.testing.scapi.utils.validation.ContentValidator
  */
 object AssertionResponseAction extends ResponsePerformer {
 
+  // response-time-...
+  val RESPONSE_TIME_IS_BELOW = "response-time-is-below"
+  val RESPONSE_TIME_IS_ABOVE = "response-time-is-above"
+
+  // status-code-...
   val STATUS_CODE_EQUALS = "status-code-equals"
   val STATUS_CODE_IS_SUCCESS = "status-code-is-success"
-  val STATUS_CODE_IS_CLIENT_ERROR = "status-code-is_client_error"
-  val STATUS_CODE_IS_SERVER_ERROR = "status-code-is_server_error"
-  val BODY_CONTAINS = "body-contains"
+  val STATUS_CODE_IS_CLIENT_ERROR = "status-code-is-client-error"
+  val STATUS_CODE_IS_SERVER_ERROR = "status-code-is-server-error"
+
+  // header-...
+  val HEADER_EXISTS = "header-exists"
+  val HEADER_VALUE_EQUALS = "header-value-equals"
+
+  // content-type-...
+  val CONTENT_TYPE_IS_JSON = "content-type-is-json"
+  val CONTENT_TYPE_IS_XML = "content-type-is-xml"
+  val CONTENT_TYPE_IS_HTML = "content-type-is-html"
+
+  // body-...
+  val BODY_CONTAINS = "body-contains" // TODO - rename it to more specific
 
   /**
    * Validates the content of an assertion response action object depending on its type.
@@ -42,13 +60,38 @@ object AssertionResponseAction extends ResponsePerformer {
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
 
+      // response-time-...
+      case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
+        responseAction.params.getOrElse("limit", None) match {
+          case limit: String => ContentValidator.validateLongString(limit, s"ResponseAssertion.${responseAction.name}.limit")
+          case None => throw new IllegalArgumentException(s"Missing required 'limit' parameter for assertion ${responseAction.name} logic.")
+        }
+
       // status-code-...
       case STATUS_CODE_EQUALS =>
-        responseAction.params.get("code") match {
-          case code => ContentValidator.validateIntegerString(code.get, s"ResponseAssertion.$STATUS_CODE_EQUALS.code")
+        responseAction.params.getOrElse("code", None) match {
+          case code: String => ContentValidator.validateIntegerString(code, s"ResponseAssertion.$STATUS_CODE_EQUALS.code")
           case None => throw new IllegalArgumentException(s"Missing required 'code' parameter for assertion $STATUS_CODE_EQUALS logic.")
         }
       case STATUS_CODE_IS_SUCCESS | STATUS_CODE_IS_CLIENT_ERROR | STATUS_CODE_IS_SERVER_ERROR => ()
+
+      // header-...
+      case HEADER_EXISTS | HEADER_VALUE_EQUALS =>
+        responseAction.params.getOrElse("headerName", None) match {
+          case headerName: String => ContentValidator.validateNonEmptyString(headerName, s"ResponseAssertion.${responseAction.name}.headerName")
+          case None => throw new IllegalArgumentException(s"Missing required 'headerName' parameter for assertion ${responseAction.name} logic.")
+        }
+        responseAction.name.toLowerCase match {
+          case HEADER_VALUE_EQUALS =>
+            responseAction.params.getOrElse("expectedValue", None) match {
+              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$HEADER_VALUE_EQUALS.expectedValue")
+              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $HEADER_VALUE_EQUALS logic.")
+            }
+          case _ => ()
+        }
+
+      // content-type-...
+      case CONTENT_TYPE_IS_JSON | CONTENT_TYPE_IS_XML | CONTENT_TYPE_IS_HTML => ()
 
       // body-...
       case BODY_CONTAINS =>
@@ -71,6 +114,14 @@ object AssertionResponseAction extends ResponsePerformer {
   def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
     responseAction.name match {
 
+      // response-time-...
+      case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
+        val limit = responseAction.params("limit")
+        responseAction.name match {
+          case RESPONSE_TIME_IS_BELOW => assertResponseTimeIsBelow(response, limit)
+          case RESPONSE_TIME_IS_ABOVE => assertResponseTimeIsAbove(response, limit)
+        }
+
       // status-code-...
       case STATUS_CODE_EQUALS =>
         val code = responseAction.params("code")
@@ -78,6 +129,21 @@ object AssertionResponseAction extends ResponsePerformer {
       case STATUS_CODE_IS_SUCCESS => assertStatusCodeSuccess(response)
       case STATUS_CODE_IS_CLIENT_ERROR => assertStatusCodeIsClientError(response)
       case STATUS_CODE_IS_SERVER_ERROR => assertStatusCodeIsServerError(response)
+
+      // header-...
+      case HEADER_EXISTS | HEADER_VALUE_EQUALS =>
+        val headerName = responseAction.params("headerName")
+        responseAction.name match {
+          case HEADER_EXISTS => assertHeaderExists(response, headerName)
+          case HEADER_VALUE_EQUALS =>
+            val expectedValue = responseAction.params("expectedValue")
+            assertHeaderValueEquals(response, headerName, expectedValue)
+        }
+
+      // content-type-...
+      case CONTENT_TYPE_IS_JSON => assertContentTypeIsJson(response)
+      case CONTENT_TYPE_IS_XML => assertContentTypeIsXml(response)
+      case CONTENT_TYPE_IS_HTML => assertContentTypeIsHtml(response)
 
       // body-...
       case BODY_CONTAINS =>
@@ -90,6 +156,30 @@ object AssertionResponseAction extends ResponsePerformer {
   /*
     dedicated actions
    */
+
+  /**
+   * Asserts that the response time is below the specified maximum time.
+   *
+   * @param response      The response whose duration is to be checked.
+   * @param maxTimeMillis The maximum allowed time in milliseconds as a string.
+   * @return A Boolean indicating whether the response's duration is below the specified maximum time. Returns true if it's below, false otherwise.
+   */
+  def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Boolean = {
+    val lMaxTimeMillis: Long = maxTimeMillis.toLong
+    response.duration <= lMaxTimeMillis
+  }
+
+  /**
+   * Asserts that the response time is above the specified minimum time.
+   *
+   * @param response      The response whose duration is to be checked.
+   * @param minTimeMillis The minimum required time in milliseconds as a string.
+   * @return A Boolean indicating whether the response's duration is above the specified minimum time. Returns true if it's above, false otherwise.
+   */
+  def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Boolean = {
+    val lMinTimeMillis: Long = minTimeMillis.toLong
+    response.duration >= lMinTimeMillis
+  }
 
   /**
    * Asserts that the status code of the response matches the expected status code.
@@ -136,6 +226,78 @@ object AssertionResponseAction extends ResponsePerformer {
    */
   def assertStatusCodeIsServerError(response: Response): Boolean = {
     response.statusCode >= 500 && response.statusCode <= 599
+  }
+
+  /**
+   * Checks if the specified header exists in the given response.
+   *
+   * @param response The response object containing the headers.
+   * @param headerName The name of the header to check for.
+   * @return True if the header exists in the response, otherwise false.
+   */
+  def assertHeaderExists(response: Response, headerName: String): Boolean = {
+    response.headers.contains(headerName.toLowerCase)
+  }
+
+  /**
+   * Asserts that the value of the specified header in the given response matches the expected value.
+   *
+   * @param response The response object containing the headers.
+   * @param headerName The name of the header to check.
+   * @param expectedValue The expected value of the header.
+   * @return True if the header value matches the expected value, otherwise false.
+   */
+  def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Boolean = {
+    if (assertHeaderExists(response, headerName))
+      expectedValue.equals(response.headers(headerName.toLowerCase).head)
+    else
+      false
+  }
+
+  /**
+   * Asserts that the value of the "Content-Type" header in the given response is "application/json".
+   *
+   * @param response The response object containing the headers.
+   * @return True if the "Content-Type" header value is "application/json", otherwise false.
+   */
+  def assertContentTypeIsJson(response: Response): Boolean = {
+    val isContentTypeJson = assertHeaderValueEquals(response, "content-type", "application/json")
+    val isBodyJson = try {
+      response.body.parseJson
+      true
+    } catch {
+      case _: JsonParser.ParsingException => false
+    }
+
+    isContentTypeJson && isBodyJson
+  }
+
+  /**
+   * Asserts that the value of the "Content-Type" header in the given response is "application/xml".
+   *
+   * @param response The response object containing the headers.
+   * @return True if the "Content-Type" header value is "application/xml", otherwise false.
+   */
+  def assertContentTypeIsXml(response: Response): Boolean = {
+    val isContentTypeXml = assertHeaderValueEquals(response, "content-type", "application/xml")
+    val isBodyXml = try {
+      XML.loadString(response.body)
+      true
+    } catch {
+      case _: Exception => false
+    }
+
+    isContentTypeXml && isBodyXml
+  }
+
+  /**
+   * Asserts that the value of the "Content-Type" header in the given response is "text/html".
+   *
+   * @param response The response object containing the headers.
+   * @return True if the "Content-Type" header value is "text/html", otherwise false.
+   */
+  def assertContentTypeIsHtml(response: Response): Boolean = {
+    assertHeaderValueEquals(response, "content-type", "text/html")
   }
 
   /**

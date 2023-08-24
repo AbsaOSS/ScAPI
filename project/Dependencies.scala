@@ -26,6 +26,7 @@ object Dependencies {
   private val commonsIoVersion = "2.13.0"
   private val requestsVersion = "0.8.0"
   private val loggerVersion = "2.14.1"
+  private val scalaXmlVersion = "1.3.0"
 
   def getScalaDependency(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion
 
@@ -40,6 +41,7 @@ object Dependencies {
     "com.lihaoyi"               %% "requests"               % requestsVersion,
     "org.apache.logging.log4j"  % "log4j-core"              % loggerVersion,
     "org.apache.logging.log4j"  % "log4j-api"               % loggerVersion,
+    "org.scala-lang.modules"    %% "scala-xml"              % scalaXmlVersion,
 
     // test
     "org.scalameta"             %% "munit"                  % munitVersion          % Test

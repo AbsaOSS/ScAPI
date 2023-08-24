@@ -29,10 +29,10 @@ import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseActi
  * @param only The control if test should be only be running when set to true.
  */
 case class SuiteTestScenario(name: String,
-                             categories: Set[String],
-                             headers: Set[Header],
-                             actions: Set[Action],
-                             responseActions: Set[ResponseAction],
+                             categories: Seq[String],
+                             headers: Seq[Header],
+                             actions: Seq[Action],
+                             responseActions: Seq[ResponseAction],
                              only: Option[Boolean] = Some(false)) extends Requestable {
   /**
    * Method to resolve references within the SuiteTestScenario instance.

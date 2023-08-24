@@ -27,7 +27,7 @@ class RequestHeadersTest extends FunSuite {
    */
 
   test("buildHeaders - should correctly build headers map") {
-    val headersSet = Set(
+    val headersSeq = Seq(
       Header("Content-Type", "application/json"),
       Header("Authorization", "Bearer abcdefg12345"),
       Header("Custom-Header", "customValue")
@@ -39,15 +39,15 @@ class RequestHeadersTest extends FunSuite {
       "Custom-Header" -> "customValue"
     )
 
-    val actualMap = RequestHeaders.buildHeaders(headersSet)
+    val actualMap = RequestHeaders.buildHeaders(headersSeq)
     assertEquals(actualMap, expectedMap)
   }
 
   test("buildHeaders - should return an empty map if no headers are provided") {
-    val headersSet = Set.empty[Header]
+    val headersSeq = Seq.empty[Header]
     val expectedMap = Map.empty[String, String]
 
-    val actualMap = RequestHeaders.buildHeaders(headersSet)
+    val actualMap = RequestHeaders.buildHeaders(headersSeq)
     assertEquals(actualMap, expectedMap)
   }
 

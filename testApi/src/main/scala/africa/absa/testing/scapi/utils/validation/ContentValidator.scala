@@ -38,6 +38,19 @@ object ContentValidator {
   }
 
   /**
+   * Validates that a string can be parsed to a long. Throws an exception if the string cannot be parsed.
+   *
+   * @param input The string to be validated.
+   * @throws ContentValidationFailed if the input string cannot be parsed to a long.
+   */
+  def validateLongString(input: String, param: String): Unit = {
+    Try(input.toLong) match {
+      case Success(_) => // Do nothing
+      case Failure(e) => throw ContentValidationFailed(input, s"Received value of '$param' cannot be parsed to a long: ${e.getMessage}")
+    }
+  }
+
+  /**
    * Validates that a string is not empty. Throws an exception if the string is empty.
    *
    * @param input The string to be validated.

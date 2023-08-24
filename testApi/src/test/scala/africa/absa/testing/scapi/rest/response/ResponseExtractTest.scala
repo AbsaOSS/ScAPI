@@ -29,15 +29,30 @@ class ResponseExtractTest extends FunSuite {
   val responseWithID: Response = Response(
     200,
     "[{\"id\":\"efa01eeb-34cb-42da-b150-ca6dbe52xxx1\",\"domainName\":\"Domain1\"},{\"id\":\"382be85a-1f00-4c15-b607-cbda03ccxxx2\",\"domainName\":\"Domain2\"},{\"id\":\"65173a5b-b13c-4db0-bd1b-24b3e3abxxx3\",\"domainName\":\"Domain3\"}]",
-    Map("Content-Type" -> Seq("application/json")))
+    "",
+    "",
+    Map("Content-Type" -> Seq("application/json")),
+    Map.empty,
+    100
+  )
   val responseNoJsonBody: Response = Response(
     200,
     "no json here",
-    Map("Content-Type" -> Seq("application/json")))
+    "",
+    "",
+    Map("Content-Type" -> Seq("application/json")),
+    Map.empty,
+    100
+  )
   val responseJsonNoArrayBody: Response = Response(
     200,
     "{\"id\":\"efa01eeb-34cb-42da-b150-ca6dbe52xxx1\",\"domainName\":\"Domain1\"}",
-    Map("Content-Type" -> Seq("application/json")))
+    "",
+    "",
+    Map("Content-Type" -> Seq("application/json")),
+    Map.empty,
+    100
+  )
 
   /*
     validateContent
@@ -124,7 +139,7 @@ class ResponseExtractTest extends FunSuite {
     val assertion1None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> ""))
     val assertion2None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> ""))
     val assertion3None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> ""))
-    val assertion4None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map())
+    val assertion4None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map.empty)
 
     interceptMessage[IllegalArgumentException]("Missing required 'cacheKey' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion4None)

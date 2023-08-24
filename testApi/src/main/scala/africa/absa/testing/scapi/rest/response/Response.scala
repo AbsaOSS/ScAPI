@@ -17,8 +17,9 @@
 package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.logging.Logger
 
-case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])
+case class Response(statusCode: Int, body: String, url: String, statusMessage: String, headers: Map[String, Seq[String]], cookies: Map[String, String], duration: Long)
 
 /**
  * A singleton object that is responsible for managing and handling responses.
@@ -56,14 +57,34 @@ object Response {
    * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false).
    * @throws IllegalArgumentException If an response action group is not supported.
    */
-  def perform(response: Response, responseAction: Set[ResponseAction]): Boolean = {
+  def perform(response: Response, responseAction: Seq[ResponseAction]): Boolean = {
+    def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {
+      val filteredParams = resolvedResponseAction.params.filter(_._1 != "method").map { case (k, v) => s"$k->$v" }.mkString(", ")
+      val baseLog = s"\nParameters received: \n\tRequired Response-Action: \n\t\tGroup->'${resolvedResponseAction.group}', \n\t\tMethod->'${resolvedResponseAction.name}', \n\t\tParams->'${filteredParams}', \n\tActual Response: \n\t\t$response"
+      val exceptionLog = exception.map(e => s"\nException: ${e.getMessage}").getOrElse("")
+      Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
+    }
+
     responseAction.forall { assertion =>
       val resolvedResponseAction: ResponseAction = assertion.resolveByRuntimeCache()
-      resolvedResponseAction.group match {
-        case GROUP_ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
-        case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
-        case GROUP_LOG => LogResponseAction.performResponseAction(response, assertion)
-        case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
+      Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - Started.")
+
+      try {
+        val res = resolvedResponseAction.group match {
+          case GROUP_ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
+          case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
+          case GROUP_LOG => LogResponseAction.performResponseAction(response, assertion)
+          case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
+        }
+
+        Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - ${if (res) "completed successfully" else "failed"}.")
+        if (!res) logParameters(response, resolvedResponseAction)
+        res
+      } catch {
+        case e: IllegalArgumentException =>
+          Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - failed with exception.")
+          logParameters(response, resolvedResponseAction, Some(e))
+          throw e
       }
     }
   }

@@ -39,10 +39,10 @@ class ResponseTest extends FunSuite {
 
   test("perform - unsupported group") {
     val unsupportedAssertion = ResponseAction(method = "unsupportedGroup.not needed", Map("param 1" -> ""))
-    val response = Response(200, "OK", Map.empty)
+    val response = Response(200, "OK", "", "", Map.empty, Map.empty, 100)
 
     intercept[IllegalArgumentException] {
-      Response.perform(response, Set(unsupportedAssertion))
+      Response.perform(response, Seq(unsupportedAssertion))
     }
   }
 

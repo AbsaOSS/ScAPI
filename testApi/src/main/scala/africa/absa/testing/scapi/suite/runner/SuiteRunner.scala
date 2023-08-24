@@ -39,7 +39,7 @@ object SuiteRunner {
    */
   def runSuites(suiteBundles: Set[SuiteBundle], environment: Environment, restClientCreator: RestClientCreator): List[SuiteResults] = {
     suiteBundles.foldLeft(List[SuiteResults]()) { (resultList, suiteBundle) =>
-      Logger.debug(s"Running Suite: ${suiteBundle.suite.endpoint}")
+      Logger.debug(s"Suite: ${suiteBundle.suite.endpoint} - Started")
 
       val resultSuiteBefore: List[SuiteResults] = suiteBundle.suiteBefore.toList.flatMap { suiteBefore =>
         suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.endpoint, suiteBefore.name, method, environment, restClientCreator) }
@@ -80,7 +80,7 @@ object SuiteRunner {
    * @return SuiteResults after the execution of the suite-before method.
    */
   private def runSuiteBefore(suiteEndpoint: String, suiteBeforeName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
-    Logger.debug(s"Running Suite-Before: ${suiteBeforeName}")
+    Logger.debug(s"Suite-Before: ${suiteBeforeName} - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
@@ -91,7 +91,7 @@ object SuiteRunner {
       )
 
       val testEndTime: Long = System.currentTimeMillis()
-      Logger.debug(s"Before method '${method.name}' finished. Response statusCode is '${response.statusCode}'")
+      Logger.debug(s"Suite-Before: method '${method.name}' - ${if (isSuccess) "completed successfully" else "failed"}.")
       SuiteResults.withBooleanStatus(
         resultType = SuiteResults.RESULT_TYPE_BEFORE_METHOD,
         suiteName = suiteEndpoint,
@@ -113,7 +113,7 @@ object SuiteRunner {
    * @return SuiteResults after the execution of the suite-test.
    */
   private def runSuiteTest(suiteEndpoint: String, test: SuiteTestScenario, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
-    Logger.debug(s"Running Suite-Test: ${test.name}")
+    Logger.debug(s"Suite-Test: ${test.name} - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
@@ -124,7 +124,7 @@ object SuiteRunner {
       )
 
       val testEndTime: Long = System.currentTimeMillis()
-      Logger.debug(s"Test '${test.name}' finished. Response statusCode is '${response.statusCode}'")
+      Logger.debug(s"Suite-Test: '${test.name}' - ${if (isSuccess) "completed successfully" else "failed"}.")
       SuiteResults.withBooleanStatus(
         resultType = SuiteResults.RESULT_TYPE_TEST,
         suiteName = suiteEndpoint,
@@ -151,7 +151,7 @@ object SuiteRunner {
    * @return SuiteResults after the execution of the suite-after method.
    */
   private def runSuiteAfter(suiteEndpoint: String, suiteAfterName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResults = {
-    Logger.debug(s"Running Suite-After: ${suiteAfterName}")
+    Logger.debug(s"Suite-After: ${suiteAfterName} - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
@@ -162,7 +162,7 @@ object SuiteRunner {
       )
 
       val testEndTime: Long = System.currentTimeMillis()
-      Logger.debug(s"After method '${method.name}' finished. Response statusCode is '${response.statusCode}'")
+      Logger.debug(s"After method '${method.name}' ${if (isSuccess) "completed successfully" else "failed"}.")
       SuiteResults.withBooleanStatus(
         resultType = SuiteResults.RESULT_TYPE_AFTER_METHOD,
         suiteName = suiteEndpoint,

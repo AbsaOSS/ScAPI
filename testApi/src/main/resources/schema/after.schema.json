@@ -125,7 +125,7 @@
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["assert.status-code-equals", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "enum": ["assert.response-time-is-below", "assert.response-time-is-above", "assert.status-code-equals", "assert.status-code-is-success", "assert.status-code-is-client-error", "assert.status-code-is-server-error", "assert.header-exists", "assert.header-value-equals", "assert.content-type-is-json", "assert.content-type-is-xml", "assert.content-type-is-html", "assert.body-contains", "log.error", "log.warn", "log.info", "log.debug", "extractJson.string-from-list"],
           "description": "The method to be used for the response action. Restricted to specific values."
         }
       },

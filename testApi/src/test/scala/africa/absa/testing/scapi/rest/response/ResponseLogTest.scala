@@ -57,7 +57,7 @@ class ResponseLogTest extends FunSuite {
   }
 
   test("validateContent - no message provided") {
-    val responseAction = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.INFO}", Map())
+    val responseAction = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.INFO}", Map.empty)
     interceptMessage[IllegalArgumentException]("Missing required 'message' for assertion info logic.") {
       LogResponseAction.validateContent(responseAction)
     }
@@ -69,31 +69,31 @@ class ResponseLogTest extends FunSuite {
 
   test("performAssertion - ERROR supported") {
     val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.ERROR}", Map("message" -> "info message"))
-    val response = Response(500, "OK", Map("Content-Type" -> Seq("application/json")))
+    val response = Response(500, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
   }
 
   test("performAssertion - WARN supported") {
     val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.WARN}", Map("message" -> "info message"))
-    val response = Response(401, "OK", Map("Content-Type" -> Seq("application/json")))
+    val response = Response(401, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
   }
 
   test("performAssertion - INFO supported") {
     val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.INFO}", Map("message" -> "info message"))
-    val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
+    val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
   }
 
   test("performAssertion - DEBUG supported") {
     val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.DEBUG}", Map("message" -> "info message"))
-    val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
+    val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
   }
 
   test("performAssertion - not supported validation type") {
     val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.not_info", Map("message" -> "info message"))
-    val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
+    val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     intercept[IllegalArgumentException] {
       LogResponseAction.performResponseAction(response, assertion)
     }
