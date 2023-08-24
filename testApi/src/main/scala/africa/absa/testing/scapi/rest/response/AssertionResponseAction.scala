@@ -48,8 +48,14 @@ object AssertionResponseAction extends ResponsePerformer {
   val CONTENT_TYPE_IS_XML = "content-type-is-xml"
   val CONTENT_TYPE_IS_HTML = "content-type-is-html"
 
+  // cookies-...
+  val COOKIE_EXISTS = "cookie-exists"
+  val COOKIE_VALUE_EQUALS = "cookie-value-equals"
+  val COOKIE_IS_SECURED = "cookie-is-secured"
+  val COOKIE_IS_NOT_SECURED = "cookie-is-not-secured"
+
   // body-...
-  val BODY_CONTAINS = "body-contains" // TODO - rename it to more specific
+  val BODY_CONTAINS_TEXT = "body-contains-text"
 
   /**
    * Validates the content of an assertion response action object depending on its type.
@@ -93,11 +99,26 @@ object AssertionResponseAction extends ResponsePerformer {
       // content-type-...
       case CONTENT_TYPE_IS_JSON | CONTENT_TYPE_IS_XML | CONTENT_TYPE_IS_HTML => ()
 
+      // cookies-...
+      case COOKIE_EXISTS | COOKIE_VALUE_EQUALS | COOKIE_IS_SECURED | COOKIE_IS_NOT_SECURED =>
+        responseAction.params.getOrElse("cookieName", None) match {
+          case cookieName: String => ContentValidator.validateNonEmptyString(cookieName, s"ResponseAssertion.${responseAction.name}.cookieName")
+          case None => throw new IllegalArgumentException(s"Missing required 'cookieName' parameter for assertion ${responseAction.name} logic.")
+        }
+        responseAction.name.toLowerCase match {
+          case COOKIE_VALUE_EQUALS =>
+            responseAction.params.getOrElse("expectedValue", None) match {
+              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$COOKIE_VALUE_EQUALS.expectedValue")
+              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $COOKIE_VALUE_EQUALS logic.")
+            }
+          case _ => ()
+        }
+
       // body-...
-      case BODY_CONTAINS =>
-        responseAction.params.get("body") match {
-          case body => ContentValidator.validateNonEmptyString(body.get, s"ResponseAssertion.$BODY_CONTAINS.body")
-          case None => throw new IllegalArgumentException(s"Missing required 'body' parameter for assertion $BODY_CONTAINS logic.")
+      case BODY_CONTAINS_TEXT =>
+        responseAction.params.getOrElse("text", None) match {
+          case text: String => ContentValidator.validateNonEmptyString(text, s"ResponseAssertion.$BODY_CONTAINS_TEXT.text")
+          case None => throw new IllegalArgumentException(s"Missing required 'text' parameter for assertion $BODY_CONTAINS_TEXT logic.")
         }
       case _ => throw UndefinedResponseActionType(responseAction.name)
     }
@@ -145,10 +166,23 @@ object AssertionResponseAction extends ResponsePerformer {
       case CONTENT_TYPE_IS_XML => assertContentTypeIsXml(response)
       case CONTENT_TYPE_IS_HTML => assertContentTypeIsHtml(response)
 
+      // cookies-...
+      case COOKIE_EXISTS | COOKIE_VALUE_EQUALS | COOKIE_IS_SECURED | COOKIE_IS_NOT_SECURED =>
+        val cookieName = responseAction.params("cookieName")
+        responseAction.name match {
+          case COOKIE_EXISTS => assertCookieExists(response, cookieName)
+          case COOKIE_VALUE_EQUALS =>
+            val expectedValue = responseAction.params("expectedValue")
+            assertCookieValueEquals(response, cookieName, expectedValue)
+          case COOKIE_IS_SECURED => assertCookieIsSecured(response, cookieName)
+          case COOKIE_IS_NOT_SECURED => assertCookieIsNotSecured(response, cookieName)
+        }
+
       // body-...
-      case BODY_CONTAINS =>
-        val body = responseAction.params("body")
-        assertBodyContains(response, body)
+      case BODY_CONTAINS_TEXT =>
+        val text = responseAction.params("text")
+        assertBodyContainsText(response, text)
+
       case _ => throw new IllegalArgumentException(s"Unsupported assertion method [group: assert]: ${responseAction.name}")
     }
   }
@@ -300,17 +334,73 @@ object AssertionResponseAction extends ResponsePerformer {
     assertHeaderValueEquals(response, "content-type", "text/html")
   }
 
+  // cookies-...
+
+  /**
+   * Asserts that the specified cookie exists in the given response.
+   *
+   * @param response The response object containing the cookies.
+   * @param cookieName The name of the cookie to check for existence.
+   * @return True if the specified cookie exists in the response, otherwise false.
+   */
+  def assertCookieExists(response: Response, cookieName: String): Boolean = {
+    response.cookies.contains(cookieName)
+  }
+
+  /**
+   * Asserts that the value of the specified cookie in the given response equals the expected value.
+   *
+   * @param response      The response object containing the cookies.
+   * @param cookieName    The name of the cookie to check.
+   * @param expectedValue The expected value of the cookie.
+   * @return True if the value of the specified cookie matches the expected value, otherwise false.
+   */
+  def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Boolean = {
+    if (assertCookieExists(response, cookieName))
+      response.cookies(cookieName)._1 == expectedValue
+    else
+      false
+  }
+
+  /**
+   * Asserts that the specified cookie in the given response is secured.
+   *
+   * @param response   The response object containing the cookies.
+   * @param cookieName The name of the cookie to check.
+   * @return True if the specified cookie is secured, otherwise false.
+   */
+  def assertCookieIsSecured(response: Response, cookieName: String): Boolean = {
+    if (assertCookieExists(response, cookieName))
+      response.cookies(cookieName)._2
+    else
+      false
+  }
+
+  /**
+   * Asserts that the specified cookie in the given response is not secured.
+   *
+   * @param response   The response object containing the cookies.
+   * @param cookieName The name of the cookie to check.
+   * @return True if the specified cookie is not secured, otherwise false.
+   */
+  def assertCookieIsNotSecured(response: Response, cookieName: String): Boolean = {
+    if (assertCookieExists(response, cookieName))
+      !response.cookies(cookieName)._2
+    else
+      false
+  }
+
   /**
    * Asserts that the body of the response contains the expected content.
    *
    * @param response        The HTTP response to check the body of.
-   * @param expectedContent The expected content present in the response body as a string.
+   * @param text The expected text present in the response body as a string.
    * @return A Boolean indicating whether the expected content is present in the response body or not.
    */
-  def assertBodyContains(response: Response, expectedContent: String): Boolean = {
-    val isSuccess: Boolean = response.body.contains(expectedContent)
+  def assertBodyContainsText(response: Response, text: String): Boolean = {
+    val isSuccess: Boolean = response.body.contains(text)
     if (!isSuccess)
-        Logger.error(s"Expected body to contain $expectedContent")
+        Logger.error(s"Expected body to contain $text")
     isSuccess
   }
 }

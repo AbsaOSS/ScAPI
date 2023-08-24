@@ -18,6 +18,8 @@ package africa.absa.testing.scapi.rest.request.sender
 
 import africa.absa.testing.scapi.rest.response.Response
 
+import java.net.HttpCookie
+
 /**
  * ScAPIRequestSender is an implementation of the RequestSender interface.
  * It provides the capability to send different types of HTTP requests including GET, POST, PUT, and DELETE.
@@ -29,13 +31,18 @@ object ScAPIRequestSender extends RequestSender {
     val response = requestFunc
     val endTime = System.nanoTime()
 
+    val extractedCookies: Map[String, (String, Boolean)] = response.cookies.view.map {
+      case (name, cookie: HttpCookie) =>
+        (name, (cookie.getValue, cookie.getSecure))
+    }.toMap
+
     Response(
       response.statusCode,
       response.text(),
       url = response.url,
       statusMessage = response.statusMessage,
       response.headers,
-      cookies = response.cookies.view.mapValues(cookie => cookie.toString).toMap,
+      cookies = extractedCookies,
       (endTime - startTime) / 1_000_000
     )
   }

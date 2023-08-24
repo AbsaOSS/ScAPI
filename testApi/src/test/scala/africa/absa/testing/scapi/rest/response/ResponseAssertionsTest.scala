@@ -133,19 +133,78 @@ class ResponseAssertionsTest extends FunSuite {
     }
   }
 
-  // body-...
+  // cookies-...
 
-  test("validateContent - body is not empty") {
-    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("body" -> "test content"))
+  test("validateContent - cookie exists - valid cookie name string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_EXISTS}", Map("cookieName" -> "testCookie"))
     AssertionResponseAction.validateContent(responseAction)
   }
 
-  test("validateContent - body is empty") {
-    intercept[ContentValidationFailed] {
-      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("body" -> "")))
+  test("validateContent - cookie exists - invalid cookie name string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_EXISTS}", Map("cookieName" -> ""))
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ResponseAssertion.cookie-exists.cookieName' is empty.") {
+      AssertionResponseAction.validateContent(responseAction)
     }
   }
 
+  test("validateContent - cookie exists - missing cookie name parameter") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_EXISTS}", Map())
+    interceptMessage[IllegalArgumentException]("Missing required 'cookieName' parameter for assertion cookie-exists logic.") {
+      AssertionResponseAction.validateContent(responseAction)
+    }
+  }
+
+  test("validateContent - cookie value equals - valid cookie name and value strings") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    AssertionResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - cookie value equals - invalid cookie name string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "", "expectedValue" -> "cookieValue"))
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ResponseAssertion.cookie-value-equals.cookieName' is empty.") {
+      AssertionResponseAction.validateContent(responseAction)
+    }
+  }
+
+  test("validateContent - cookie value equals - invalid cookie value string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie", "expectedValue" -> ""))
+    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ResponseAssertion.cookie-value-equals.expectedValue' is empty.") {
+      AssertionResponseAction.validateContent(responseAction)
+    }
+  }
+
+  test("validateContent - cookie value equals - missing cookie name string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("expectedValue" -> "cookieValue"))
+    interceptMessage[IllegalArgumentException]("Missing required 'cookieName' parameter for assertion cookie-value-equals logic.") {
+      AssertionResponseAction.validateContent(responseAction)
+    }
+  }
+
+  test("validateContent - cookie value equals - missing cookie value string") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie"))
+    interceptMessage[IllegalArgumentException]("Missing required 'expectedValue' parameter for assertion cookie-value-equals logic.") {
+      AssertionResponseAction.validateContent(responseAction)
+    }
+  }
+
+  // body-...
+
+  test("validateContent - body contains text - body is not empty") {
+    val responseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS_TEXT}", Map("text" -> "test content"))
+    AssertionResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - body contains text - body is empty") {
+    intercept[ContentValidationFailed] {
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS_TEXT}", Map("text" -> "")))
+    }
+  }
+
+  test("validateContent - body contains text - body parameter is missing") {
+    interceptMessage[IllegalArgumentException]("Missing required 'text' parameter for assertion body-contains-text logic.") {
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS_TEXT}", Map.empty))
+    }
+  }
 
   test("validateContent - unsupported response action") {
     intercept[UndefinedResponseActionType] {
@@ -337,21 +396,87 @@ class ResponseAssertionsTest extends FunSuite {
     assert(!AssertionResponseAction.performResponseAction(response, contentTypeIsJsonResponseAction))
   }
 
+  // cookies-...
+
+  test("performAssertions - cookie exists") {
+    val cookieExistsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_EXISTS}", Map("cookieName" -> "testCookie"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("", false)), 100)
+
+    assert(AssertionResponseAction.performResponseAction(response, cookieExistsResponseAction))
+  }
+
+  test("performAssertions - cookie does not exists") {
+    val cookieExistsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_EXISTS}", Map("cookieName" -> "anotherCookie"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("", false)), 100)
+
+    assert(!AssertionResponseAction.performResponseAction(response, cookieExistsResponseAction))
+  }
+
+  test("performAssertions - cookie value is equals") {
+    val cookieValueEqualsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("cookieValue", false)), 100)
+
+    assert(AssertionResponseAction.performResponseAction(response, cookieValueEqualsResponseAction))
+  }
+
+  test("performAssertions - cookie value is not equals") {
+    val cookieValueEqualsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("anotherValue", false)), 100)
+
+    assert(!AssertionResponseAction.performResponseAction(response, cookieValueEqualsResponseAction))
+  }
+
+  test("performAssertions - cookie value equals - cookie does not exist") {
+    val cookieValueEqualsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_VALUE_EQUALS}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map.empty, 100)
+
+    assert(!AssertionResponseAction.performResponseAction(response, cookieValueEqualsResponseAction))
+  }
+
+  test("performAssertions - cookie is secured") {
+    val cookieIsSecuredResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_IS_SECURED}", Map("cookieName" -> "securedCookie"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("securedCookie" -> ("someValue", true)), 100)
+
+    assert(AssertionResponseAction.performResponseAction(response, cookieIsSecuredResponseAction))
+  }
+
+  test("performAssertions - cookie is secured - cookie does not exist") {
+    val cookieIsSecuredResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_IS_SECURED}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map.empty, 100)
+
+    assert(!AssertionResponseAction.performResponseAction(response, cookieIsSecuredResponseAction))
+  }
+
+  test("performAssertions - cookie is not secured") {
+    val cookieIsNotSecuredResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_IS_NOT_SECURED}", Map("cookieName" -> "notSecuredCookie"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("notSecuredCookie" -> ("someValue", false)), 100)
+
+    assert(AssertionResponseAction.performResponseAction(response, cookieIsNotSecuredResponseAction))
+  }
+
+  test("performAssertions - cookie is not secured - cookie does not exist") {
+    val cookieIsNotSecuredResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.COOKIE_IS_NOT_SECURED}", Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map.empty, 100)
+
+    assert(!AssertionResponseAction.performResponseAction(response, cookieIsNotSecuredResponseAction))
+  }
+
   // body-...
 
   test("performAssertions - body contains assertion") {
-    val bodyContainsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummy"))
+    val bodyContainsTextResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS_TEXT}", Map("text" -> "dummy"))
     val response = Response(200, "This is a dummy body", "", "", Map.empty, Map.empty, 100)
-    assert(AssertionResponseAction.performResponseAction(response, bodyContainsResponseAction))
+    assert(AssertionResponseAction.performResponseAction(response, bodyContainsTextResponseAction))
   }
 
   test("performAssertions - body does not contains assertion") {
-    val bodyContainsResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("body" -> "dummies"))
+    val bodyContainsTextResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS_TEXT}", Map("text" -> "dummies"))
     val response = Response(200, "This is a dummy body", "", "", Map.empty, Map.empty, 100)
 
-    assert(!AssertionResponseAction.performResponseAction(response, bodyContainsResponseAction))
+    assert(!AssertionResponseAction.performResponseAction(response, bodyContainsTextResponseAction))
   }
 
+  // unsupported
 
   test("performAssertions - unsupported assertion") {
     val unsupportedResponseAction = ResponseAction(method = s"${Response.GROUP_ASSERT}.unsupported-assertion", Map("nonsense" -> "value"))

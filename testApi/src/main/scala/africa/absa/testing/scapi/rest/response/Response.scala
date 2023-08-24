@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 
-case class Response(statusCode: Int, body: String, url: String, statusMessage: String, headers: Map[String, Seq[String]], cookies: Map[String, String], duration: Long)
+case class Response(statusCode: Int, body: String, url: String, statusMessage: String, headers: Map[String, Seq[String]], cookies: Map[String, (String, Boolean)], duration: Long)
 
 /**
  * A singleton object that is responsible for managing and handling responses.
