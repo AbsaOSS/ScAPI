@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.model
 
-import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
+import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseAction}
 
 /**
  * Case class that represents a single method.
@@ -24,12 +24,12 @@ import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
  * @param name The name of the method.
  * @param headers The set of header options for the method.
  * @param actions The set of action objects for the method.
- * @param assertions The set of assertion objects for the method.
+ * @param responseActions The set of responseAction objects for the method.
  */
 case class Method(name: String,
                   headers: Set[Header],
                   actions: Set[Action],
-                  assertions: Set[Assertion]) extends Requestable {
+                  responseActions: Set[ResponseAction]) extends Requestable {
   /**
    * Method to resolve references within the Method instance.
    *
@@ -41,7 +41,7 @@ case class Method(name: String,
       name,
       headers.map(c => c.resolveReferences(references)),
       actions.map(c => c.resolveReferences(references)),
-      assertions.map(c => c.resolveReferences(references))
+      responseActions.map(c => c.resolveReferences(references))
     )
   }
 }

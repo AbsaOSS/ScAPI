@@ -27,10 +27,9 @@
           ]
         }
       ],
-      "assertions": [
+      "responseActions": [
         {
-          "group": "assert",
-          "name": "status-code",
+          "method": "assert.status-code",
           "param_1": "200"
         }
       ]

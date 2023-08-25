@@ -198,35 +198,39 @@ case class Action private(methodName: String, url: String, body: Option[String] 
 }
 
 /**
- * Case class that represents Assertion.
- * This class is used to hold test assertions.
+ * Case class that represents ResponseAction.
+ * This class is used to hold test response action.
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
- * @constructor create a new Assertion with a name and value.
- * @param name the name of the assertion.
- * @param params the map containing the parameters of the assertion. Each key-value pair in the map
+ * @constructor create a new ResponseAction with a name and value.
+ * @param method the "group and name" of the response action.
+ * @param params the map containing the parameters of the response action. Each key-value pair in the map
  * represents a parameter name and its corresponding value.
  */
-case class Assertion private(group: String,
-                             name: String,
-                             params: Map[String, String]) extends ReferenceResolver {
+case class ResponseAction private(method: String,
+                                  params: Map[String, String]) extends ReferenceResolver {
+
+  private def splitter: Seq[String] = method.split("\\.").toSeq
+
+  def group : String = splitter.head
+  def name : String = splitter.tail.head
 
   /**
    * Method to resolve references.
    *
    * @param references the map of references that may be used to resolve references in the value.
-   * @return a new Assertion instance with resolved references.
+   * @return a new ResponseAction instance with resolved references.
    */
-  def resolveReferences(references: Map[String, String]): Assertion = this.copy(
+  def resolveReferences(references: Map[String, String]): ResponseAction = this.copy(
     params = this.params.map { case (k, v) => k -> getResolved(v, references) }
   )
 
   /**
    * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
    *
-   * @return A new Assertion instance with resolved references.
+   * @return A new ResponseAction instance with resolved references.
    */
-  def resolveByRuntimeCache(): Assertion = this.copy(
+  def resolveByRuntimeCache(): ResponseAction = this.copy(
     params = this.params.map { case (k, v) => k -> RuntimeCache.resolve(v) }
   )
 }

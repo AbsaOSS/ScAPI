@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.json.ResponseAction
 
 case class Response(statusCode: Int, body: String, headers: Map[String, Seq[String]])
 
@@ -30,39 +30,39 @@ object Response {
   val GROUP_LOG: String = "log"
 
   /**
-   * Validates an Assertion based on its group type.
+   * Validates an ResponseAction based on its group type.
    * Calls the appropriate group's validateContent method based on group type.
    *
-   * @param assertion The assertion to be validated.
-   * @throws IllegalArgumentException If the assertion group type is not supported.
+   * @param responseAction The responseAction to be validated.
+   * @throws IllegalArgumentException If the response action group is not supported.
    */
-  def validate(assertion: Assertion): Unit = {
-    assertion.group match {
-      case GROUP_ASSERT => ResponseAssertion.validateContent(assertion)
-      case GROUP_EXTRACT_JSON => ResponseExtractJson.validateContent(assertion)
-      case GROUP_LOG => ResponseLog.validateContent(assertion)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
+  def validate(responseAction: ResponseAction): Unit = {
+    responseAction.group match {
+      case GROUP_ASSERT => AssertionResponseAction.validateContent(responseAction)
+      case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.validateContent(responseAction)
+      case GROUP_LOG => LogResponseAction.validateContent(responseAction)
+      case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${responseAction.group}")
     }
   }
 
   /**
    * Performs actions on the given Response based on a set of Assertions.
-   * Each Assertion is resolved by the runtime cache before being used.
+   * Each response action is resolved by the runtime cache before being used.
    * The appropriate group's performAssertions method is called based on the group type of each Assertion.
    * Returns true only if all assertions return true, and false as soon as any assertion returns false.
    *
    * @param response   The response on which actions will be performed.
-   * @param assertions The set of assertions that dictate what actions will be performed on the response.
-   * @return           Boolean indicating whether all assertions passed (true) or any assertion failed (false).
-   * @throws IllegalArgumentException If an assertion group type is not supported.
+   * @param responseAction The set of response actions that dictate what actions will be performed on the response.
+   * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false).
+   * @throws IllegalArgumentException If an response action group is not supported.
    */
-  def perform(response: Response, assertions: Set[Assertion]): Boolean = {
-    assertions.forall { assertion =>
-      val resolvedAssertion: Assertion = assertion.resolveByRuntimeCache()
-      resolvedAssertion.group match {
-        case GROUP_ASSERT => ResponseAssertion.performAssertion(response, assertion)
-        case GROUP_EXTRACT_JSON => ResponseExtractJson.performAssertion(response, assertion)
-        case GROUP_LOG => ResponseLog.performAssertion(response, assertion)
+  def perform(response: Response, responseAction: Set[ResponseAction]): Boolean = {
+    responseAction.forall { assertion =>
+      val resolvedResponseAction: ResponseAction = assertion.resolveByRuntimeCache()
+      resolvedResponseAction.group match {
+        case GROUP_ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
+        case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
+        case GROUP_LOG => LogResponseAction.performResponseAction(response, assertion)
         case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
       }
     }

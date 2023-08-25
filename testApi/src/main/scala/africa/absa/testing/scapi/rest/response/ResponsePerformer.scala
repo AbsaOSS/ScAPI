@@ -16,9 +16,9 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.Assertion
+import africa.absa.testing.scapi.json.ResponseAction
 
 trait ResponsePerformer {
-  def validateContent(assertion: Assertion): Unit
-  def performAssertion(response: Response, assertion: Assertion): Boolean
+  def validateContent(responseAction: ResponseAction): Unit
+  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean
 }

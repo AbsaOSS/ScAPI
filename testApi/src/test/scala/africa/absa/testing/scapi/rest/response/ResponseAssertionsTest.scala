@@ -16,8 +16,8 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.Assertion
-import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedAssertionType}
+import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedResponseActionType}
 import munit.FunSuite
 
 class ResponseAssertionsTest extends FunSuite {
@@ -26,69 +26,69 @@ class ResponseAssertionsTest extends FunSuite {
     validateContent
    */
   test("validateContent - valid status code string") {
-    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "200"))
-    ResponseAssertion.validateContent(assertion)
+    val assertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE}", Map("param_1" -> "200"))
+    AssertionResponseAction.validateContent(assertion)
   }
 
   test("validateContent - invalid status code string") {
     intercept[ContentValidationFailed] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.STATUS_CODE, Map("param_1" -> "not an integer")))
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.STATUS_CODE}", Map("param_1" -> "not an integer")))
     }
   }
 
   test("validateContent - body is not empty") {
-    val assertion = Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, Map("param_1" -> "test content"))
-    ResponseAssertion.validateContent(assertion)
+    val assertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("param_1" -> "test content"))
+    AssertionResponseAction.validateContent(assertion)
   }
 
   test("validateContent - body is empty") {
     intercept[ContentValidationFailed] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = ResponseAssertion.BODY_CONTAINS, Map("param_1" -> "")))
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.${AssertionResponseAction.BODY_CONTAINS}", Map("param_1" -> "")))
     }
   }
 
-  test("validateContent - unsupported assertion") {
-    intercept[UndefinedAssertionType] {
-      ResponseAssertion.validateContent(Assertion(group = Response.GROUP_ASSERT, name = "unsupported", Map("param_1" -> "value")))
+  test("validateContent - unsupported response action") {
+    intercept[UndefinedResponseActionType] {
+      AssertionResponseAction.validateContent(ResponseAction(method = s"${Response.GROUP_ASSERT}.unsupported", Map("param_1" -> "value")))
     }
   }
 
   /*
-    performAssertions
+    performResponseAction
    */
   test("performAssertions - status code assertion - equals") {
-    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", Map("param_1" -> "200"))
+    val statusCodeAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.status-code", Map("param_1" -> "200"))
     val response = Response(200, "Dummy Body", Map.empty)
 
-    assert(ResponseAssertion.performAssertion(response, statusCodeAssertion))
+    assert(AssertionResponseAction.performResponseAction(response, statusCodeAssertion))
   }
 
   test("performAssertions - status code assertion - not equals") {
-    val statusCodeAssertion = Assertion(group = Response.GROUP_ASSERT, name = "status-code", Map("param_1" -> "200"))
+    val statusCodeAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.status-code", Map("param_1" -> "200"))
     val response = Response(500, "Dummy Body", Map.empty)
 
-    assert(!ResponseAssertion.performAssertion(response, statusCodeAssertion))
+    assert(!AssertionResponseAction.performResponseAction(response, statusCodeAssertion))
   }
 
   test("performAssertions - body contains assertion") {
-    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", Map("param_1" -> "dummy"))
+    val bodyContainsAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("param_1" -> "dummy"))
     val response = Response(200, "This is a dummy body", Map.empty)
-    assert(ResponseAssertion.performAssertion(response, bodyContainsAssertion))
+    assert(AssertionResponseAction.performResponseAction(response, bodyContainsAssertion))
   }
 
   test("performAssertions - body does not contains assertion") {
-    val bodyContainsAssertion = Assertion(group = Response.GROUP_ASSERT, name = "body-contains", Map("param_1" -> "dummies"))
+    val bodyContainsAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.body-contains", Map("param_1" -> "dummies"))
     val response = Response(200, "This is a dummy body", Map.empty)
 
-    assert(!ResponseAssertion.performAssertion(response, bodyContainsAssertion))
+    assert(!AssertionResponseAction.performResponseAction(response, bodyContainsAssertion))
   }
 
   test("performAssertions - unsupported assertion") {
-    val unsupportedAssertion = Assertion(group = Response.GROUP_ASSERT, name = "unsupported-assertion", Map("param_1" -> "value"))
+    val unsupportedAssertion = ResponseAction(method = s"${Response.GROUP_ASSERT}.unsupported-assertion", Map("param_1" -> "value"))
     val response = Response(200, "Dummy Body", Map.empty)
 
     interceptMessage[IllegalArgumentException]("Unsupported assertion[group: assert]: unsupported-assertion") {
-      ResponseAssertion.performAssertion(response, unsupportedAssertion)
+      AssertionResponseAction.performResponseAction(response, unsupportedAssertion)
     }
   }
 }

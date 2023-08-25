@@ -259,7 +259,7 @@ object SuiteFactory {
 
   /**
    * This method validates the content of a SuiteBundle.
-   * It checks the suite's headers, body, parameters, and assertions.
+   * It checks the suite's headers, body, parameters, and response action.
    *
    * @param suiteBundle The SuiteBundle to be validated.
    */
@@ -269,7 +269,7 @@ object SuiteFactory {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
       RequestBody.validateContent(test.actions.head.body)
       RequestParams.validateContent(test.actions.head.params)
-      test.assertions.foreach(assertion => Response.validate(assertion))
+      test.responseActions.foreach(responseAction => Response.validate(responseAction))
     })
   }
 }
@@ -281,7 +281,7 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
+  implicit val assertionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
@@ -301,7 +301,7 @@ object SuiteBeforeJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
+  implicit val responseActionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteBeforeFormat: RootJsonFormat[SuiteBefore] = jsonFormat2(SuiteBefore)
 }
@@ -313,29 +313,28 @@ object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
   implicit val headerFormat: RootJsonFormat[Header] = jsonFormat2(Header)
   implicit val paramFormat: RootJsonFormat[Param] = jsonFormat2(Param)
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
-  implicit val assertionFormat: RootJsonFormat[Assertion] = AssertionJsonProtocol.AssertionJsonFormat
+  implicit val assertionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
   implicit val suiteAfterFormat: RootJsonFormat[SuiteAfter] = jsonFormat2(SuiteAfter)
 }
 
 /**
- * Object that provides implicit JSON format for Assertion class.
+ * Object that provides implicit JSON format for ResponseAction class.
  */
-object AssertionJsonProtocol extends DefaultJsonProtocol {
+object ResponseActionJsonProtocol extends DefaultJsonProtocol {
 
-  implicit object AssertionJsonFormat extends RootJsonFormat[Assertion] {
-    def write(a: Assertion): JsObject = JsObject(
-      ("group" -> JsString(a.group)) +:
-        ("name" -> JsString(a.name)) +:
+  implicit object ResponseActionJsonFormat extends RootJsonFormat[ResponseAction] {
+    def write(a: ResponseAction): JsObject = JsObject(
+      ("method" -> JsString(a.method)) +:
         a.params.view.mapValues(JsString(_)).toSeq: _*
     )
 
-    def read(value: JsValue): Assertion = {
-      value.asJsObject.getFields("group", "name") match {
-        case Seq(JsString(group), JsString(name)) =>
+    def read(value: JsValue): ResponseAction = {
+      value.asJsObject.getFields("method") match {
+        case Seq(JsString(method)) =>
           val params = value.asJsObject.fields.view.filterKeys(_.startsWith("param_")).toMap
-          Assertion(group, name, params.map { case (k, v) => k -> v.convertTo[String] })
-        case _ => throw new DeserializationException("Assertion expected")
+          ResponseAction(method, params.map { case (k, v) => k -> v.convertTo[String] })
+        case _ => throw DeserializationException("Assertion expected")
       }
     }
   }

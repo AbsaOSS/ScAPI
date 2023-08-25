@@ -51,10 +51,10 @@
             "$ref": "#/definitions/Action"
           }
         },
-        "assertions": {
+        "responseActions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Assertion"
+            "$ref": "#/definitions/ResponseAction"
           }
         }
       },
@@ -63,7 +63,7 @@
         "categories",
         "headers",
         "actions",
-        "assertions"
+        "responseActions"
       ],
       "title": "Test"
     },
@@ -110,14 +110,11 @@
       ],
       "title": "Action"
     },
-    "Assertion": {
+    "ResponseAction": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "group": {
-          "type": "string"
-        },
-        "name": {
+        "method": {
           "type": "string"
         }
       },
@@ -127,11 +124,10 @@
         }
       },
       "required": [
-        "group",
-        "name",
+        "method",
         "param_1"
       ],
-      "title": "Assertion"
+      "title": "ResponseAction"
     },
     "Param": {
       "type": "object",

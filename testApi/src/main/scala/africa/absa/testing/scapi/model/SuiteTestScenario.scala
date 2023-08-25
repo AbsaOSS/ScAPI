@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.model
 
-import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
+import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseAction}
 
 /**
  * Case class that represents a suite test scenario.
@@ -25,14 +25,14 @@ import africa.absa.testing.scapi.json.{Action, Assertion, Header, Requestable}
  * @param categories The required test categories of the test scenario.
  * @param headers The set of header options for the test scenario.
  * @param actions The set of action objects for the test scenario.
- * @param assertions The set of assertion objects for the test scenario.
+ * @param responseActions The set of responseAction objects for the test scenario.
  * @param only The control if test should be only be running when set to true.
  */
 case class SuiteTestScenario(name: String,
                              categories: Set[String],
                              headers: Set[Header],
                              actions: Set[Action],
-                             assertions: Set[Assertion],
+                             responseActions: Set[ResponseAction],
                              only: Option[Boolean] = Some(false)) extends Requestable {
   /**
    * Method to resolve references within the SuiteTestScenario instance.
@@ -46,7 +46,7 @@ case class SuiteTestScenario(name: String,
       categories,
       headers.map(c => c.resolveReferences(references)),
       actions.map(c => c.resolveReferences(references)),
-      assertions.map(c => c.resolveReferences(references)),
+      responseActions.map(c => c.resolveReferences(references)),
       only
     )
   }
