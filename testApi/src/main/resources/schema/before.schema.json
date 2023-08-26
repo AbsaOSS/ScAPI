@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-06/schema#",
   "$ref": "#/definitions/suiteBefore",
 
-  "version" : "1.0.0",
   "definitions": {
     "suiteBefore": {
       "type": "object",
