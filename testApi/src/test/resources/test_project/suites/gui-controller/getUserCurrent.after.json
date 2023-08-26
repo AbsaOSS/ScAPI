@@ -21,8 +21,8 @@
       ],
       "responseActions": [
         {
-          "method": "assert.statusCode",
-          "param_1": "200"
+          "method": "assert.status-code",
+          "code": "200"
         }
       ]
     }

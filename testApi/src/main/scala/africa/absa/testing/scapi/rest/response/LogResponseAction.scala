@@ -30,9 +30,7 @@ object LogResponseAction extends ResponsePerformer {
   val INFO = "info"
 
   /**
-   * This method validates the content of the response action.
-   * It checks if the response action's name is "info", then validates if its `param_1` is a non-empty string.
-   * For all other response action names, it throws an `UndefinedAssertionType` exception.
+   * Validates the content of an log response action object depending on its type.
    *
    * @param responseAction The response action to be validated.
    * @throws UndefinedResponseActionType if the response action's name is not recognized.
@@ -40,18 +38,16 @@ object LogResponseAction extends ResponsePerformer {
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
       case INFO =>
-        responseAction.params.get("param_1") match {
-          case param_1 => ContentValidator.validateNonEmptyString(param_1.get, s"ResponseLog.$INFO.param_1")
-          case None => throw new IllegalArgumentException(s"Missing required param_1 for assertion $INFO")
+        responseAction.params.get("message") match {
+          case message => ContentValidator.validateNonEmptyString(message.get, s"ResponseLog.$INFO.message")
+          case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion $INFO logic.")
         }
       case _ => throw UndefinedResponseActionType(responseAction.name)
     }
   }
 
   /**
-   * This method performs the necessary response actions on the response.
-   * It checks if the response action's name is "info", then logs the `param_1` as info message.
-   * For all other response action names, it throws an `IllegalArgumentException`.
+   * Performs log actions on a response depending on the type of log method provided.
    *
    * @param response  The response on which the response action are to be performed.
    * @param responseAction The responseAction to be performed on the response.
@@ -60,9 +56,9 @@ object LogResponseAction extends ResponsePerformer {
   def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
     responseAction.name match {
       case INFO =>
-        val param_1 = responseAction.params.getOrElse("param_1", throw new IllegalArgumentException("param_1 is missing"))
-        logInfo(param_1)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: log]: ${responseAction.name}")
+        val message = responseAction.params("message")
+        logInfo(message)
+      case _ => throw new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}")
     }
   }
 

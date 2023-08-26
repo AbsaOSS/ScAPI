@@ -3,10 +3,11 @@
   "$id": "https://africa.absa/schemas/suiteConstants",
   "$ref": "#/definitions/suiteConstants",
 
+  "version" : "1.0.0",
   "definitions": {
     "suiteConstants": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "constants": {
           "$ref": "#/definitions/SuiteConstants"
