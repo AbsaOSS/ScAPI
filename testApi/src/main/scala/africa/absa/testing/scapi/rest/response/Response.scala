@@ -60,7 +60,15 @@ object Response {
   def perform(response: Response, responseAction: Seq[ResponseAction]): Boolean = {
     def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {
       val filteredParams = resolvedResponseAction.params.filter(_._1 != "method").map { case (k, v) => s"$k->$v" }.mkString(", ")
-      val baseLog = s"\nParameters received: \n\tRequired Response-Action: \n\t\tGroup->'${resolvedResponseAction.group}', \n\t\tMethod->'${resolvedResponseAction.name}', \n\t\tParams->'${filteredParams}', \n\tActual Response: \n\t\t$response"
+      val baseLog =
+        s"""
+           |Parameters received:
+           |  Required Response-Action:
+           |    Group->'${resolvedResponseAction.group}',
+           |    Method->'${resolvedResponseAction.name}',
+           |    Params->'${filteredParams}',
+           |  Actual Response:
+           |    $response""".stripMargin
       val exceptionLog = exception.map(e => s"\nException: ${e.getMessage}").getOrElse("")
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
     }
