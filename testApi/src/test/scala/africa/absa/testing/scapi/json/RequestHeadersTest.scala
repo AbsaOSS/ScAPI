@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.rest.request.RequestHeaders
-import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedHeaderType}
+import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedHeaderTypeException}
 import munit.FunSuite
 
 class RequestHeadersTest extends FunSuite {
@@ -62,7 +62,7 @@ class RequestHeadersTest extends FunSuite {
 
   test("validateContent - CONTENT_TYPE header - empty") {
     val header = Header(RequestHeaders.CONTENT_TYPE, "")
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'Header.content-type' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'Header.content-type' is empty.") {
       RequestHeaders.validateContent(header)
     }
   }
@@ -74,14 +74,14 @@ class RequestHeadersTest extends FunSuite {
 
   test("validateContent - AUTHORIZATION header - empty") {
     val header = Header(RequestHeaders.AUTHORIZATION, "")
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'Header.authorization' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'Header.authorization' is empty.") {
       RequestHeaders.validateContent(header)
     }
   }
 
   test("validateContent - Unsupported header type") {
     val header = Header("unsupported-header", "value")
-    intercept[UndefinedHeaderType] {
+    intercept[UndefinedHeaderTypeException] {
       RequestHeaders.validateContent(header)
     }
   }

@@ -16,11 +16,13 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
+
+import scala.util.{Failure, Success, Try}
 import scala.xml.XML
 
 /**
@@ -61,7 +63,7 @@ object AssertionResponseAction extends ResponsePerformer {
    * Validates the content of an assertion response action object depending on its type.
    *
    * @param responseAction The response action object to be validated.
-   * @throws UndefinedResponseActionType If the response action type is not recognized.
+   * @throws UndefinedResponseActionTypeException If the response action type is not recognized.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
@@ -120,7 +122,7 @@ object AssertionResponseAction extends ResponsePerformer {
           case text: String => ContentValidator.validateNonEmptyString(text, s"ResponseAssertion.$BODY_CONTAINS_TEXT.text")
           case None => throw new IllegalArgumentException(s"Missing required 'text' parameter for assertion $BODY_CONTAINS_TEXT logic.")
         }
-      case _ => throw UndefinedResponseActionType(responseAction.name)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
 
@@ -129,10 +131,10 @@ object AssertionResponseAction extends ResponsePerformer {
    *
    * @param response  The response to perform the assertions on.
    * @param responseAction The assertion response action to perform on the response.
-   * @return Boolean value indicating whether the assertion passed or failed.
+   * @return Boolean value indicating whether the assertion passed or failed. TODO - update all similar docs
    * @throws IllegalArgumentException If the assertion type is not supported.
    */
-  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
+  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     responseAction.name match {
 
       // response-time-...
@@ -183,7 +185,7 @@ object AssertionResponseAction extends ResponsePerformer {
         val text = responseAction.params("text")
         assertBodyContainsText(response, text)
 
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion method [group: assert]: ${responseAction.name}")
+      case _ => Failure(new IllegalArgumentException(s"Unsupported assertion method [group: assert]: ${responseAction.name}"))
     }
   }
 
@@ -198,9 +200,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param maxTimeMillis The maximum allowed time in milliseconds as a string.
    * @return A Boolean indicating whether the response's duration is below the specified maximum time. Returns true if it's below, false otherwise.
    */
-  def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Boolean = {
+  def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Try[Unit] = {
     val lMaxTimeMillis: Long = maxTimeMillis.toLong
-    response.duration <= lMaxTimeMillis
+
+    if (response.duration <= lMaxTimeMillis) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Expected maximal length '$lMaxTimeMillis' is smaller then received '${response.duration}' one."))
+    }
   }
 
   /**
@@ -210,9 +217,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param minTimeMillis The minimum required time in milliseconds as a string.
    * @return A Boolean indicating whether the response's duration is above the specified minimum time. Returns true if it's above, false otherwise.
    */
-  def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Boolean = {
+  def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Try[Unit] = {
     val lMinTimeMillis: Long = minTimeMillis.toLong
-    response.duration >= lMinTimeMillis
+
+    if (response.duration >= lMinTimeMillis) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Expected minimal length '$lMinTimeMillis' is bigger then received '${response.duration}' one."))
+    }
   }
 
   /**
@@ -222,14 +234,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param expectedCode The expected status code as a string.
    * @return A Boolean indicating whether the response's status code matches the expected code. Returns true if they match, false otherwise.
    */
-  def assertStatusCodeEquals(response: Response, expectedCode: String): Boolean = {
+  def assertStatusCodeEquals(response: Response, expectedCode: String): Try[Unit] = {
     val iExpectedCode: Int = expectedCode.toInt
 
-    val isSuccess: Boolean = response.statusCode == iExpectedCode
-    if (!isSuccess) {
-      Logger.error(s"Expected $iExpectedCode, but got ${response.statusCode}")
+    if (response.statusCode == iExpectedCode) {
+      Success(())
+    } else {
+      Failure(new IllegalArgumentException(s"Expected $iExpectedCode, but got ${response.statusCode}"))
     }
-    isSuccess
   }
 
   /**
@@ -238,8 +250,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the status code.
    * @return True if the status code is in the range 200-299, otherwise false.
    */
-  def assertStatusCodeSuccess(response: Response): Boolean = {
-    response.statusCode >= 200 && response.statusCode <= 299
+  def assertStatusCodeSuccess(response: Response): Try[Unit] = {
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (200 - 299)."))
+    }
   }
 
   /**
@@ -248,8 +264,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the status code.
    * @return True if the status code is in the range 400-499, otherwise false.
    */
-  def assertStatusCodeIsClientError(response: Response): Boolean = {
-    response.statusCode >= 400 && response.statusCode <= 499
+  def assertStatusCodeIsClientError(response: Response): Try[Unit] = {
+    if (response.statusCode >= 400 && response.statusCode <= 499) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (400 - 499)."))
+    }
   }
 
   /**
@@ -258,8 +278,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the status code.
    * @return True if the status code is in the range 500-599, otherwise false.
    */
-  def assertStatusCodeIsServerError(response: Response): Boolean = {
-    response.statusCode >= 500 && response.statusCode <= 599
+  def assertStatusCodeIsServerError(response: Response): Try[Unit] = {
+    if (response.statusCode >= 500 && response.statusCode <= 599) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (500 - 599)."))
+    }
   }
 
   /**
@@ -269,8 +293,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param headerName The name of the header to check for.
    * @return True if the header exists in the response, otherwise false.
    */
-  def assertHeaderExists(response: Response, headerName: String): Boolean = {
-    response.headers.contains(headerName.toLowerCase)
+  def assertHeaderExists(response: Response, headerName: String): Try[Unit] = {
+    if (response.headers.contains(headerName.toLowerCase)) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Expected header '$headerName' not found."))
+    }
   }
 
   /**
@@ -281,11 +309,17 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param expectedValue The expected value of the header.
    * @return True if the header value matches the expected value, otherwise false.
    */
-  def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Boolean = {
-    if (assertHeaderExists(response, headerName))
-      expectedValue.equals(response.headers(headerName.toLowerCase).head)
+  def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Try[Unit] = {
+    if (assertHeaderExists(response, headerName).isSuccess) {
+      if (expectedValue.equals(response.headers(headerName.toLowerCase).head)) {
+        Success(())
+      } else {
+        Failure(AssertionException(s"Expected header '$headerName' value '$expectedValue' is not equal to " +
+          s"received header value '$response.headers(headerName.toLowerCase).head'."))
+      }
+    }
     else
-      false
+      Failure(AssertionException(s"Expected header '$headerName' not found."))
   }
 
   /**
@@ -294,7 +328,7 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the headers.
    * @return True if the "Content-Type" header value is "application/json", otherwise false.
    */
-  def assertContentTypeIsJson(response: Response): Boolean = {
+  def assertContentTypeIsJson(response: Response): Try[Unit] = {
     val isContentTypeJson = assertHeaderValueEquals(response, "content-type", "application/json")
     val isBodyJson = try {
       response.body.parseJson
@@ -303,7 +337,11 @@ object AssertionResponseAction extends ResponsePerformer {
       case _: JsonParser.ParsingException => false
     }
 
-    isContentTypeJson && isBodyJson
+    if (isContentTypeJson.isSuccess && isBodyJson) {
+      Success(())
+    } else {
+      Failure(AssertionException("Received content is not JSON type."))
+    }
   }
 
   /**
@@ -312,7 +350,7 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the headers.
    * @return True if the "Content-Type" header value is "application/xml", otherwise false.
    */
-  def assertContentTypeIsXml(response: Response): Boolean = {
+  def assertContentTypeIsXml(response: Response): Try[Unit] = {
     val isContentTypeXml = assertHeaderValueEquals(response, "content-type", "application/xml")
     val isBodyXml = try {
       XML.loadString(response.body)
@@ -321,7 +359,11 @@ object AssertionResponseAction extends ResponsePerformer {
       case _: Exception => false
     }
 
-    isContentTypeXml && isBodyXml
+    if (isContentTypeXml.isSuccess && isBodyXml) {
+      Success(())
+    } else {
+      Failure(AssertionException("Received content is not XML type."))
+    }
   }
 
   /**
@@ -330,8 +372,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response The response object containing the headers.
    * @return True if the "Content-Type" header value is "text/html", otherwise false.
    */
-  def assertContentTypeIsHtml(response: Response): Boolean = {
-    assertHeaderValueEquals(response, "content-type", "text/html")
+  def assertContentTypeIsHtml(response: Response): Try[Unit] = {
+    val res = assertHeaderValueEquals(response, "content-type", "text/html")
+
+    res match {
+      case Success(_) => Success(())
+      case Failure(exception) =>
+        Failure(AssertionException(s"Received content is not HTML type. Details: ${exception.getMessage}"))
+    }
   }
 
   // cookies-...
@@ -343,8 +391,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param cookieName The name of the cookie to check for existence.
    * @return True if the specified cookie exists in the response, otherwise false.
    */
-  def assertCookieExists(response: Response, cookieName: String): Boolean = {
-    response.cookies.contains(cookieName)
+  def assertCookieExists(response: Response, cookieName: String): Try[Unit] = {
+    if (response.cookies.contains(cookieName)) {
+      Success(())
+    } else {
+      Failure(AssertionException(s"Cookie '$cookieName' does not exist in the response."))
+    }
   }
 
   /**
@@ -355,11 +407,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param expectedValue The expected value of the cookie.
    * @return True if the value of the specified cookie matches the expected value, otherwise false.
    */
-  def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Boolean = {
-    if (assertCookieExists(response, cookieName))
-      response.cookies(cookieName)._1 == expectedValue
-    else
-      false
+  def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Try[Unit] = {
+    assertCookieExists(response, cookieName).flatMap { _ =>
+      if (response.cookies(cookieName)._1 == expectedValue) {
+        Success(())
+      } else {
+        Failure(AssertionException(s"Cookie '$cookieName' value does not match expected value '$expectedValue'."))
+      }
+    }
   }
 
   /**
@@ -369,11 +424,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param cookieName The name of the cookie to check.
    * @return True if the specified cookie is secured, otherwise false.
    */
-  def assertCookieIsSecured(response: Response, cookieName: String): Boolean = {
-    if (assertCookieExists(response, cookieName))
-      response.cookies(cookieName)._2
-    else
-      false
+  def assertCookieIsSecured(response: Response, cookieName: String): Try[Unit] = {
+    assertCookieExists(response, cookieName).flatMap { _ =>
+      if (response.cookies(cookieName)._2) {
+        Success(())
+      } else {
+        Failure(AssertionException(s"Cookie '$cookieName' is not secured."))
+      }
+    }
   }
 
   /**
@@ -383,11 +441,14 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param cookieName The name of the cookie to check.
    * @return True if the specified cookie is not secured, otherwise false.
    */
-  def assertCookieIsNotSecured(response: Response, cookieName: String): Boolean = {
-    if (assertCookieExists(response, cookieName))
-      !response.cookies(cookieName)._2
-    else
-      false
+  def assertCookieIsNotSecured(response: Response, cookieName: String): Try[Unit] = {
+    assertCookieExists(response, cookieName).flatMap { _ =>
+      if (!response.cookies(cookieName)._2) {
+        Success(())
+      } else {
+        Failure(AssertionException(s"Cookie '$cookieName' is secured."))
+      }
+    }
   }
 
   /**
@@ -397,10 +458,12 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param text The expected text present in the response body as a string.
    * @return A Boolean indicating whether the expected content is present in the response body or not.
    */
-  def assertBodyContainsText(response: Response, text: String): Boolean = {
-    val isSuccess: Boolean = response.body.contains(text)
-    if (!isSuccess)
-        Logger.error(s"Expected body to contain $text")
-    isSuccess
+  def assertBodyContainsText(response: Response, text: String): Try[Unit] = {
+    if (response.body.contains(text)) {
+      Success(())
+    } else {
+      Logger.error(s"Expected body to contain $text")
+      Failure(AssertionException(s"Body does not contain expected text '$text'."))
+    }
   }
 }

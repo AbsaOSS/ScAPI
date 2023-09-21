@@ -16,11 +16,18 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.ResponseAction
+object ResponseActionGroupType extends Enumeration {
+  val ASSERT, EXTRACT_JSON, LOG = Value
+  type ResponseActionGroupType = Value
 
-import scala.util.Try
+  private val stringToValueMap = Map(
+    "assert" -> ASSERT,
+    "extractJson" -> EXTRACT_JSON,
+    "log" -> LOG
+  )
 
-trait ResponsePerformer {
-  def validateContent(responseAction: ResponseAction): Unit
-  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit]
+  def fromString(s: String): Option[ResponseActionGroupType] = stringToValueMap.get(s)
 }
+
+
+

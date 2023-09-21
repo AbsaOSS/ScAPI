@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.model
 
-import africa.absa.testing.scapi.json.ResponseAction
-
-import scala.util.Try
-
-trait ResponsePerformer {
-  def validateContent(responseAction: ResponseAction): Unit
-  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit]
+object SuiteResultType extends Enumeration {
+  val BEFORE_SUITE, TEST_SUITE, AFTER_SUITE = Value
+  type SuiteResultType = Value
 }

@@ -16,10 +16,12 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.UndefinedResponseActionTypeException
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
+
+import scala.util.{Failure, Success, Try}
 
 /**
  * Singleton object `ResponseLog` that extends the `ResponsePerformer` trait.
@@ -36,7 +38,7 @@ object LogResponseAction extends ResponsePerformer {
    * Validates the content of an log response action object depending on its type.
    *
    * @param responseAction The response action to be validated.
-   * @throws UndefinedResponseActionType if the response action's name is not recognized.
+   * @throws UndefinedResponseActionTypeException if the response action's name is not recognized.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
@@ -45,7 +47,7 @@ object LogResponseAction extends ResponsePerformer {
           case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
           case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion ${responseAction.name} logic.")
         }
-      case _ => throw UndefinedResponseActionType(responseAction.name)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
 
@@ -56,15 +58,15 @@ object LogResponseAction extends ResponsePerformer {
    * @param responseAction The responseAction to be performed on the response.
    * @throws IllegalArgumentException if the response action's name is not recognized.
    */
-  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
-    val message = responseAction.params.getOrElse("message", throw new IllegalArgumentException("Missing 'message' parameter"))
+  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
+    val message = responseAction.params.getOrElse("message", return Failure(new IllegalArgumentException("Missing 'message' parameter")))
 
     responseAction.name match {
       case ERROR => logError(message)
       case WARN => logWarn(message)
       case INFO => logInfo(message)
       case DEBUG => logDebug(message)
-      case _ => throw new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}")
+      case _ => Failure(new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}"))
     }
   }
 
@@ -77,9 +79,9 @@ object LogResponseAction extends ResponsePerformer {
    *
    * @param message The message to be logged.
    */
-  def logError(message: String): Boolean = {
+  def logError(message: String): Try[Unit] = {
     Logger.error(message)
-    true
+    Success(())
   }
 
   /**
@@ -87,9 +89,9 @@ object LogResponseAction extends ResponsePerformer {
    *
    * @param message The message to be logged.
    */
-  def logWarn(message: String): Boolean = {
+  def logWarn(message: String): Try[Unit] = {
     Logger.warn(message)
-    true
+    Success(())
   }
 
   /**
@@ -97,9 +99,9 @@ object LogResponseAction extends ResponsePerformer {
    *
    * @param message The message to be logged.
    */
-  def logInfo(message: String): Boolean = {
+  def logInfo(message: String): Try[Unit] = {
     Logger.info(message)
-    true
+    Success(())
   }
 
   /**
@@ -107,9 +109,9 @@ object LogResponseAction extends ResponsePerformer {
    *
    * @param message The message to be logged.
    */
-  def logDebug(message: String): Boolean = {
+  def logDebug(message: String): Try[Unit] = {
     Logger.debug(message)
-    true
+    Success(())
   }
 
 }

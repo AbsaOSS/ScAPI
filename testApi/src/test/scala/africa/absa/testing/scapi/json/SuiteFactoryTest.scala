@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
+import africa.absa.testing.scapi.{ProjectLoadFailedException, UndefinedConstantsInPropertiesException}
 import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import munit.FunSuite
 import org.apache.logging.log4j.LogManager
@@ -66,11 +66,11 @@ class SuiteFactoryTest extends FunSuite {
     initTestLogger()
 
     try {
-      val caught = intercept[ProjectLoadFailed] {
+      val caught = intercept[ProjectLoadFailedException] {
         SuiteFactory.fromFiles(environment, testRootPath, "(.*)", "json")
       }
 
-      assert(caught.isInstanceOf[ProjectLoadFailed])
+      assert(caught.isInstanceOf[ProjectLoadFailedException])
       assert(out.toString.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
       assert(out.toString.contains("Not all suites loaded. Failed suites:"))
     } finally {
@@ -119,7 +119,7 @@ class SuiteFactoryTest extends FunSuite {
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map.empty
 
-    intercept[UndefinedConstantsInProperties] {
+    intercept[UndefinedConstantsInPropertiesException] {
       SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
     }
   }

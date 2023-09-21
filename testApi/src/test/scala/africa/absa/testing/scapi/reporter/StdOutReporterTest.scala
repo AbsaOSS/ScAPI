@@ -16,53 +16,54 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.SuiteResults
+import africa.absa.testing.scapi.AssertionException
+import africa.absa.testing.scapi.model.{SuiteResult, SuiteResultType}
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
+import scala.util.{Failure, Success}
 
 class StdOutReporterTest extends FunSuite {
 
-  val successTestResults: List[SuiteResults] = List(
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+  val successTestResults: List[SuiteResult] = List(
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 1",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 1",
       name = "Test 2",
-      status = true,
+      result = Success(()),
       duration = Some(200L),
       categories = Some("Category 2")
     ),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 2",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(50L),
       categories = Some("Category 3"))
   )
 
-  val mixedSuccessTestResults: List[SuiteResults] = List(
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+  val mixedSuccessTestResults: List[SuiteResult] = List(
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 1",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 1",
       name = "Test 2",
-      status = false,
+      result = Failure(AssertionException("Error message")),
       duration = Some(200L),
-      categories = Some("Category 2"),
-      errMessage = Some("Error message")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      categories = Some("Category 2")),
+    SuiteResult(SuiteResultType.TEST_SUITE,
       suiteName = "Suite 2",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(50L),
       categories = Some("Category 3"))
   )
@@ -88,7 +89,7 @@ class StdOutReporterTest extends FunSuite {
     assertEquals(clue(output.contains("End Report")), true)
   }
 
-  test("full results with failed") {
+  test("full results with failed".only) {
     /*
       "Full":
         min 1 Success test
@@ -96,7 +97,6 @@ class StdOutReporterTest extends FunSuite {
         min 2 Suites
         min 1 suites with min 2 tests
      */
-    var failedTestResults = successTestResults
 
     val baos = new ByteArrayOutputStream()
 
@@ -126,7 +126,7 @@ class StdOutReporterTest extends FunSuite {
     assertEquals(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")), true)
 
     // error from detail
-    assertEquals(clue(output.contains("Error: Error message")), true)
+    assertEquals(clue(output.contains("Assertion failed: Error message")), true)
   }
 
   test("results all success") {

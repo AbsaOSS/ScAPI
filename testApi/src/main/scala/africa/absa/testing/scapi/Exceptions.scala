@@ -20,23 +20,30 @@ import com.networknt.schema.ValidationMessage
 
 import scala.collection.mutable
 
-case class UndefinedConstantsInProperties(undefinedConstants: Set[String], source: String)
+case class UndefinedConstantsInPropertiesException(undefinedConstants: Set[String], source: String)
   extends Exception(s"Undefined constant(s): '${undefinedConstants.mkString(", ")}' in '$source'.")
 
-case class PropertyNotFound(property: String) extends Exception(s"Property not found: '$property'.")
+case class PropertyNotFoundException(property: String) extends Exception(s"Property not found: '$property'.")
 
-case class JsonInvalidSchema(filePath: String, messages: mutable.Set[ValidationMessage])
+case class JsonInvalidSchemaException(filePath: String, messages: mutable.Set[ValidationMessage])
   extends Exception(s"Json file '$filePath' not valid to defined json schema. " + messages.mkString("\n"))
 
-case class ProjectLoadFailed() extends Exception("Problems during project loading.")
+case class ProjectLoadFailedException() extends Exception("Problems during project loading.")
 
-case class SuiteLoadFailed(detail: String) extends Exception(s"Problems during project loading. Details: $detail")
+case class SuiteLoadFailedException(detail: String)
+  extends Exception(s"Problems during project loading. Details: $detail")
 
-case class UndefinedHeaderType(undefinedType: String)
+case class SuiteBeforeFailedException(detail: String)
+  extends Exception(s"Problems during running before suite logic. Details: $detail")
+
+case class UndefinedHeaderTypeException(undefinedType: String)
   extends Exception(s"Undefined Header content type: '$undefinedType'")
 
-case class UndefinedResponseActionType(undefinedType: String)
+case class UndefinedResponseActionTypeException(undefinedType: String)
   extends Exception(s"Undefined response action content type: '$undefinedType'")
 
-case class ContentValidationFailed(value: String, message: String)
+case class ContentValidationFailedException(value: String, message: String)
   extends Exception(s"Content validation failed for value: '$value': $message")
+
+case class AssertionException(message: String)
+  extends Exception(s"Assertion failed: $message")

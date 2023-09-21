@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.PropertyNotFound
+import africa.absa.testing.scapi.PropertyNotFoundException
 import munit.FunSuite
 
 class EnvironmentTest extends FunSuite {
@@ -58,7 +58,7 @@ class EnvironmentTest extends FunSuite {
 
   test("apply - properties does not exist") {
     val env: Environment = Environment(constants, propertiesResolved)
-    interceptMessage[PropertyNotFound]("Property not found: 'no_exist'.") {
+    interceptMessage[PropertyNotFoundException]("Property not found: 'no_exist'.") {
       env("no_exist")
     }
   }

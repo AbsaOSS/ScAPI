@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.ContentValidationFailedException
 import africa.absa.testing.scapi.rest.request.RequestParams
 import munit.FunSuite
 
@@ -61,7 +61,7 @@ class RequestParamsTest extends FunSuite {
 
   test("validateContent - should throw exception for empty name") {
     val params = Set(Param("", "value"))
-    intercept[ContentValidationFailed] {
+    intercept[ContentValidationFailedException] {
       RequestParams.validateContent(Some(params))
     }
   }

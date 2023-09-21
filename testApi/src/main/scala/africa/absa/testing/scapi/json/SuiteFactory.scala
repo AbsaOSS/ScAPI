@@ -21,7 +21,7 @@ import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSche
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
-import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.{Response, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
 import spray.json._
 
@@ -71,7 +71,7 @@ object SuiteFactory {
       failedSuites.foreach { case (key, value) =>
         Logger.error(s"$key => $value")
       }
-      throw ProjectLoadFailed()
+      throw ProjectLoadFailedException()
     }
   }
 
@@ -324,16 +324,26 @@ object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
 object ResponseActionJsonProtocol extends DefaultJsonProtocol {
 
   implicit object ResponseActionJsonFormat extends RootJsonFormat[ResponseAction] {
-    def write(a: ResponseAction): JsObject = JsObject(
-      ("method" -> JsString(a.method)) +:
-        a.params.view.mapValues(JsString(_)).toSeq: _*
-    )
+    def write(a: ResponseAction): JsObject = {
+      val fixedFields = Seq(
+        "group" -> JsString(a.group.toString),
+        "name" -> JsString(a.name)
+      )
+
+      val paramFields = a.params.view.mapValues(JsString(_)).toSeq
+
+      JsObject((fixedFields ++ paramFields): _*)
+    }
 
     def read(value: JsValue): ResponseAction = {
       value.asJsObject.getFields("method") match {
         case Seq(JsString(method)) =>
+          val splitter: Seq[String] = method.split("\\.").toSeq
+          val group = ResponseActionGroupType.fromString(splitter.head).getOrElse(
+            throw new IllegalArgumentException(s"Invalid action group: ${splitter.head}"))
+          val name = splitter.tail.head
           val params = value.asJsObject.fields.view.toMap
-          ResponseAction(method, params.map { case (k, v) => k -> v.convertTo[String] })
+          ResponseAction(group, name, params.map { case (k, v) => k -> v.convertTo[String] })
         case _ => throw DeserializationException("Assertion expected")
       }
     }

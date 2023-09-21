@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json.schema
 
-import africa.absa.testing.scapi.JsonInvalidSchema
+import africa.absa.testing.scapi.JsonInvalidSchemaException
 import africa.absa.testing.scapi.utils.file.JsonUtils
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.networknt.schema.{JsonSchema, JsonSchemaFactory, SpecVersion}
@@ -61,7 +61,7 @@ case class JsonSchemaValidator(jsonPath: String, schemaPath: URL) {
     val errors = jsonSchema.validate(jsonNode)
 
     import scala.jdk.CollectionConverters._
-    if (!errors.isEmpty) throw JsonInvalidSchema(jsonPath, errors.asScala)
+    if (!errors.isEmpty) throw JsonInvalidSchemaException(jsonPath, errors.asScala)
   }
 }
 

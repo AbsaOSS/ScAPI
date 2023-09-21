@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
-import africa.absa.testing.scapi.{JsonInvalidSchema, UndefinedConstantsInProperties}
+import africa.absa.testing.scapi.{JsonInvalidSchemaException, UndefinedConstantsInPropertiesException}
 import munit.FunSuite
 
 import java.net.URL
@@ -61,7 +61,7 @@ class EnvironmentFactoryTest extends FunSuite {
   }
 
   test("fromFile - missing referenced constant") {
-    intercept[UndefinedConstantsInProperties] {
+    intercept[UndefinedConstantsInPropertiesException] {
       val envPath: String = getClass.getResource("/missing_constant_env.json").getPath
       EnvironmentFactory.fromFile(envPath)
     }
@@ -79,7 +79,7 @@ class EnvironmentFactoryTest extends FunSuite {
 
   def validateEnvJson(name: String, resourcePath: String): Unit = {
     test(name) {
-      intercept[JsonInvalidSchema] {
+      intercept[JsonInvalidSchemaException] {
         val envSchemaPath: URL = ScAPIJsonSchema.ENVIRONMENT
         val envPath: String = getClass.getResource(resourcePath).getPath
 

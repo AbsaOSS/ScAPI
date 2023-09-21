@@ -16,15 +16,17 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.{ContentValidationFailed, UndefinedResponseActionType}
+import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 
+import scala.util.Try
+
 class ResponseExtractTest extends FunSuite {
 
-  val assertionStringFromList: ResponseAction = ResponseAction(method = s"${Response.GROUP_EXTRACT_JSON}.${ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "question_id", "listIndex" -> "1", "jsonKey" -> "id", "cacheLevel" -> "suite"))
-  val assertionUnsupported: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.Unsupported", Map("cacheKey" -> "key", "listIndex" -> "200", "jsonKey" -> "jsonKey", "cacheLevel" -> "Test"))
+  val assertionStringFromList: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "question_id", "listIndex" -> "1", "jsonKey" -> "id", "cacheLevel" -> "suite"))
+  val assertionUnsupported: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = "Unsupported", Map("cacheKey" -> "key", "listIndex" -> "200", "jsonKey" -> "jsonKey", "cacheLevel" -> "Test"))
 
   val responseWithID: Response = Response(
     200,
@@ -63,7 +65,7 @@ class ResponseExtractTest extends FunSuite {
   }
 
   test("validateContent - unsupported option") {
-    intercept[UndefinedResponseActionType] {
+    intercept[UndefinedResponseActionTypeException] {
       ExtractJsonResponseAction.validateContent(assertionUnsupported)
     }
   }
@@ -73,8 +75,8 @@ class ResponseExtractTest extends FunSuite {
    */
 
   test("performAssertion - STRING_FROM_LIST") {
-    val result: Boolean = ExtractJsonResponseAction.performResponseAction(responseWithID, assertionStringFromList)
-    assert(result)
+    val result: Try[Unit] = ExtractJsonResponseAction.performResponseAction(responseWithID, assertionStringFromList)
+    assert(result.isSuccess)
     assertEquals("382be85a-1f00-4c15-b607-cbda03ccxxx2", RuntimeCache.get("question_id").get)
   }
 
@@ -106,7 +108,7 @@ class ResponseExtractTest extends FunSuite {
     val jsonKey = "ids"
     val runtimeCacheLevel = "Test"
     val result = ExtractJsonResponseAction.stringFromList(responseWithID, cacheKey, listIndex, jsonKey, runtimeCacheLevel)
-    assert(!result)
+    assert(!result.isSuccess)
   }
 
   test("stringFromList - incorrect parameters - no json body in response") {
@@ -116,7 +118,7 @@ class ResponseExtractTest extends FunSuite {
     val runtimeCacheLevel = "Test"
 
     val result = ExtractJsonResponseAction.stringFromList(responseNoJsonBody, cacheKey, listIndex, jsonKey, runtimeCacheLevel)
-    assert(!result)
+    assert(!result.isSuccess)
   }
 
   test("stringFromList - incorrect parameters - no json arrays in response body") {
@@ -126,7 +128,7 @@ class ResponseExtractTest extends FunSuite {
     val runtimeCacheLevel = "Test"
 
     val result = ExtractJsonResponseAction.stringFromList(responseJsonNoArrayBody, cacheKey, listIndex, jsonKey, runtimeCacheLevel)
-    assert(!result)
+    assert(!result.isSuccess)
   }
 
   /*
@@ -136,10 +138,10 @@ class ResponseExtractTest extends FunSuite {
   // positive test "stringFromList - correct parameters" - tested during "validateContent - STRING_FROM_LIST"
 
   test("validateStringFromList - None parameters") {
-    val assertion1None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> ""))
-    val assertion2None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> ""))
-    val assertion3None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> ""))
-    val assertion4None: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map.empty)
+    val assertion1None: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> ""))
+    val assertion2None: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "", "listIndex" -> ""))
+    val assertion3None: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> ""))
+    val assertion4None: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map.empty)
 
     interceptMessage[IllegalArgumentException]("Missing required 'cacheKey' parameter for extract string-from-list logic") {
       ExtractJsonResponseAction.validateStringFromList(assertion4None)
@@ -156,28 +158,28 @@ class ResponseExtractTest extends FunSuite {
   }
 
   test("validateStringFromList - empty parameters") {
-    val assertionParam1: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
-    val assertionParam2: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
-    val assertionParam3: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "", "cacheLevel" -> ""))
-    val assertionParam4: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> ""))
+    val assertionParam1: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam2: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "1", "listIndex" -> "", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam3: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "", "cacheLevel" -> ""))
+    val assertionParam4: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "1", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> ""))
 
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheKey' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheKey' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam1)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.listIndex' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.listIndex' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam2)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.jsonKey' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.jsonKey' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam3)
     }
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheLevel' is empty.") {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'ExtractJson.string-from-list.cacheLevel' is empty.") {
       ExtractJsonResponseAction.validateStringFromList(assertionParam4)
     }
   }
 
   test("validateStringFromList - not integer in string") {
-    val assertion: ResponseAction = ResponseAction(method = s"{Response.GROUP_EXTRACT_JSON}.&{ExtractJsonResponseAction.STRING_FROM_LIST}", Map("cacheKey" -> "key", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> "y"))
-    interceptMessage[ContentValidationFailed]("Content validation failed for value: 'x': Received value of 'ExtractJson.string-from-list.listIndex' cannot be parsed to an integer: For input string: \"x\"") {
+    val assertion: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseAction.STRING_FROM_LIST, Map("cacheKey" -> "key", "listIndex" -> "x", "jsonKey" -> "y", "cacheLevel" -> "y"))
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: 'x': Received value of 'ExtractJson.string-from-list.listIndex' cannot be parsed to an integer: For input string: \"x\"") {
       ExtractJsonResponseAction.validateStringFromList(assertion)
     }
 

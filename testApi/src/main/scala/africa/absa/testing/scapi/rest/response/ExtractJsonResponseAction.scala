@@ -16,12 +16,14 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedResponseActionType
+import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
+
+import scala.util.{Failure, Success, Try}
 
 /**
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
@@ -35,23 +37,23 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * Validates the content of an extract response action object depending on its type.
    *
    * @param responseAction The ResponseAction instance to be validated.
-   * @throws UndefinedResponseActionType if an unsupported assertion type is encountered.
+   * @throws UndefinedResponseActionTypeException if an unsupported assertion type is encountered.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
     responseAction.name.toLowerCase match {
       case STRING_FROM_LIST => validateStringFromList(responseAction)
-      case _ => throw UndefinedResponseActionType(responseAction.name)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
 
   /**
    * Performs extract actions on a response depending on the type of assertion method provided.
    *
-   * @param response  The Response instance to perform response action on.
+   * @param response       The Response instance to perform response action on.
    * @param responseAction The ResponseAction instance containing the response action details.
    * @throws IllegalArgumentException if an unsupported response action name is encountered.
    */
-  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
+  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     responseAction.name match {
       case STRING_FROM_LIST =>
         val cacheKey = responseAction.params("cacheKey")
@@ -79,7 +81,7 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * @param runtimeCacheLevel    The expiration level to use when storing the extracted string in the runtime cache.
    * @return Boolean indicating whether the string extraction and caching operation was successful.
    */
-  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Boolean = {
+  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Try[Unit] = {
     try {
       val jsonAst = response.body.parseJson
 
@@ -87,7 +89,7 @@ object ExtractJsonResponseAction extends ResponsePerformer {
         case JsArray(array) => array
         case _ =>
           Logger.error("Expected a JSON array")
-          return false
+          return Failure(AssertionException("Expected a JSON array in the response."))
       }
 
       // Extract "jsonKey" from the object at the given index
@@ -96,15 +98,15 @@ object ExtractJsonResponseAction extends ResponsePerformer {
         case Seq(JsNumber(value)) => value.toString()
         case _ =>
           Logger.error(s"Expected '$jsonKey' field not found in provided json.")
-          return false
+          return Failure(AssertionException(s"Expected '$jsonKey' field not found in provided json."))
       }
 
       RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
-      true
+      Success(())
     } catch {
       case e: spray.json.JsonParser.ParsingException =>
         Logger.error(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
-        false
+        Failure(AssertionException(s"Expected json string in response body. JSON parsing error: ${e.getMessage}"))
     }
   }
 

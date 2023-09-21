@@ -19,16 +19,14 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 
+import scala.util.{Failure, Success, Try}
+
 case class Response(statusCode: Int, body: String, url: String, statusMessage: String, headers: Map[String, Seq[String]], cookies: Map[String, (String, Boolean)], duration: Long)
 
 /**
  * A singleton object that is responsible for managing and handling responses.
  */
 object Response {
-
-  val GROUP_ASSERT: String = "assert"
-  val GROUP_EXTRACT_JSON: String = "extractJson"
-  val GROUP_LOG: String = "log"
 
   /**
    * Validates an ResponseAction based on its group type.
@@ -39,9 +37,9 @@ object Response {
    */
   def validate(responseAction: ResponseAction): Unit = {
     responseAction.group match {
-      case GROUP_ASSERT => AssertionResponseAction.validateContent(responseAction)
-      case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.validateContent(responseAction)
-      case GROUP_LOG => LogResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.ASSERT => AssertionResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.EXTRACT_JSON => ExtractJsonResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.LOG => LogResponseAction.validateContent(responseAction)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${responseAction.group}")
     }
   }
@@ -54,10 +52,10 @@ object Response {
    *
    * @param response   The response on which actions will be performed.
    * @param responseAction The set of response actions that dictate what actions will be performed on the response.
-   * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false).
+   * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false). TODO
    * @throws IllegalArgumentException If an response action group is not supported.
    */
-  def perform(response: Response, responseAction: Seq[ResponseAction]): Boolean = {
+  def perform(response: Response, responseAction: Seq[ResponseAction]): Try[Unit] = {
     def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {
       val filteredParams = resolvedResponseAction.params.filter(_._1 != "method").map { case (k, v) => s"$k->$v" }.mkString(", ")
       val baseLog =
@@ -73,27 +71,28 @@ object Response {
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
     }
 
-    responseAction.forall { assertion =>
+    responseAction.iterator.map { assertion =>
       val resolvedResponseAction: ResponseAction = assertion.resolveByRuntimeCache()
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - Started.")
 
-      try {
-        val res = resolvedResponseAction.group match {
-          case GROUP_ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
-          case GROUP_EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
-          case GROUP_LOG => LogResponseAction.performResponseAction(response, assertion)
-          case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}")
-        }
+      val res: Try[Unit] = resolvedResponseAction.group match {
+        case ResponseActionGroupType.ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
+        case ResponseActionGroupType.EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
+        case ResponseActionGroupType.LOG => LogResponseAction.performResponseAction(response, assertion)
+        case _ => Failure(new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}"))
+      }
 
-        Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - ${if (res) "completed successfully" else "failed"}.")
-        if (!res) logParameters(response, resolvedResponseAction)
-        res
-      } catch {
-        case e: IllegalArgumentException =>
+      res match {
+        case Success(_) =>
+          Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - completed successfully.")
+        case Failure(e: IllegalArgumentException) =>
           Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - failed with exception.")
           logParameters(response, resolvedResponseAction, Some(e))
-          throw e
+        case Failure(e) =>
+          Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - failed with unexpected exception.")
+          logParameters(response, resolvedResponseAction, Some(e))
       }
-    }
+      res
+    }.find(_.isFailure).getOrElse(Success(()))
   }
 }

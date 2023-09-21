@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.utils.validation
 
-import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.ContentValidationFailedException
 import munit.FunSuite
 
 class ContentValidatorTest extends FunSuite {
@@ -30,13 +30,13 @@ class ContentValidatorTest extends FunSuite {
   }
 
   test("validateIntegerString - fails with non-integer string") {
-    intercept[ContentValidationFailed] {
+    intercept[ContentValidationFailedException] {
       ContentValidator.validateIntegerString("not an integer", "unitTest")
     }
   }
 
   test("validateIntegerString - fails with empty string") {
-    intercept[ContentValidationFailed] {
+    intercept[ContentValidationFailedException] {
       ContentValidator.validateIntegerString("", "unitTest")
     }
   }
@@ -50,7 +50,7 @@ class ContentValidatorTest extends FunSuite {
   }
 
   test("validateNonEmptyString - fails with empty string") {
-    intercept[ContentValidationFailed] {
+    intercept[ContentValidationFailedException] {
       ContentValidator.validateNonEmptyString("", "unitTest")
     }
   }

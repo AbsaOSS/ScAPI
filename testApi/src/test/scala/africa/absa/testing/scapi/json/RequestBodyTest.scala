@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.ContentValidationFailedException
 import africa.absa.testing.scapi.rest.request.RequestBody
 import munit.FunSuite
 import spray.json.JsonParser.ParsingException
@@ -79,7 +79,7 @@ class RequestBodyTest extends FunSuite {
   test("validateContent - fail when body is a non json string") {
     val jsonBody = Some("""not json string""")
 
-    intercept[ContentValidationFailed] {
+    intercept[ContentValidationFailedException] {
       RequestBody.validateContent(jsonBody)
     }
   }
