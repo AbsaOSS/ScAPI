@@ -199,14 +199,15 @@ case class Action private(methodName: String, url: String, body: Option[String] 
 }
 
 /**
- * Case class that represents ResponseAction.
- * This class is used to hold test response action.
- * It implements the `ReferenceResolver` trait to support resolution of reference constants.
+ * Represents a `ResponseAction` case class.
  *
- * @constructor create a new ResponseAction with a name and value.
- * @param method the "group and name" of the response action.
- * @param params the map containing the parameters of the response action. Each key-value pair in the map
- * represents a parameter name and its corresponding value.
+ * <p>This class encapsulates the details of a test response action and provides
+ * functionality to resolve reference constants through the `ReferenceResolver` trait.</p>
+ *
+ * @param group   The type of the response action group.
+ * @param name    The name that identifies the response action.
+ * @param params  A map containing the parameters of the response action. Each entry in the map
+ *                corresponds to a parameter name and its associated value.
  */
 case class ResponseAction private(group: ResponseActionGroupType,
                                   name: String,

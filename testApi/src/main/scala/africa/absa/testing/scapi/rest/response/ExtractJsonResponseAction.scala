@@ -22,6 +22,7 @@ import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
+import africa.absa.testing.scapi.rest.response.ExtractJsonResponseActionType._
 
 import scala.util.{Failure, Success, Try}
 
@@ -31,8 +32,6 @@ import scala.util.{Failure, Success, Try}
  */
 object ExtractJsonResponseAction extends ResponsePerformer {
 
-  val STRING_FROM_LIST = "string-from-list"
-
   /**
    * Validates the content of an extract response action object depending on its type.
    *
@@ -40,7 +39,8 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * @throws UndefinedResponseActionTypeException if an unsupported assertion type is encountered.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
-    responseAction.name.toLowerCase match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
       case STRING_FROM_LIST => validateStringFromList(responseAction)
       case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
@@ -54,7 +54,8 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * @throws IllegalArgumentException if an unsupported response action name is encountered.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    responseAction.name match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
       case STRING_FROM_LIST =>
         val cacheKey = responseAction.params("cacheKey")
         val listIndex = responseAction.params("listIndex").toInt

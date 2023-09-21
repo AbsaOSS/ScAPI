@@ -21,6 +21,7 @@ import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import spray.json._
+import africa.absa.testing.scapi.rest.response.AssertResponseActionType._
 
 import scala.util.{Failure, Success, Try}
 import scala.xml.XML
@@ -31,34 +32,6 @@ import scala.xml.XML
  */
 object AssertionResponseAction extends ResponsePerformer {
 
-  // response-time-...
-  val RESPONSE_TIME_IS_BELOW = "response-time-is-below"
-  val RESPONSE_TIME_IS_ABOVE = "response-time-is-above"
-
-  // status-code-...
-  val STATUS_CODE_EQUALS = "status-code-equals"
-  val STATUS_CODE_IS_SUCCESS = "status-code-is-success"
-  val STATUS_CODE_IS_CLIENT_ERROR = "status-code-is-client-error"
-  val STATUS_CODE_IS_SERVER_ERROR = "status-code-is-server-error"
-
-  // header-...
-  val HEADER_EXISTS = "header-exists"
-  val HEADER_VALUE_EQUALS = "header-value-equals"
-
-  // content-type-...
-  val CONTENT_TYPE_IS_JSON = "content-type-is-json"
-  val CONTENT_TYPE_IS_XML = "content-type-is-xml"
-  val CONTENT_TYPE_IS_HTML = "content-type-is-html"
-
-  // cookies-...
-  val COOKIE_EXISTS = "cookie-exists"
-  val COOKIE_VALUE_EQUALS = "cookie-value-equals"
-  val COOKIE_IS_SECURED = "cookie-is-secured"
-  val COOKIE_IS_NOT_SECURED = "cookie-is-not-secured"
-
-  // body-...
-  val BODY_CONTAINS_TEXT = "body-contains-text"
-
   /**
    * Validates the content of an assertion response action object depending on its type.
    *
@@ -66,7 +39,8 @@ object AssertionResponseAction extends ResponsePerformer {
    * @throws UndefinedResponseActionTypeException If the response action type is not recognized.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
-    responseAction.name.toLowerCase match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
 
       // response-time-...
       case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
@@ -89,7 +63,7 @@ object AssertionResponseAction extends ResponsePerformer {
           case headerName: String => ContentValidator.validateNonEmptyString(headerName, s"ResponseAssertion.${responseAction.name}.headerName")
           case None => throw new IllegalArgumentException(s"Missing required 'headerName' parameter for assertion ${responseAction.name} logic.")
         }
-        responseAction.name.toLowerCase match {
+        action match {
           case HEADER_VALUE_EQUALS =>
             responseAction.params.getOrElse("expectedValue", None) match {
               case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$HEADER_VALUE_EQUALS.expectedValue")
@@ -107,7 +81,7 @@ object AssertionResponseAction extends ResponsePerformer {
           case cookieName: String => ContentValidator.validateNonEmptyString(cookieName, s"ResponseAssertion.${responseAction.name}.cookieName")
           case None => throw new IllegalArgumentException(s"Missing required 'cookieName' parameter for assertion ${responseAction.name} logic.")
         }
-        responseAction.name.toLowerCase match {
+        action match {
           case COOKIE_VALUE_EQUALS =>
             responseAction.params.getOrElse("expectedValue", None) match {
               case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$COOKIE_VALUE_EQUALS.expectedValue")
@@ -135,12 +109,13 @@ object AssertionResponseAction extends ResponsePerformer {
    * @throws IllegalArgumentException If the assertion type is not supported.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    responseAction.name match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
 
       // response-time-...
       case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
         val limit = responseAction.params("limit")
-        responseAction.name match {
+        action match {
           case RESPONSE_TIME_IS_BELOW => assertResponseTimeIsBelow(response, limit)
           case RESPONSE_TIME_IS_ABOVE => assertResponseTimeIsAbove(response, limit)
         }
@@ -156,7 +131,7 @@ object AssertionResponseAction extends ResponsePerformer {
       // header-...
       case HEADER_EXISTS | HEADER_VALUE_EQUALS =>
         val headerName = responseAction.params("headerName")
-        responseAction.name match {
+        action match {
           case HEADER_EXISTS => assertHeaderExists(response, headerName)
           case HEADER_VALUE_EQUALS =>
             val expectedValue = responseAction.params("expectedValue")
@@ -171,7 +146,7 @@ object AssertionResponseAction extends ResponsePerformer {
       // cookies-...
       case COOKIE_EXISTS | COOKIE_VALUE_EQUALS | COOKIE_IS_SECURED | COOKIE_IS_NOT_SECURED =>
         val cookieName = responseAction.params("cookieName")
-        responseAction.name match {
+        action match {
           case COOKIE_EXISTS => assertCookieExists(response, cookieName)
           case COOKIE_VALUE_EQUALS =>
             val expectedValue = responseAction.params("expectedValue")

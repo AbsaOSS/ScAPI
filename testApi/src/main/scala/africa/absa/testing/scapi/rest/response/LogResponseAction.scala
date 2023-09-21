@@ -19,6 +19,7 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.UndefinedResponseActionTypeException
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
+import africa.absa.testing.scapi.rest.response.LogResponseActionType._
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 
 import scala.util.{Failure, Success, Try}
@@ -29,11 +30,6 @@ import scala.util.{Failure, Success, Try}
  */
 object LogResponseAction extends ResponsePerformer {
 
-  val ERROR= "error"
-  val WARN = "warn"
-  val INFO = "info"
-  val DEBUG = "debug"
-
   /**
    * Validates the content of an log response action object depending on its type.
    *
@@ -41,13 +37,14 @@ object LogResponseAction extends ResponsePerformer {
    * @throws UndefinedResponseActionTypeException if the response action's name is not recognized.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
-    responseAction.name.toLowerCase match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
       case ERROR | WARN | INFO | DEBUG =>
         responseAction.params.get("message") match {
           case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
           case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion ${responseAction.name} logic.")
         }
-      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name.toString)
     }
   }
 
@@ -60,8 +57,8 @@ object LogResponseAction extends ResponsePerformer {
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     val message = responseAction.params.getOrElse("message", return Failure(new IllegalArgumentException("Missing 'message' parameter")))
-
-    responseAction.name match {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
       case ERROR => logError(message)
       case WARN => logWarn(message)
       case INFO => logInfo(message)

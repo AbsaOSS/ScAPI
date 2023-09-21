@@ -21,7 +21,7 @@ import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
-import africa.absa.testing.scapi.rest.response.{AssertionResponseAction, ResponseActionGroupType}
+import africa.absa.testing.scapi.rest.response.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 import org.apache.logging.log4j.Level
@@ -31,7 +31,7 @@ class SuiteRunnerTest extends FunSuite {
   val header: Header = Header(name = RequestHeaders.AUTHORIZATION, value = "Basic abcdefg")
   val action: Action = Action(methodName = "get", url = "nice url")
   val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
-  val responseAction: ResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertionResponseAction.STATUS_CODE_EQUALS, Map("code" -> "200"))
+  val responseAction: ResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.STATUS_CODE_EQUALS.toString, Map("code" -> "200"))
   val method: Method = Method(name = "test", headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction))
   val methodNotSupported: Method = Method(name = "test", headers = Seq(header), actions = Seq(actionNotSupported), responseActions = Seq(responseAction))
 
