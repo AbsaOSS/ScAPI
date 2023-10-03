@@ -30,32 +30,32 @@ class RequestBodyTest extends FunSuite {
   test("buildBody - return string representation of JSON when jsonBody is not empty") {
     val jsonBody = Some("""{"key":"value"}""")
     val result = RequestBody.buildBody(jsonBody)
-    assertEquals(result, """{"key":"value"}""")
+    assertEquals("""{"key":"value"}""", result)
   }
 
   test("buildBody - throw exception when non json string received") {
     val jsonBody = Some("""not json string""")
 
-    intercept[ParsingException] {
+    interceptMessage[ParsingException]("Unexpected character 'o' at input index 0 (line 1, position 1), expected JSON Value:\nnot json string\n^\n") {
       RequestBody.buildBody(jsonBody)
     }
   }
 
   test("buildBody - return empty string representation of JSON when no body received") {
     val result = RequestBody.buildBody()
-    assertEquals(result, """{}""")
+    assertEquals("""{}""", result)
   }
 
   test("buildBody - return empty JSON object string when jsonBody is empty") {
     val jsonBody = Some("")
     val result = RequestBody.buildBody(jsonBody)
-    assertEquals(result, "{}")
+    assertEquals("{}", result)
   }
 
   test("buildBody - return empty JSON object string when jsonBody is None") {
     val jsonBody: Option[String] = None
     val result = RequestBody.buildBody(jsonBody)
-    assertEquals(result, "{}")
+    assertEquals("{}", result)
   }
 
   /*
@@ -79,7 +79,7 @@ class RequestBodyTest extends FunSuite {
   test("validateContent - fail when body is a non json string") {
     val jsonBody = Some("""not json string""")
 
-    intercept[ContentValidationFailedException] {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: 'not json string': Received value cannot be parsed to json: Unexpected character 'o' at input index 0 (line 1, position 1), expected JSON Value:\nnot json string\n^\n") {
       RequestBody.validateContent(jsonBody)
     }
   }

@@ -21,14 +21,14 @@ import africa.absa.testing.scapi.model.SuiteResultType.SuiteResultType
 import scala.util.{Failure, Try}
 
 /**
- * Case class representing the results of a suite test.
+ * Represents the results of a suite test.
  *
  * @param resultType   The type of the result (e.g. Before, Test, After)
- * @param suiteName     The name of the suite
- * @param name          The name of the test or method
- * @param duration      The duration of the test, if applicable
- * @param categories    The categories of the test, if any
- *                      TODO
+ * @param suiteName    The name of the test suite
+ * @param name         The specific name of the test or method within the suite
+ * @param result       The outcome of the test (e.g. Success, Failure)
+ * @param duration     The time taken to execute the test, if applicable (in milliseconds)
+ * @param categories   The categories or tags associated with the test, if any
  */
 case class SuiteResult(resultType: SuiteResultType,
                        suiteName: String,

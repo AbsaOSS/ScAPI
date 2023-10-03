@@ -64,58 +64,24 @@ class ResponseLogTest extends FunSuite {
   test("performAssertion - ERROR supported") {
     val assertion = ResponseAction(group = ResponseActionGroupType.LOG, name = LogType.ERROR, Map("message" -> "info message"))
     val response = Response(500, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
-    assertEquals(LogResponseAction.performResponseAction(response, assertion).isSuccess, true)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
   test("performAssertion - WARN supported") {
     val assertion = ResponseAction(group = ResponseActionGroupType.LOG, name = LogType.WARN, Map("message" -> "info message"))
     val response = Response(401, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
-    assertEquals(LogResponseAction.performResponseAction(response, assertion).isSuccess, true)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
   test("performAssertion - INFO supported") {
     val assertion = ResponseAction(group = ResponseActionGroupType.LOG, name = LogType.INFO, Map("message" -> "info message"))
     val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
-    assertEquals(LogResponseAction.performResponseAction(response, assertion).isSuccess, true)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
   test("performAssertion - DEBUG supported") {
     val assertion = ResponseAction(group = ResponseActionGroupType.LOG, name = LogType.DEBUG, Map("message" -> "info message"))
     val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
-    assertEquals(LogResponseAction.performResponseAction(response, assertion).isSuccess, true)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
-
-  /*
-    logError
-   */
-
-  test("logError") {
-    assertEquals(LogResponseAction.logError("log error message").isSuccess, true)
-  }
-
-  /*
-    logWarn
-   */
-
-  test("logInfo") {
-    assertEquals(LogResponseAction.logWarn("log warn message").isSuccess, true)
-  }
-
-  /*
-    logInfo
-   */
-
-  test("logInfo") {
-    assertEquals(LogResponseAction.logInfo("log info message").isSuccess, true)
-  }
-
-  /*
-    logDebug
-   */
-
-  test("logDebug") {
-    assertEquals(LogResponseAction.logDebug("log debug message").isSuccess, true)
-  }
-
-
 }

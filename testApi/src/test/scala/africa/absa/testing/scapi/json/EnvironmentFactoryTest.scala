@@ -61,7 +61,7 @@ class EnvironmentFactoryTest extends FunSuite {
   }
 
   test("fromFile - missing referenced constant") {
-    intercept[UndefinedConstantsInPropertiesException] {
+    interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'errPort' in ''Environment' action.'.") {
       val envPath: String = getClass.getResource("/missing_constant_env.json").getPath
       EnvironmentFactory.fromFile(envPath)
     }

@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedResponseActionTypeException
+import africa.absa.testing.scapi.{PropertyNotFoundException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.response.LogResponseActionType._
@@ -51,19 +51,20 @@ object LogResponseAction extends ResponsePerformer {
   /**
    * Performs log actions on a response depending on the type of log method provided.
    *
-   * @param response  The response on which the response action are to be performed.
-   * @param responseAction The responseAction to be performed on the response.
-   * @throws IllegalArgumentException if the response action's name is not recognized.
+   * @param response       The response on which the response action is to be performed.
+   * @param responseAction The response action to be performed on the response.
+   * @throws UndefinedResponseActionTypeException if the response action's name is not recognized.
+   * @throws PropertyNotFoundException if the required 'message' parameter is missing.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    val message = responseAction.params.getOrElse("message", return Failure(new IllegalArgumentException("Missing 'message' parameter")))
+    val message = responseAction.params.getOrElse("message", return Failure(PropertyNotFoundException("Missing 'message' parameter")))
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case ERROR => logError(message)
       case WARN => logWarn(message)
       case INFO => logInfo(message)
       case DEBUG => logDebug(message)
-      case _ => Failure(new IllegalArgumentException(s"Unsupported log method [group: log]: ${responseAction.name}"))
+      case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported log method [group: log]: ${responseAction.name}"))
     }
   }
 
@@ -72,41 +73,45 @@ object LogResponseAction extends ResponsePerformer {
    */
 
   /**
-   * This method logs a message at the ERROR level.
+   * Logs a message at the ERROR level.
    *
    * @param message The message to be logged.
+   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  def logError(message: String): Try[Unit] = {
+  private def logError(message: String): Try[Unit] = {
     Logger.error(message)
     Success(())
   }
 
   /**
-   * This method logs a message at the WARN level.
+   * Logs a message at the WARN level.
    *
    * @param message The message to be logged.
+   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  def logWarn(message: String): Try[Unit] = {
+  private def logWarn(message: String): Try[Unit] = {
     Logger.warn(message)
     Success(())
   }
 
   /**
-   * This method logs a message at the INFO level.
+   * Logs a message at the INFO level.
    *
    * @param message The message to be logged.
+   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  def logInfo(message: String): Try[Unit] = {
+  private def logInfo(message: String): Try[Unit] = {
     Logger.info(message)
     Success(())
   }
 
   /**
-   * This method logs a message at the DEBUG level.
+   * Logs a message at the DEBUG level.
    *
    * @param message The message to be logged.
+   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  def logDebug(message: String): Try[Unit] = {
+  private def logDebug(message: String): Try[Unit] = {
     Logger.debug(message)
     Success(())
   }

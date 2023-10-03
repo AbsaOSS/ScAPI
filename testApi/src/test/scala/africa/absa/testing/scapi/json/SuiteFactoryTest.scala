@@ -119,7 +119,7 @@ class SuiteFactoryTest extends FunSuite {
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map.empty
 
-    intercept[UndefinedConstantsInPropertiesException] {
+    interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'env.basic_token' in ''SuiteConstants' action.'.") {
       SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
     }
   }
@@ -146,12 +146,12 @@ class SuiteFactoryTest extends FunSuite {
     assertEquals(filteredSuiteBundles.size, 1)
 
     val filteredSuite = filteredSuiteBundles.head.suite
-    assertEquals(filteredSuite.endpoint, "endpoint1")
-    assertEquals(filteredSuite.tests.size, 1)
+    assertEquals(clue("endpoint1"), clue(filteredSuite.endpoint))
+    assertEquals(clue(1), clue(filteredSuite.tests.size))
 
     val filteredTest = filteredSuite.tests.head
-    assertEquals(filteredTest.name, "test2")
-    assertEquals(filteredTest.only, Some(true))
+    assertEquals(clue("test2"), clue(filteredTest.name))
+    assertEquals(clue(Some(true)), clue(filteredTest.only))
   }
 
   test("fromFile - only used - twice") {
@@ -166,6 +166,6 @@ class SuiteFactoryTest extends FunSuite {
 
     val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
-    assertEquals(filteredSuiteBundles.size, 0)
+    assertEquals(clue(0), clue(filteredSuiteBundles.size))
   }
 }

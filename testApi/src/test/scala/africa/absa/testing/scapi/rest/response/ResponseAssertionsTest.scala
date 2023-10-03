@@ -67,7 +67,7 @@ class ResponseAssertionsTest extends FunSuite {
   }
 
   test("validateContent - invalid status code string") {
-    intercept[ContentValidationFailedException] {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: 'not an integer': Received value of 'ResponseAssertion.status-code-equals.code' cannot be parsed to an integer: For input string: \"not an integer\"") {
       AssertionResponseAction.validateContent(ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.STATUS_CODE_EQUALS, Map("code" -> "not an integer")))
     }
   }
@@ -195,7 +195,7 @@ class ResponseAssertionsTest extends FunSuite {
   }
 
   test("validateContent - body contains text - body is empty") {
-    intercept[ContentValidationFailedException] {
+    interceptMessage[ContentValidationFailedException]("Content validation failed for value: '': Received string value of 'ResponseAssertion.body-contains-text.text' is empty.") {
       AssertionResponseAction.validateContent(ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.BODY_CONTAINS_TEXT, Map("text" -> "")))
     }
   }
@@ -207,7 +207,7 @@ class ResponseAssertionsTest extends FunSuite {
   }
 
   test("validateContent - unsupported response action") {
-    intercept[UndefinedResponseActionTypeException] {
+    interceptMessage[UndefinedResponseActionTypeException]("Undefined response action content type: 'unsupported'") {
       AssertionResponseAction.validateContent(ResponseAction(group = ResponseActionGroupType.ASSERT, name = "unsupported", Map("body" -> "value")))
     }
   }

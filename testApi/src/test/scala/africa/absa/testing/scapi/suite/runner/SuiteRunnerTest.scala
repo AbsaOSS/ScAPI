@@ -106,9 +106,9 @@ class SuiteRunnerTest extends FunSuite {
     val beforeSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.BEFORE_SUITE && result.suiteName == "endpoint2").get
 
-    assertEquals(5, suiteResults.size)
-    assertEquals("test", beforeSuiteResult.name)
-    assertEquals(true, beforeSuiteResult.isSuccess)
+    assertEquals(5, clue(suiteResults.size))
+    assertEquals("test", clue(beforeSuiteResult.name))
+    assertEquals(true, clue(beforeSuiteResult.isSuccess))
   }
 
   test("runSuite - SuiteBefore empty") {
@@ -117,7 +117,7 @@ class SuiteRunnerTest extends FunSuite {
     val beforeSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
       result.resultType == SuiteResultType.BEFORE_SUITE && result.suiteName == "endpoint2")
 
-    assertEquals(2, suiteResults.size)
+    assertEquals(2, clue(suiteResults.size))
     assert(beforeSuiteResult.isEmpty)
   }
 
@@ -127,9 +127,9 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "endpoint2").get
 
-    assertEquals(5, suiteResults.size)
-    assertEquals("test", afterSuiteResult.name)
-    assertEquals(true, afterSuiteResult.isSuccess)
+    assertEquals(5, clue(suiteResults.size))
+    assertEquals("test", clue(afterSuiteResult.name))
+    assertEquals(true, clue(afterSuiteResult.isSuccess))
   }
 
   test("runSuite - SuiteAfter empty") {
@@ -138,7 +138,7 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "endpoint2")
 
-    assertEquals(2, suiteResults.size)
+    assertEquals(2, clue(suiteResults.size))
     assert(afterSuiteResult.isEmpty)
   }
 
@@ -148,8 +148,8 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "endpoint2").get
 
-    assertEquals(2, suiteResults.size)
-    assertEquals(false, afterSuiteResult.isSuccess)
+    assertEquals(2, clue(suiteResults.size))
+    assertEquals(false, clue(afterSuiteResult.isSuccess))
     assertEquals("RestClient:sendRequest - unexpected action method called", afterSuiteResult.errorMsg.get)
   }
 }

@@ -51,7 +51,7 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    *
    * @param response       The Response instance to perform response action on.
    * @param responseAction The ResponseAction instance containing the response action details.
-   * @throws IllegalArgumentException if an unsupported response action name is encountered.
+   * @throws UndefinedResponseActionTypeException if an unsupported response action name is encountered.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
@@ -63,7 +63,7 @@ object ExtractJsonResponseAction extends ResponsePerformer {
         val cacheLevel = responseAction.params("cacheLevel")
 
         stringFromList(response, cacheKey, listIndex, jsonKey, cacheLevel)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
+      case _ => throw UndefinedResponseActionTypeException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
     }
   }
 
@@ -80,9 +80,9 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * @param listIndex            The index in the JSON array from which to extract the string.
    * @param jsonKey              The key in the JSON object from which to extract the string.
    * @param runtimeCacheLevel    The expiration level to use when storing the extracted string in the runtime cache.
-   * @return Boolean indicating whether the string extraction and caching operation was successful.
+   * @return A Try[Unit] indicating whether the string extraction and caching operation was successful or not.
    */
-  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Try[Unit] = {
+  private def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Try[Unit] = {
     try {
       val jsonAst = response.body.parseJson
 
@@ -118,7 +118,7 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    *
    * @param assertion The ResponseAction instance containing the response action details.
    */
-  def validateStringFromList(assertion: ResponseAction): Unit = {
+  private def validateStringFromList(assertion: ResponseAction): Unit = {
     val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $STRING_FROM_LIST logic"))
     val listIndex = assertion.params.getOrElse("listIndex", throw new IllegalArgumentException(s"Missing required 'listIndex' parameter for extract $STRING_FROM_LIST logic"))
     val jsonKey = assertion.params.getOrElse("jsonKey", throw new IllegalArgumentException(s"Missing required 'jsonKey' parameter for extract $STRING_FROM_LIST logic"))

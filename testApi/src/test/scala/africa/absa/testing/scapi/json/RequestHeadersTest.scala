@@ -40,7 +40,7 @@ class RequestHeadersTest extends FunSuite {
     )
 
     val actualMap = RequestHeaders.buildHeaders(headersSeq)
-    assertEquals(actualMap, expectedMap)
+    assertEquals(clue(expectedMap), clue(actualMap))
   }
 
   test("buildHeaders - should return an empty map if no headers are provided") {
@@ -48,7 +48,7 @@ class RequestHeadersTest extends FunSuite {
     val expectedMap = Map.empty[String, String]
 
     val actualMap = RequestHeaders.buildHeaders(headersSeq)
-    assertEquals(actualMap, expectedMap)
+    assertEquals(clue(expectedMap), clue(actualMap))
   }
 
   /*
@@ -81,7 +81,7 @@ class RequestHeadersTest extends FunSuite {
 
   test("validateContent - Unsupported header type") {
     val header = Header("unsupported-header", "value")
-    intercept[UndefinedHeaderTypeException] {
+    interceptMessage[UndefinedHeaderTypeException]("Undefined Header content type: 'unsupported-header'") {
       RequestHeaders.validateContent(header)
     }
   }

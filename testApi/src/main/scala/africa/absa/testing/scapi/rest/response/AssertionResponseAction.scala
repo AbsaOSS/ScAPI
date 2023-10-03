@@ -103,10 +103,10 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Performs assertion actions on a response depending on the type of assertion method provided.
    *
-   * @param response  The response to perform the assertions on.
-   * @param responseAction The assertion response action to perform on the response.
-   * @return Boolean value indicating whether the assertion passed or failed. TODO - update all similar docs
-   * @throws IllegalArgumentException If the assertion type is not supported.
+   * @param response       The response on which the assertions are to be performed.
+   * @param responseAction The assertion response action to be performed on the response.
+   * @throws UndefinedResponseActionTypeException If the assertion type is not supported.
+   * @return A Try[Unit] indicating the success of the assertion operation.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
@@ -160,7 +160,7 @@ object AssertionResponseAction extends ResponsePerformer {
         val text = responseAction.params("text")
         assertBodyContainsText(response, text)
 
-      case _ => Failure(new IllegalArgumentException(s"Unsupported assertion method [group: assert]: ${responseAction.name}"))
+      case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported assertion method [group: assert]: ${responseAction.name}"))
     }
   }
 
@@ -169,13 +169,13 @@ object AssertionResponseAction extends ResponsePerformer {
    */
 
   /**
-   * Asserts that the response time is below the specified maximum time.
+   * Asserts that the response duration is below the specified maximum time.
    *
-   * @param response      The response whose duration is to be checked.
-   * @param maxTimeMillis The maximum allowed time in milliseconds as a string.
-   * @return A Boolean indicating whether the response's duration is below the specified maximum time. Returns true if it's below, false otherwise.
+   * @param response      The response object containing the duration to be checked.
+   * @param maxTimeMillis The maximum allowed duration in milliseconds, provided as a string.
+   * @return A Try[Unit] that succeeds if the response's duration is below the specified maximum time, and fails with an AssertionException otherwise.
    */
-  def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Try[Unit] = {
+  private def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Try[Unit] = {
     val lMaxTimeMillis: Long = maxTimeMillis.toLong
 
     if (response.duration <= lMaxTimeMillis) {
@@ -186,13 +186,13 @@ object AssertionResponseAction extends ResponsePerformer {
   }
 
   /**
-   * Asserts that the response time is above the specified minimum time.
+   * Asserts that the response duration is greater than or equal to the specified minimum time.
    *
-   * @param response      The response whose duration is to be checked.
-   * @param minTimeMillis The minimum required time in milliseconds as a string.
-   * @return A Boolean indicating whether the response's duration is above the specified minimum time. Returns true if it's above, false otherwise.
+   * @param response      The response object containing the duration to be checked.
+   * @param minTimeMillis The minimum required duration in milliseconds, provided as a string.
+   * @return A Try[Unit] that is a Success if the response's duration is greater than or equal to the specified minimum time, and a Failure with an AssertionException otherwise.
    */
-  def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Try[Unit] = {
+  private def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Try[Unit] = {
     val lMinTimeMillis: Long = minTimeMillis.toLong
 
     if (response.duration >= lMinTimeMillis) {
@@ -203,29 +203,30 @@ object AssertionResponseAction extends ResponsePerformer {
   }
 
   /**
-   * Asserts that the status code of the response matches the expected status code.
+   * Compares the status code of the given response with the expected status code.
    *
-   * @param response     The response whose status code is to be checked.
-   * @param expectedCode The expected status code as a string.
-   * @return A Boolean indicating whether the response's status code matches the expected code. Returns true if they match, false otherwise.
+   * @param response     The HTTP response object to be evaluated.
+   * @param expectedCode The expected HTTP status code as a string.
+   * @return A Try[Unit] that is successful if the response's status code matches the expected code, and contains an exception otherwise.
+   * @throws AssertionException if the response's status code does not match the expected code.
    */
-  def assertStatusCodeEquals(response: Response, expectedCode: String): Try[Unit] = {
+  private def assertStatusCodeEquals(response: Response, expectedCode: String): Try[Unit] = {
     val iExpectedCode: Int = expectedCode.toInt
 
     if (response.statusCode == iExpectedCode) {
       Success(())
     } else {
-      Failure(new IllegalArgumentException(s"Expected $iExpectedCode, but got ${response.statusCode}"))
+      Failure(AssertionException(s"Expected $iExpectedCode, but got ${response.statusCode}"))
     }
   }
 
   /**
-   * Checks if the status code of the given response is in the success range (200-299).
+   * Asserts if the status code of the given response is within the success range (200-299).
    *
-   * @param response The response object containing the status code.
-   * @return True if the status code is in the range 200-299, otherwise false.
+   * @param response      The HTTP response object containing the status code.
+   * @return A Try[Unit] that is a Success if the status code is within the range 200-299, and a Failure with an AssertionException otherwise.
    */
-  def assertStatusCodeSuccess(response: Response): Try[Unit] = {
+  private def assertStatusCodeSuccess(response: Response): Try[Unit] = {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       Success(())
     } else {
@@ -234,12 +235,12 @@ object AssertionResponseAction extends ResponsePerformer {
   }
 
   /**
-   * Checks if the status code of the given response is in the client error range (400-499).
+   * Asserts that the status code of the given response is within the client error range (400-499).
    *
-   * @param response The response object containing the status code.
-   * @return True if the status code is in the range 400-499, otherwise false.
+   * @param response      The response object containing the status code.
+   * @return A Try[Unit] that is a Success if the status code is within the range 400-499, and a Failure with an AssertionException otherwise.
    */
-  def assertStatusCodeIsClientError(response: Response): Try[Unit] = {
+  private def assertStatusCodeIsClientError(response: Response): Try[Unit] = {
     if (response.statusCode >= 400 && response.statusCode <= 499) {
       Success(())
     } else {
@@ -248,12 +249,12 @@ object AssertionResponseAction extends ResponsePerformer {
   }
 
   /**
-   * Checks if the status code of the given response is in the server error range (500-599).
+   * Asserts that the status code of the given response is within the server error range (500-599).
    *
-   * @param response The response object containing the status code.
-   * @return True if the status code is in the range 500-599, otherwise false.
+   * @param response      The response object containing the status code.
+   * @return A Try[Unit] that is a Success if the status code is within the range 500-599, and a Failure with an AssertionException otherwise.
    */
-  def assertStatusCodeIsServerError(response: Response): Try[Unit] = {
+  private def assertStatusCodeIsServerError(response: Response): Try[Unit] = {
     if (response.statusCode >= 500 && response.statusCode <= 599) {
       Success(())
     } else {
@@ -262,13 +263,13 @@ object AssertionResponseAction extends ResponsePerformer {
   }
 
   /**
-   * Checks if the specified header exists in the given response.
+   * Asserts that the specified header exists in the given response.
    *
-   * @param response The response object containing the headers.
-   * @param headerName The name of the header to check for.
-   * @return True if the header exists in the response, otherwise false.
+   * @param response      The response object containing the headers.
+   * @param headerName    The name of the header to check for.
+   * @return A Try[Unit] that is a Success if the header exists in the response, and a Failure with an AssertionException otherwise.
    */
-  def assertHeaderExists(response: Response, headerName: String): Try[Unit] = {
+  private def assertHeaderExists(response: Response, headerName: String): Try[Unit] = {
     if (response.headers.contains(headerName.toLowerCase)) {
       Success(())
     } else {
@@ -279,12 +280,12 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the value of the specified header in the given response matches the expected value.
    *
-   * @param response The response object containing the headers.
-   * @param headerName The name of the header to check.
+   * @param response      The response object containing the headers.
+   * @param headerName    The name of the header to check.
    * @param expectedValue The expected value of the header.
-   * @return True if the header value matches the expected value, otherwise false.
+   * @return A Try[Unit] that is a Success if the header value matches the expected value, and a Failure with an AssertionException otherwise.
    */
-  def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Try[Unit] = {
+  private def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Try[Unit] = {
     if (assertHeaderExists(response, headerName).isSuccess) {
       if (expectedValue.equals(response.headers(headerName.toLowerCase).head)) {
         Success(())
@@ -300,10 +301,10 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the value of the "Content-Type" header in the given response is "application/json".
    *
-   * @param response The response object containing the headers.
-   * @return True if the "Content-Type" header value is "application/json", otherwise false.
+   * @param response      The response object containing the headers.
+   * @return A Try[Unit] that is a Success if the "Content-Type" header value is "application/json", and a Failure with an AssertionException otherwise.
    */
-  def assertContentTypeIsJson(response: Response): Try[Unit] = {
+  private def assertContentTypeIsJson(response: Response): Try[Unit] = {
     val isContentTypeJson = assertHeaderValueEquals(response, "content-type", "application/json")
     val isBodyJson = try {
       response.body.parseJson
@@ -322,10 +323,10 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the value of the "Content-Type" header in the given response is "application/xml".
    *
-   * @param response The response object containing the headers.
-   * @return True if the "Content-Type" header value is "application/xml", otherwise false.
+   * @param response      The response object containing the headers.
+   * @return A Try[Unit] that is a Success if the "Content-Type" header value is "application/xml", and a Failure with an AssertionException otherwise.
    */
-  def assertContentTypeIsXml(response: Response): Try[Unit] = {
+  private def assertContentTypeIsXml(response: Response): Try[Unit] = {
     val isContentTypeXml = assertHeaderValueEquals(response, "content-type", "application/xml")
     val isBodyXml = try {
       XML.loadString(response.body)
@@ -344,10 +345,10 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the value of the "Content-Type" header in the given response is "text/html".
    *
-   * @param response The response object containing the headers.
-   * @return True if the "Content-Type" header value is "text/html", otherwise false.
+   * @param response      The response object containing the headers.
+   * @return A Try[Unit] that is a Success if the "Content-Type" header value is "text/html", and a Failure with an AssertionException otherwise.
    */
-  def assertContentTypeIsHtml(response: Response): Try[Unit] = {
+  private def assertContentTypeIsHtml(response: Response): Try[Unit] = {
     val res = assertHeaderValueEquals(response, "content-type", "text/html")
 
     res match {
@@ -362,11 +363,11 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the specified cookie exists in the given response.
    *
-   * @param response The response object containing the cookies.
-   * @param cookieName The name of the cookie to check for existence.
-   * @return True if the specified cookie exists in the response, otherwise false.
+   * @param response      The response object containing the cookies.
+   * @param cookieName    The name of the cookie to check for existence.
+   * @return A Try[Unit] that is a Success if the specified cookie exists in the response, and a Failure with an AssertionException otherwise.
    */
-  def assertCookieExists(response: Response, cookieName: String): Try[Unit] = {
+  private def assertCookieExists(response: Response, cookieName: String): Try[Unit] = {
     if (response.cookies.contains(cookieName)) {
       Success(())
     } else {
@@ -380,9 +381,9 @@ object AssertionResponseAction extends ResponsePerformer {
    * @param response      The response object containing the cookies.
    * @param cookieName    The name of the cookie to check.
    * @param expectedValue The expected value of the cookie.
-   * @return True if the value of the specified cookie matches the expected value, otherwise false.
+   * @return A Try[Unit] that is a Success if the value of the specified cookie matches the expected value, and a Failure with an AssertionException otherwise.
    */
-  def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Try[Unit] = {
+  private def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
       if (response.cookies(cookieName)._1 == expectedValue) {
         Success(())
@@ -395,11 +396,11 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the specified cookie in the given response is secured.
    *
-   * @param response   The response object containing the cookies.
-   * @param cookieName The name of the cookie to check.
-   * @return True if the specified cookie is secured, otherwise false.
+   * @param response      The response object containing the cookies.
+   * @param cookieName    The name of the cookie to check.
+   * @return A Try[Unit] that is a Success if the specified cookie is secured, and a Failure with an AssertionException otherwise.
    */
-  def assertCookieIsSecured(response: Response, cookieName: String): Try[Unit] = {
+  private def assertCookieIsSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
       if (response.cookies(cookieName)._2) {
         Success(())
@@ -412,11 +413,11 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the specified cookie in the given response is not secured.
    *
-   * @param response   The response object containing the cookies.
-   * @param cookieName The name of the cookie to check.
-   * @return True if the specified cookie is not secured, otherwise false.
+   * @param response      The response object containing the cookies.
+   * @param cookieName    The name of the cookie to check.
+   * @return A Try[Unit] that is a Success if the specified cookie is not secured, and a Failure with an AssertionException otherwise.
    */
-  def assertCookieIsNotSecured(response: Response, cookieName: String): Try[Unit] = {
+  private def assertCookieIsNotSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
       if (!response.cookies(cookieName)._2) {
         Success(())
@@ -429,11 +430,11 @@ object AssertionResponseAction extends ResponsePerformer {
   /**
    * Asserts that the body of the response contains the expected content.
    *
-   * @param response        The HTTP response to check the body of.
-   * @param text The expected text present in the response body as a string.
-   * @return A Boolean indicating whether the expected content is present in the response body or not.
+   * @param response      The HTTP response to check the body of.
+   * @param text          The expected text present in the response body as a string.
+   * @return A Try[Unit] that is a Success if the body contains the expected text, and a Failure with an AssertionException otherwise.
    */
-  def assertBodyContainsText(response: Response, text: String): Try[Unit] = {
+  private def assertBodyContainsText(response: Response, text: String): Try[Unit] = {
     if (response.body.contains(text)) {
       Success(())
     } else {

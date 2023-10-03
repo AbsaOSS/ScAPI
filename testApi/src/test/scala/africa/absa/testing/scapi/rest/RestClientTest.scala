@@ -58,32 +58,32 @@ class RestClientTest extends FunSuite {
     val restClient: RestClient = new RestClient(mockRequestSender)
     val response: Response = restClient.sendRequest("get", "testUrl", "testData", Map("Authorization" -> "Bearer testToken"), Map("param1" -> "value1"), false)
 
-    assert(response.statusCode == 200)
-    assert(response.body == "test response")
+    assertEquals(200, response.statusCode)
+    assertEquals("test response", response.body)
   }
 
   test("sendRequest - call post with correct parameters") {
     val restClient: RestClient = new RestClient(mockRequestSender)
     val response: Response = restClient.sendRequest("post", "testUrl", "testData", Map("Authorization" -> "Bearer testToken"), Map("param1" -> "value1"), false)
 
-    assert(response.statusCode == 200)
-    assert(response.body == "test response")
+    assertEquals(200, response.statusCode)
+    assertEquals("test response", response.body)
   }
 
   test("sendRequest - call put with correct parameters") {
     val restClient: RestClient = new RestClient(mockRequestSender)
     val response: Response = restClient.sendRequest("put", "testUrl", "testData", Map("Authorization" -> "Bearer testToken"), Map("param1" -> "value1"), false)
 
-    assert(response.statusCode == 200)
-    assert(response.body == "test response")
+    assertEquals(200, response.statusCode)
+    assertEquals("test response", response.body)
   }
 
   test("sendRequest - call delete with correct parameters") {
     val restClient: RestClient = new RestClient(mockRequestSender)
     val response: Response = restClient.sendRequest("delete", "testUrl", "testData", Map("Authorization" -> "Bearer testToken"), Map("param1" -> "value1"), false)
 
-    assert(response.statusCode == 200)
-    assert(response.body == "test response")
+    assertEquals(200, response.statusCode)
+    assertEquals("test response", response.body)
   }
 
   test("sendRequest - call not supported action") {
