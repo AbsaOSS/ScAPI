@@ -73,7 +73,7 @@ object Response {
            |  Required Response-Action:
            |    Group->'${resolvedResponseAction.group}',
            |    Method->'${resolvedResponseAction.name}',
-           |    Params->'${filteredParams}',
+           |    Params->'$filteredParams',
            |  Actual Response:
            |    $response""".stripMargin
       val exceptionLog = exception.map(e => s"\nException: ${e.getMessage}").getOrElse("")

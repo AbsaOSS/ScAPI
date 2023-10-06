@@ -72,7 +72,7 @@ object ContentValidator {
   def validateNotNone(input: Option[String], paramName: String): Unit = {
     input match {
       case Some(_) => // do nothing, input is valid
-      case None => throw new ContentValidationFailedException(paramName, "Input cannot be None")
+      case None => throw ContentValidationFailedException(paramName, "Input cannot be None")
     }
   }
 }

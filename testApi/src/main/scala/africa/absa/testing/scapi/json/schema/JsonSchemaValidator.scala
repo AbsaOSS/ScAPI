@@ -31,28 +31,28 @@ import java.net.URL
  * @param schemaPath Path to the JSON Schema file.
  */
 case class JsonSchemaValidator(jsonPath: String, schemaPath: URL) {
-  protected val mapper: ObjectMapper = new ObjectMapper()
+  private val mapper: ObjectMapper = new ObjectMapper()
 
   /**
    * Method to read JSON data from the specified file path.
    *
    * @return JsonNode object representing the JSON data.
    */
-  def jsonNode: JsonNode = mapper.readTree(JsonUtils.stringFromPath(jsonPath))
+  private def jsonNode: JsonNode = mapper.readTree(JsonUtils.stringFromPath(jsonPath))
 
   /**
    * Method to create a JsonSchemaFactory instance.
    *
    * @return JsonSchemaFactory instance.
    */
-  def jsonSchemaFactory: JsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
+  private def jsonSchemaFactory: JsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
 
   /**
    * Method to generate a JsonSchema from the provided schema file path.
    *
    * @return JsonSchema object representing the JSON schema.
    */
-  def jsonSchema: JsonSchema = jsonSchemaFactory.getSchema(JsonUtils.stringFromPath(schemaPath))
+  private def jsonSchema: JsonSchema = jsonSchemaFactory.getSchema(JsonUtils.stringFromPath(schemaPath))
 
   /**
    * Method to validate the JSON data against the provided schema.

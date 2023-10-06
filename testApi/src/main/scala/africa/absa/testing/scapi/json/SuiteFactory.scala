@@ -127,7 +127,7 @@ object SuiteFactory {
    * @param environmentMap The map containing environment variables.
    * @return A SuiteBundle instance.
    */
-  def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String]): SuiteBundle = {
+  private def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String]): SuiteBundle = {
     val (suiteFilePath, suiteFileName) = FileUtils.splitPathAndFileName(suitePath)
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
@@ -189,7 +189,8 @@ object SuiteFactory {
    * @param extension     The file extension.
    * @param parser        The parser function used to parse JSON string.
    * @return A Suite instance.
-   */  def loadJsonSuite[T <: SuiteAround](suiteFilePath: String,
+   */
+  private def loadJsonSuite[T <: SuiteAround](suiteFilePath: String,
                                       suiteName: String,
                                       properties: Map[String, String],
                                       jsonSchema: URL,
@@ -212,7 +213,7 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A SuiteConstants instance.
    */
-  def parseToSuiteConstant(jsonString: String): SuiteConstants = {
+  private def parseToSuiteConstant(jsonString: String): SuiteConstants = {
     import SuiteConstantJsonProtocol.suiteConstantFormat
     jsonString.parseJson.convertTo[SuiteConstants]
   }
@@ -223,7 +224,7 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A SuiteBefore instance.
    */
-  def parseToSuiteBefore(jsonString: String): SuiteBefore = {
+  private def parseToSuiteBefore(jsonString: String): SuiteBefore = {
     import SuiteBeforeJsonProtocol.suiteBeforeFormat
     jsonString.parseJson.convertTo[SuiteBefore]
   }
@@ -234,7 +235,7 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A SuiteAfter instance.
    */
-  def parseToSuiteAfter(jsonString: String): SuiteAfter = {
+  private def parseToSuiteAfter(jsonString: String): SuiteAfter = {
     import SuiteAfterJsonProtocol.suiteAfterFormat
     jsonString.parseJson.convertTo[SuiteAfter]
   }
@@ -245,7 +246,7 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A Suite instance.
    */
-  def parseToSuite(jsonString: String): Suite = {
+  private def parseToSuite(jsonString: String): Suite = {
     import SuiteJsonProtocol.suiteFormat
     jsonString.parseJson.convertTo[Suite]
   }
@@ -333,7 +334,7 @@ object ResponseActionJsonProtocol extends DefaultJsonProtocol {
 
       val paramFields = a.params.view.mapValues(JsString(_)).toSeq
 
-      JsObject((fixedFields ++ paramFields): _*)
+      JsObject(fixedFields ++ paramFields: _*)
     }
 
     def read(value: JsValue): ResponseAction = {

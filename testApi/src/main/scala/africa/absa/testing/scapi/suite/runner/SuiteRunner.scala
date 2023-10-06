@@ -31,7 +31,7 @@ import scala.util.{Failure, Try}
  * Main object handling the running of test suites.
  */
 object SuiteRunner {
-  type RestClientCreator = () => RestClient
+  private type RestClientCreator = () => RestClient
 
   /**
    * Run a set of test suites.
@@ -86,16 +86,11 @@ object SuiteRunner {
    * @return SuiteResults after the execution of the suite-before method.
    */
   private def runSuiteBefore(suiteEndpoint: String, suiteBeforeName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
-    Logger.debug(s"Suite-Before: ${suiteBeforeName} - Started")
+    Logger.debug(s"Suite-Before: $suiteBeforeName - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(method, environment, restClientCreator)
-      val result: Try[Unit] = Response.perform(
-        response = response,
-        responseAction = method.responseActions
-      )
-
+      val result: Try[Unit] = processRequest(method, environment, restClientCreator)
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Before: method '${method.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
@@ -123,12 +118,7 @@ object SuiteRunner {
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(test, environment, restClientCreator)
-      val result: Try[Unit] = Response.perform(
-        response = response,
-        responseAction = test.responseActions
-      )
-
+      val result: Try[Unit] = processRequest(test, environment, restClientCreator)
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Test: '${test.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
@@ -157,16 +147,11 @@ object SuiteRunner {
    * @return SuiteResults after the execution of the suite-after method.
    */
   private def runSuiteAfter(suiteEndpoint: String, suiteAfterName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
-    Logger.debug(s"Suite-After: ${suiteAfterName} - Started")
+    Logger.debug(s"Suite-After: $suiteAfterName - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
-      val response: Response = sendRequest(method, environment, restClientCreator)
-      val result: Try[Unit] = Response.perform(
-        response = response,
-        responseAction = method.responseActions
-      )
-
+      val result: Try[Unit] = processRequest(method, environment, restClientCreator)
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"After method '${method.name}' ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
@@ -200,6 +185,23 @@ object SuiteRunner {
   }
 
   /**
+   * Process the request and perform the associated response actions.
+   *
+   * @param requestable       The request-able method containing the actions and response actions.
+   * @param environment       The current environment.
+   * @param restClientCreator A creator function for the REST client.
+   * @return A Try containing the result of the response actions.
+   */
+  private def processRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Try[Unit] = {
+    val response: Response = sendRequest(requestable, environment, restClientCreator)
+    val result: Try[Unit] = Response.perform(
+      response = response,
+      responseAction = requestable.responseActions
+    )
+    result
+  }
+
+  /**
    * Handles exceptions occurring during suite running.
    *
    * @param e             The exception to handle.
@@ -212,7 +214,7 @@ object SuiteRunner {
   private def handleException(e: Throwable, suiteEndpoint: String, name: String, testStartTime: Long, resultType: String, categories: Option[String] = None): SuiteResult = {
     val testEndTime = System.currentTimeMillis()
     val message = e match {
-      case _ => s"Request exception occurred while running suite: ${suiteEndpoint}, ${resultType}: ${name}. Exception: ${e.getMessage}"
+      case _ => s"Request exception occurred while running suite: $suiteEndpoint, $resultType: $name. Exception: ${e.getMessage}"
     }
     Logger.error(message)
     resultType match {

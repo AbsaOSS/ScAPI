@@ -45,7 +45,7 @@ object LogResponseAction extends ResponsePerformer {
           case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
           case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion ${responseAction.name} logic.")
         }
-      case _ => throw UndefinedResponseActionTypeException(responseAction.name.toString)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
 
