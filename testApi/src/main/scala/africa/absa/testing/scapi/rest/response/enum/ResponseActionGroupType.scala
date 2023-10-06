@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.`enum`
 
 object ResponseActionGroupType extends Enumeration {
   val ASSERT, EXTRACT_JSON, LOG = Value

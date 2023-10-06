@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.rest.request.sender
 
+import africa.absa.testing.scapi.rest.model.CookieValue
 import africa.absa.testing.scapi.rest.response.Response
 
 import java.net.HttpCookie
@@ -31,9 +32,9 @@ object ScAPIRequestSender extends RequestSender {
     val response = requestFunc
     val endTime = System.nanoTime()
 
-    val extractedCookies: Map[String, (String, Boolean)] = response.cookies.view.map {
+    val extractedCookies: Map[String, CookieValue] = response.cookies.view.map {
       case (name, cookie: HttpCookie) =>
-        (name, (cookie.getValue, cookie.getSecure))
+        (name, CookieValue(cookie.getValue, cookie.getSecure))
     }.toMap
 
     Response(

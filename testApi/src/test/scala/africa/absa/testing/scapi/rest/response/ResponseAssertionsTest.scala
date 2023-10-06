@@ -17,6 +17,9 @@
 package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.rest.model.CookieValue
+import africa.absa.testing.scapi.rest.response.`enum`.{AssertResponseActionType, ResponseActionGroupType}
+import africa.absa.testing.scapi.rest.response.action.AssertionResponseAction
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
 import munit.FunSuite
 
@@ -400,28 +403,28 @@ class ResponseAssertionsTest extends FunSuite {
 
   test("performAssertions - cookie exists") {
     val cookieExistsResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_EXISTS, Map("cookieName" -> "testCookie"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("", false)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> CookieValue(value = "", secured = false)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieExistsResponseAction).isSuccess)
   }
 
   test("performAssertions - cookie does not exists") {
     val cookieExistsResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_EXISTS, Map("cookieName" -> "anotherCookie"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("", false)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> CookieValue(value = "", secured = false)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieExistsResponseAction).isFailure)
   }
 
   test("performAssertions - cookie value is equals") {
     val cookieValueEqualsResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_VALUE_EQUALS, Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("cookieValue", false)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> CookieValue(value = "cookieValue", secured = false)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieValueEqualsResponseAction).isSuccess)
   }
 
   test("performAssertions - cookie value is not equals") {
     val cookieValueEqualsResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_VALUE_EQUALS, Map("cookieName" -> "testCookie", "expectedValue" -> "cookieValue"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> ("anotherValue", false)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("testCookie" -> CookieValue(value = "anotherValue", secured = false)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieValueEqualsResponseAction).isFailure)
   }
@@ -435,7 +438,7 @@ class ResponseAssertionsTest extends FunSuite {
 
   test("performAssertions - cookie is secured") {
     val cookieIsSecuredResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_IS_SECURED, Map("cookieName" -> "securedCookie"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("securedCookie" -> ("someValue", true)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("securedCookie" -> CookieValue(value = "someValue", secured = true)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieIsSecuredResponseAction).isSuccess)
   }
@@ -449,7 +452,7 @@ class ResponseAssertionsTest extends FunSuite {
 
   test("performAssertions - cookie is not secured") {
     val cookieIsNotSecuredResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.COOKIE_IS_NOT_SECURED, Map("cookieName" -> "notSecuredCookie"))
-    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("notSecuredCookie" -> ("someValue", false)), 100)
+    val response = Response(200, "Dummy Body", "", "", Map.empty, Map("notSecuredCookie" -> CookieValue(value = "someValue", secured = false)), 100)
 
     assert(AssertionResponseAction.performResponseAction(response, cookieIsNotSecuredResponseAction).isSuccess)
   }

@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
-import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
+import africa.absa.testing.scapi.rest.response.`enum`.AssertResponseActionType._
+import africa.absa.testing.scapi.rest.response.{Response, ResponsePerformer}
 import africa.absa.testing.scapi.utils.validation.ContentValidator
+import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import spray.json._
-import africa.absa.testing.scapi.rest.response.AssertResponseActionType._
 
 import scala.util.{Failure, Success, Try}
 import scala.xml.XML
@@ -385,7 +386,7 @@ object AssertionResponseAction extends ResponsePerformer {
    */
   private def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (response.cookies(cookieName)._1 == expectedValue) {
+      if (response.cookies(cookieName).value == expectedValue) {
         Success(())
       } else {
         Failure(AssertionException(s"Cookie '$cookieName' value does not match expected value '$expectedValue'."))
@@ -402,7 +403,7 @@ object AssertionResponseAction extends ResponsePerformer {
    */
   private def assertCookieIsSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (response.cookies(cookieName)._2) {
+      if (response.cookies(cookieName).secured) {
         Success(())
       } else {
         Failure(AssertionException(s"Cookie '$cookieName' is not secured."))
@@ -419,7 +420,7 @@ object AssertionResponseAction extends ResponsePerformer {
    */
   private def assertCookieIsNotSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (!response.cookies(cookieName)._2) {
+      if (!response.cookies(cookieName).secured) {
         Success(())
       } else {
         Failure(AssertionException(s"Cookie '$cookieName' is secured."))

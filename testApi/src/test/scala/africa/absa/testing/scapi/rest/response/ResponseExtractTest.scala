@@ -18,6 +18,8 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.rest.response.`enum`.{ExtractJsonResponseActionType, ResponseActionGroupType}
+import africa.absa.testing.scapi.rest.response.action.ExtractJsonResponseAction
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 

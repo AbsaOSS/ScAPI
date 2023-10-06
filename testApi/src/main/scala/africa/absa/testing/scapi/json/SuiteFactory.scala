@@ -21,7 +21,8 @@ import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSche
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
-import africa.absa.testing.scapi.rest.response.{Response, ResponseActionGroupType}
+import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType
 import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
 import spray.json._
 

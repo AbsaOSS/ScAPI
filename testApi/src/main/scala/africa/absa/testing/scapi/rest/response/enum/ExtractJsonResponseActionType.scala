@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
-
-import africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.`enum`
 
 import scala.language.implicitConversions
 
 object ExtractJsonResponseActionType extends Enumeration {
   type ExtractJsonResponseActionType = Value
 
-  val STRING_FROM_LIST: response.ExtractJsonResponseActionType.Value = Value("string-from-list")
+  val STRING_FROM_LIST: ExtractJsonResponseActionType.Value = Value("string-from-list")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
-
-import africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.`enum`
 
 import scala.language.implicitConversions
 
 object LogResponseActionType extends Enumeration {
   type LogResponseActionType = Value
 
-  val ERROR: response.LogResponseActionType.Value = Value("error")
-  val WARN: response.LogResponseActionType.Value = Value("warn")
-  val INFO: response.LogResponseActionType.Value = Value("info")
-  val DEBUG: response.LogResponseActionType.Value = Value("debug")
+  val ERROR: LogResponseActionType.Value = Value("error")
+  val WARN: LogResponseActionType.Value = Value("warn")
+  val INFO: LogResponseActionType.Value = Value("info")
+  val DEBUG: LogResponseActionType.Value = Value("debug")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 
