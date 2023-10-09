@@ -59,8 +59,8 @@ object ScAPIRunner {
       Logger.info("Validate only => end run.")
     } else {
       Logger.info("Running tests")
-      val testResults: List[SuiteResult] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
-      StdOutReporter.printReport(testResults)
+      val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
+      StdOutReporter.printReport(suiteResults)
     }
   }
 }
