@@ -19,7 +19,8 @@ package africa.absa.testing.scapi.suite.runner
 import africa.absa.testing.scapi.SuiteBeforeFailedException
 import africa.absa.testing.scapi.json.{Environment, Requestable}
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteResult, SuiteResultType, SuiteTestScenario}
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType
+import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteResult, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
@@ -56,7 +57,7 @@ object SuiteRunner {
 
         // add failed Test suite result instance and it will not be started
         suiteResult = suiteResult :+ SuiteResult(
-          resultType = SuiteResultType.TEST_SUITE,
+          resultType = SuiteResultType.TEST_SET,
           suiteName = suiteBundle.suite.name,
           name = "SKIPPED",
           result = Failure(SuiteBeforeFailedException(errorMsg)),
@@ -94,7 +95,7 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Before: method '${method.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.BEFORE_SUITE,
+        resultType = SuiteResultType.BEFORE_TEST_SET,
         suiteName = suiteName,
         name = method.name,
         result = result,
@@ -122,7 +123,7 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Test: '${test.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.TEST_SUITE,
+        resultType = SuiteResultType.TEST_SET,
         suiteName = suiteName,
         name = test.name,
         result = result,
@@ -155,7 +156,7 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"After method '${method.name}' ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.AFTER_SUITE,
+        resultType = SuiteResultType.AFTER_TEST_SET,
         suiteName = suiteName,
         name = method.name,
         result = result,
@@ -219,14 +220,14 @@ object SuiteRunner {
     Logger.error(message)
     resultType match {
       case "Before" => SuiteResult(
-        resultType = SuiteResultType.BEFORE_SUITE,
+        resultType = SuiteResultType.BEFORE_TEST_SET,
         suiteName = suiteName,
         name = name,
         result = Failure(e),
         duration = Some(testEndTime - testStartTime))
 
       case "Test" => SuiteResult(
-        resultType = SuiteResultType.TEST_SUITE,
+        resultType = SuiteResultType.TEST_SET,
         suiteName = suiteName,
         name = name,
         result = Failure(e),
@@ -235,7 +236,7 @@ object SuiteRunner {
       )
 
       case "After" => SuiteResult(
-        resultType = SuiteResultType.AFTER_SUITE,
+        resultType = SuiteResultType.AFTER_TEST_SET,
         suiteName = suiteName,
         name = name,
         result = Failure(e),

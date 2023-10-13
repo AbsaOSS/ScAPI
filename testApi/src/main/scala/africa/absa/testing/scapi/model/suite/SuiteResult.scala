@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.model.suite
 
-import africa.absa.testing.scapi.model.suite.SuiteResultType.SuiteResultType
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType.SuiteResultType
 
 import scala.util.{Failure, Try}
 

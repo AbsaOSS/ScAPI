@@ -16,7 +16,8 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.suite.{SuiteResult, SuiteResultType}
+import africa.absa.testing.scapi.model.suite.SuiteResult
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType
 
 /**
  * A singleton object to manage the standard output reporting of test results.
@@ -58,8 +59,8 @@ object StdOutReporter {
 
     printHeader("Simple Text Report")
 
-    val successCount = testResults.count(r => r.isSuccess && r.resultType == SuiteResultType.TEST_SUITE)
-    val failureCount = testResults.count(r => !r.isSuccess && r.resultType == SuiteResultType.TEST_SUITE)
+    val successCount = testResults.count(r => r.isSuccess && r.resultType == SuiteResultType.TEST_SET)
+    val failureCount = testResults.count(r => !r.isSuccess && r.resultType == SuiteResultType.TEST_SET)
 
     println(s"Number of tests run: ${successCount + failureCount}")
     println(s"Number of successful tests: $successCount")
@@ -67,7 +68,7 @@ object StdOutReporter {
 
     if (testResults.nonEmpty) {
       val suiteSummary = testResults
-        .filter(_.resultType == SuiteResultType.TEST_SUITE)
+        .filter(_.resultType == SuiteResultType.TEST_SET)
         .groupBy(_.suiteName).map {
           case (suiteName, results) =>
             (suiteName, results.size, results.count(_.isSuccess))
@@ -83,7 +84,7 @@ object StdOutReporter {
       printTableRowSplitter()
       println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
-      val resultsList = testResults.filter(_.resultType == SuiteResultType.TEST_SUITE)
+      val resultsList = testResults.filter(_.resultType == SuiteResultType.TEST_SET)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
         println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(

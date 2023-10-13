@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model.suite
+package africa.absa.testing.scapi.model.suite.types
 
 object SuiteResultType extends Enumeration {
-  val BEFORE_SUITE, TEST_SUITE, AFTER_SUITE = Value
   type SuiteResultType = Value
+
+  val BEFORE_TEST_SET: SuiteResultType.Value = Value("before-test-set")
+  val TEST_SET: SuiteResultType.Value = Value("test-set")
+  val AFTER_TEST_SET: SuiteResultType.Value = Value("after-test-set")
 }

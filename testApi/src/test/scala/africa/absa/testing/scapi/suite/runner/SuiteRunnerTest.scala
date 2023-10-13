@@ -20,6 +20,7 @@ import africa.absa.testing.scapi.json.{Action, Environment, Header, ResponseActi
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.model.suite._
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
 import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
@@ -105,7 +106,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BEFORE_SUITE && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2").get
 
     assertEquals(5, clue(suiteResults.size))
     assertEquals("test", clue(beforeSuiteResult.name))
@@ -116,7 +117,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoBefore, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BEFORE_SUITE && result.suiteName == "name2")
+      result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2")
 
     assertEquals(2, clue(suiteResults.size))
     assert(beforeSuiteResult.isEmpty)
@@ -126,7 +127,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
 
     assertEquals(5, clue(suiteResults.size))
     assertEquals("test", clue(afterSuiteResult.name))
@@ -137,7 +138,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoAfter, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "name2")
+      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2")
 
     assertEquals(2, clue(suiteResults.size))
     assert(afterSuiteResult.isEmpty)
@@ -147,7 +148,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleAfterMethodNotSupported, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_SUITE && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
 
     assertEquals(2, clue(suiteResults.size))
     assertEquals(false, clue(afterSuiteResult.isSuccess))
