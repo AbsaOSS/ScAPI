@@ -28,7 +28,7 @@ jobs:
           min-coverage-changed-files: 80.0
           title: JaCoCo code coverage report - ScAPI
           update-comment: true
-          debug: true
+          debug-mode: true
       - name: Get the Coverage info
         run: |
           echo "Total coverage ${{ steps.jacoco.outputs.coverage-overall }}"
