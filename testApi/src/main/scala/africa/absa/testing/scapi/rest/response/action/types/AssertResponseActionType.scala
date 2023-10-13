@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response.`enum`
+package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
 

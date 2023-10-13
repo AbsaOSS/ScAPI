@@ -24,7 +24,7 @@ import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.model.suite.{Method, TestSet, AfterTestSet, SuitePreAndPostProcessing, BeforeTestSet, Suite, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
-import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType
+import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType
 import africa.absa.testing.scapi.utils.file.{FileUtils, JsonUtils}
 import spray.json._
 

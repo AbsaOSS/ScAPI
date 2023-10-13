@@ -17,8 +17,8 @@
 package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
-import africa.absa.testing.scapi.rest.response.`enum`.{ResponseActionGroupType, LogResponseActionType => LogType}
 import africa.absa.testing.scapi.rest.response.action.LogResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.{ResponseActionGroupType, LogResponseActionType => LogType}
 import munit.FunSuite
 
 

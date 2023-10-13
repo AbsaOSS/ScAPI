@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType.ResponseActionGroupType
+import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType.ResponseActionGroupType
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.{PropertyNotFoundException, UndefinedConstantsInPropertiesException}
 

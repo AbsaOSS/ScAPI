@@ -18,7 +18,7 @@ package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.rest.response.`enum`.ExtractJsonResponseActionType._
+import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType._
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator

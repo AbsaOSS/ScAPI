@@ -22,7 +22,7 @@ import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.model.suite._
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
-import africa.absa.testing.scapi.rest.response.`enum`.{AssertResponseActionType, ResponseActionGroupType}
+import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 import org.apache.logging.log4j.Level

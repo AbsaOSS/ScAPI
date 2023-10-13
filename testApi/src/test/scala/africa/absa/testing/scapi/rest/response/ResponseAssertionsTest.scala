@@ -18,8 +18,8 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.model.CookieValue
-import africa.absa.testing.scapi.rest.response.`enum`.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.rest.response.action.AssertionResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
 import munit.FunSuite
 

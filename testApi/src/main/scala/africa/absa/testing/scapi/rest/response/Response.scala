@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.model.CookieValue
-import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType
+import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType
 import africa.absa.testing.scapi.rest.response.action.{AssertionResponseAction, ExtractJsonResponseAction, LogResponseAction}
 
 import scala.util.{Failure, Success, Try}

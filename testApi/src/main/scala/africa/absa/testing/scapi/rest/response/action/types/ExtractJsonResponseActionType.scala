@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response.`enum`
+package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
 
-object LogResponseActionType extends Enumeration {
-  type LogResponseActionType = Value
+object ExtractJsonResponseActionType extends Enumeration {
+  type ExtractJsonResponseActionType = Value
 
-  val ERROR: LogResponseActionType.Value = Value("error")
-  val WARN: LogResponseActionType.Value = Value("warn")
-  val INFO: LogResponseActionType.Value = Value("info")
-  val DEBUG: LogResponseActionType.Value = Value("debug")
+  val STRING_FROM_LIST: ExtractJsonResponseActionType.Value = Value("string-from-list")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 
-  def fromString(s: String): Option[LogResponseActionType] = stringToValueMap.get(s)
+  def fromString(s: String): Option[ExtractJsonResponseActionType] = stringToValueMap.get(s)
 
   // Implicit conversion from AssertResponseActionType to String
-  implicit def enumValueToString(value: LogResponseActionType): String = value.toString
+  implicit def enumValueToString(value: ExtractJsonResponseActionType): String = value.toString
 }
+
+
+
