@@ -17,17 +17,16 @@
 package africa.absa.testing.scapi.model.suite
 
 /**
- * Abstract class that represents a suite support methods.
+ * Case class that represents a suite before methods.
  *
- * @param name The name of the after methods.
- * @param methods The set of suite after methods.
+ * @param name The name of the before methods.
+ * @param methods The set of suite before methods.
  */
-abstract class SuiteAround(name: String, methods: Set[Method]) {
-  /**
-   * Method to resolve references within the before methods instance.
-   *
-   * @param references A map containing the references to be resolved.
-   * @return A new SuiteBefore instance where all references are resolved.
-   */
-  def resolveReferences(references: Map[String, String]): SuiteAround
+case class BeforeTestSet(name: String, methods: Set[Method]) extends SuitePreAndPostProcessing(name, methods) {
+  override def resolveReferences(references: Map[String, String]): SuitePreAndPostProcessing = {
+    BeforeTestSet(
+      name,
+      methods.map(c => c.resolveReferences(references))
+    )
+  }
 }

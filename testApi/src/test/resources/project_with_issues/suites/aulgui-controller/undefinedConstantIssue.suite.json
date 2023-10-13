@@ -1,5 +1,5 @@
 {
-  "endpoint" : "getUserCurrent",
+  "name" : "getUserCurrent",
   "tests": [
     {
       "name" : "test-name-1",

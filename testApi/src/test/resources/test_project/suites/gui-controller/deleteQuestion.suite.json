@@ -1,5 +1,5 @@
 {
-  "endpoint" : "deleteQuestion",
+  "name" : "deleteQuestion",
   "tests": [
     {
       "name" : "test-name-1",

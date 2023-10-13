@@ -7,9 +7,9 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "endpoint": {
+        "name": {
           "type": "string",
-          "description": "The user endpoint name which suite cover by tests."
+          "description": "The suite name."
         },
         "tests": {
           "type": "array",
@@ -20,7 +20,7 @@
         }
       },
       "required": [
-        "endpoint",
+        "name",
         "tests"
       ],
       "title": "suite",

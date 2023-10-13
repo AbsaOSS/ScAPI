@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.rest.response.action
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.response.`enum`.ExtractJsonResponseActionType._
-import africa.absa.testing.scapi.rest.response.{Response, ResponsePerformer}
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
  * It is designed to extract specific data from a JSON response and perform validations.
  */
-object ExtractJsonResponseAction extends ResponsePerformer {
+object ExtractJsonResponseAction extends ResponseActions {
 
   /**
    * Validates the content of an extract response action object depending on its type.

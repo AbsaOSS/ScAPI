@@ -21,7 +21,7 @@ import africa.absa.testing.scapi.json._
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
-import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteAfter, SuiteAround, SuiteBefore, SuiteBundle, SuiteTestScenario}
+import africa.absa.testing.scapi.model.suite.{Method, TestSet, AfterTestSet, SuitePreAndPostProcessing, BeforeTestSet, Suite, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType
@@ -45,10 +45,10 @@ object SuiteFactory {
    * @param format       The format of suite JSON files.
    * @return Set of Suite instances.
    */
-  def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String): Set[SuiteBundle] = {
+  def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String): Set[Suite] = {
     // NOTE: format not used as json is only supported format in time od development
 
-    val suiteLoadingResults: Map[String, Try[SuiteBundle]] = {
+    val suiteLoadingResults: Map[String, Try[Suite]] = {
       val suiteJsonFiles = findSuiteJsonFiles(testRootPath, filter)
       val suiteTries = suiteJsonFiles.map { file =>
         val suiteTry = Try(loadJsonSuiteBundle(file, environment.asMap()))
@@ -59,7 +59,7 @@ object SuiteFactory {
 
     if (suiteLoadingResults.values.forall(_.isSuccess)) {
       Logger.info("All suites loaded.")
-      val suiteBundles: Set[SuiteBundle] = suiteLoadingResults.values.collect {
+      val suiteBundles: Set[Suite] = suiteLoadingResults.values.collect {
         case Success(suiteBundle) => suiteBundle
       }.toSet
 
@@ -89,8 +89,8 @@ object SuiteFactory {
    * @param suiteBundles The set of SuiteBundles to be filtered.
    * @return A set of filtered SuiteBundles based on 'only' attribute.
    */
-  def filterOnlyOrAll(suiteBundles: Set[SuiteBundle]): Set[SuiteBundle] = {
-    val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[SuiteBundle], List.empty[SuiteBundle])) {
+  def filterOnlyOrAll(suiteBundles: Set[Suite]): Set[Suite] = {
+    val (suitesWithOnlyTest, others) = suiteBundles.foldLeft((List.empty[Suite], List.empty[Suite])) {
       case ((onlySuites, normalSuites), suiteBundle) =>
         val suite = suiteBundle.suite
         val onlyTests = suite.tests.filter(_.only.getOrElse(false))
@@ -98,7 +98,7 @@ object SuiteFactory {
           case 0 => (onlySuites, suiteBundle :: normalSuites) // No 'only' test
           case 1 => (suiteBundle.copy(suite = suite.copy(tests = onlyTests)) :: onlySuites, normalSuites) // Exactly one 'only' test
           case _ =>
-            Logger.error(s"Suite ${suite.endpoint} has more than one test marked as only.")
+            Logger.error(s"Suite ${suite.name} has more than one test marked as only.")
             (onlySuites, normalSuites) // More than one 'only' test in a suite is an error
         }
     }
@@ -107,9 +107,9 @@ object SuiteFactory {
       case 0 => others.toSet // If no suite with 'only' test(s), return all other suites
       case 1 => suitesWithOnlyTest.toSet // Only one 'only' test across all suites
       case _ => // More than one 'only' test across all suites is an error
-        val testNames = suitesWithOnlyTest.flatMap(suiteBundle => suiteBundle.suite.tests.map(test => s"${suiteBundle.suite.endpoint}.${test.name}")).mkString(", ")
+        val testNames = suitesWithOnlyTest.flatMap(suiteBundle => suiteBundle.suite.tests.map(test => s"${suiteBundle.suite.name}.${test.name}")).mkString(", ")
         Logger.error(s"Detected more than one test with defined only option. Tests: $testNames")
-        Set.empty[SuiteBundle]
+        Set.empty[Suite]
     }
   }
 
@@ -129,7 +129,7 @@ object SuiteFactory {
    * @param environmentMap The map containing environment variables.
    * @return A SuiteBundle instance.
    */
-  private def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String]): SuiteBundle = {
+  private def loadJsonSuiteBundle(suitePath: String, environmentMap: Map[String, String]): Suite = {
     val (suiteFilePath, suiteFileName) = FileUtils.splitPathAndFileName(suitePath)
     val suiteName = suiteFileName.stripSuffix(".suite.json")
 
@@ -137,7 +137,7 @@ object SuiteFactory {
     // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
 
-    val beforeActions: Option[SuiteBefore] = loadJsonSuite[SuiteBefore](
+    val beforeActions: Option[BeforeTestSet] = loadJsonSuite[BeforeTestSet](
       suiteFilePath,
       suiteName,
       environmentMap ++ suiteConstants.constants,
@@ -145,7 +145,7 @@ object SuiteFactory {
       "before",
       parseToSuiteBefore
     )
-    val afterActions: Option[SuiteAfter] = loadJsonSuite[SuiteAfter](
+    val afterActions: Option[AfterTestSet] = loadJsonSuite[AfterTestSet](
       suiteFilePath,
       suiteName,
       environmentMap ++ suiteConstants.constants,
@@ -156,9 +156,9 @@ object SuiteFactory {
 
     JsonSchemaValidator.validate(suitePath, ScAPIJsonSchema.SUITE)
     val jsonString: String = JsonUtils.stringFromPath(suitePath)
-    val notResolvedSuite: Suite = parseToSuite(jsonString)
-    val resolvedSuite: Suite = notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
-    SuiteBundle(resolvedSuite, beforeActions, afterActions)
+    val notResolvedSuite: TestSet = parseToSuite(jsonString)
+    val resolvedSuite: TestSet = notResolvedSuite.resolveReferences(environmentMap ++ suiteConstants.constants)
+    Suite(resolvedSuite, beforeActions, afterActions)
   }
 
   /**
@@ -192,12 +192,12 @@ object SuiteFactory {
    * @param parser        The parser function used to parse JSON string.
    * @return A Suite instance.
    */
-  private def loadJsonSuite[T <: SuiteAround](suiteFilePath: String,
-                                      suiteName: String,
-                                      properties: Map[String, String],
-                                      jsonSchema: URL,
-                                      extension: String,
-                                      parser: String => T): Option[T] = {
+  private def loadJsonSuite[T <: SuitePreAndPostProcessing](suiteFilePath: String,
+                                                            suiteName: String,
+                                                            properties: Map[String, String],
+                                                            jsonSchema: URL,
+                                                            extension: String,
+                                                            parser: String => T): Option[T] = {
     val filePath: Path = Paths.get(suiteFilePath, s"$suiteName.$extension.json")
     if (!Files.exists(filePath)) {
       None
@@ -226,9 +226,9 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A SuiteBefore instance.
    */
-  private def parseToSuiteBefore(jsonString: String): SuiteBefore = {
+  private def parseToSuiteBefore(jsonString: String): BeforeTestSet = {
     import SuiteBeforeJsonProtocol.suiteBeforeFormat
-    jsonString.parseJson.convertTo[SuiteBefore]
+    jsonString.parseJson.convertTo[BeforeTestSet]
   }
 
   /**
@@ -237,9 +237,9 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A SuiteAfter instance.
    */
-  private def parseToSuiteAfter(jsonString: String): SuiteAfter = {
+  private def parseToSuiteAfter(jsonString: String): AfterTestSet = {
     import SuiteAfterJsonProtocol.suiteAfterFormat
-    jsonString.parseJson.convertTo[SuiteAfter]
+    jsonString.parseJson.convertTo[AfterTestSet]
   }
 
   /**
@@ -248,9 +248,9 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A Suite instance.
    */
-  private def parseToSuite(jsonString: String): Suite = {
+  private def parseToSuite(jsonString: String): TestSet = {
     import SuiteJsonProtocol.suiteFormat
-    jsonString.parseJson.convertTo[Suite]
+    jsonString.parseJson.convertTo[TestSet]
   }
 
   /**
@@ -259,7 +259,7 @@ object SuiteFactory {
    *
    * @param suiteBundles The set of SuiteBundles to be validated.
    */
-  def validateSuiteContent(suiteBundles: Set[SuiteBundle]): Unit = suiteBundles.foreach(validateSuiteContent)
+  def validateSuiteContent(suiteBundles: Set[Suite]): Unit = suiteBundles.foreach(validateSuiteContent)
 
   /**
    * This method validates the content of a SuiteBundle.
@@ -267,8 +267,8 @@ object SuiteFactory {
    *
    * @param suiteBundle The SuiteBundle to be validated.
    */
-  def validateSuiteContent(suiteBundle: SuiteBundle): Unit = {
-    Logger.debug(s"Validation content of suite: ${suiteBundle.suite.endpoint}")
+  def validateSuiteContent(suiteBundle: Suite): Unit = {
+    Logger.debug(s"Validation content of suite: ${suiteBundle.suite.name}")
     suiteBundle.suite.tests.foreach(test => {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
       RequestBody.validateContent(test.actions.head.body)
@@ -288,7 +288,7 @@ object SuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val responseActionsFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val suiteTestFormat: RootJsonFormat[SuiteTestScenario] = jsonFormat6(SuiteTestScenario)
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
-  implicit val suiteFormat: RootJsonFormat[Suite] = jsonFormat2(Suite)
+  implicit val suiteFormat: RootJsonFormat[TestSet] = jsonFormat2(TestSet)
 }
 
 /**
@@ -307,7 +307,7 @@ object SuiteBeforeJsonProtocol extends DefaultJsonProtocol {
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val responseActionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
-  implicit val suiteBeforeFormat: RootJsonFormat[SuiteBefore] = jsonFormat2(SuiteBefore)
+  implicit val suiteBeforeFormat: RootJsonFormat[BeforeTestSet] = jsonFormat2(BeforeTestSet)
 }
 
 /**
@@ -319,7 +319,7 @@ object SuiteAfterJsonProtocol extends DefaultJsonProtocol {
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val responseActionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
-  implicit val suiteAfterFormat: RootJsonFormat[SuiteAfter] = jsonFormat2(SuiteAfter)
+  implicit val suiteAfterFormat: RootJsonFormat[AfterTestSet] = jsonFormat2(AfterTestSet)
 }
 
 /**

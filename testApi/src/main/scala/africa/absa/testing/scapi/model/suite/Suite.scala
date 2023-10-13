@@ -17,21 +17,11 @@
 package africa.absa.testing.scapi.model.suite
 
 /**
- * A suite case class that represents a collection of test scenarios for a specific endpoint.
+ * Represents a suite of tests, with optional "before" and "after" setup/teardown.
  *
- * @param endpoint  The endpoint which the suite of tests is targeting.
- * @param tests     A set of `SuiteTestScenario` which define the tests in this suite.
- * @constructor Creates a new instance of a Suite.
+ * @constructor Create a new suite bundle with a suite and optional "before" and "after" actions.
+ * @param suite The core suite of tests to be run.
+ * @param suiteBefore An optional SuiteBefore object, representing any setup actions to be run before the suite.
+ * @param suiteAfter An optional SuiteAfter object, representing any teardown actions to be run after the suite.
  */
-case class Suite(endpoint: String, tests: Set[SuiteTestScenario]) {
-
-  /**
-   * Method to resolve references in the test scenarios using a provided map of references.
-   *
-   * @param references A map of string keys and values which will be used to resolve references in the test scenarios.
-   * @return Returns a new Suite with resolved references in its test scenarios.
-   */
-  def resolveReferences(references: Map[String, String]): Suite = {
-    Suite(endpoint, tests.map(c => c.resolveReferences(references)))
-  }
-}
+case class Suite(suite: TestSet, suiteBefore: Option[BeforeTestSet] = None, suiteAfter: Option[AfterTestSet] = None)

@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.rest.response.action
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.response.`enum`.AssertResponseActionType._
-import africa.absa.testing.scapi.rest.response.{Response, ResponsePerformer}
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import spray.json._
@@ -31,7 +31,7 @@ import scala.xml.XML
  * Object that validates and performs various assertion response actions on the response received.
  * It extends the functionality of ResponsePerformer.
  */
-object AssertionResponseAction extends ResponsePerformer {
+object AssertionResponseAction extends ResponseActions {
 
   /**
    * Validates the content of an assertion response action object depending on its type.
