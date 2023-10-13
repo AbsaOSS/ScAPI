@@ -89,7 +89,7 @@ class StdOutReporterTest extends FunSuite {
     assertEquals(true, clue(output.contains("End Report")))
   }
 
-  test("full results with failed".only) {
+  test("full results with failed") {
     /*
       "Full":
         min 1 Success test
