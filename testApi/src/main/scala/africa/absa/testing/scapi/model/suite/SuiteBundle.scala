@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
 /**
  * Represents a suite of tests, with optional "before" and "after" setup/teardown.

@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.json.factory.EnvironmentFactory
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.{JsonInvalidSchemaException, UndefinedConstantsInPropertiesException}
 import munit.FunSuite

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
 import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseAction}
 

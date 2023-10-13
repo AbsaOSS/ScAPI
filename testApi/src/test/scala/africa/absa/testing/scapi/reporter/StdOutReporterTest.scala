@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.reporter
 
 import africa.absa.testing.scapi.AssertionException
-import africa.absa.testing.scapi.model.{SuiteResult, SuiteResultType}
+import africa.absa.testing.scapi.model.suite.{SuiteResult, SuiteResultType}
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream

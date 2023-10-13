@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
-import africa.absa.testing.scapi.model.SuiteResultType.SuiteResultType
+import africa.absa.testing.scapi.model.suite.SuiteResultType.SuiteResultType
 
 import scala.util.{Failure, Try}
 

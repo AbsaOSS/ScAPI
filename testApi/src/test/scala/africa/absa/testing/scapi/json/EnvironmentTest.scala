@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.PropertyNotFoundException
+import africa.absa.testing.scapi.json.factory.EnvironmentFactory
 import munit.FunSuite
 
 class EnvironmentTest extends FunSuite {

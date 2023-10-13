@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.json.factory
 
 import africa.absa.testing.scapi._
+import africa.absa.testing.scapi.json._
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
+import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteAfter, SuiteAround, SuiteBefore, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.`enum`.ResponseActionGroupType

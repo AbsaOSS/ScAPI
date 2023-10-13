@@ -17,9 +17,10 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory}
+import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
+import africa.absa.testing.scapi.json.Environment
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.model.{SuiteBundle, SuiteResult}
+import africa.absa.testing.scapi.model.suite.{SuiteBundle, SuiteResult}
 import africa.absa.testing.scapi.reporter.StdOutReporter
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender

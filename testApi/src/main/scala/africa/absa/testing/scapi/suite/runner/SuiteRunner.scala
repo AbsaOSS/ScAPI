@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.suite.runner
 import africa.absa.testing.scapi.SuiteBeforeFailedException
 import africa.absa.testing.scapi.json.{Environment, Requestable}
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.model.{Method, SuiteBundle, SuiteResult, SuiteResultType, SuiteTestScenario}
+import africa.absa.testing.scapi.model.suite.{Method, SuiteBundle, SuiteResult, SuiteResultType, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response

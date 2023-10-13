@@ -19,6 +19,7 @@ package africa.absa.testing.scapi.suite.runner
 import africa.absa.testing.scapi.json.{Action, Environment, Header, ResponseAction}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
+import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteAfter, SuiteBefore, SuiteBundle, SuiteResult, SuiteResultType, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.RequestHeaders
 import africa.absa.testing.scapi.rest.response.`enum`.{AssertResponseActionType, ResponseActionGroupType}

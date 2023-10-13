@@ -16,8 +16,9 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.json.factory.SuiteFactory
+import africa.absa.testing.scapi.model.suite.{Suite, SuiteBundle, SuiteTestScenario}
 import africa.absa.testing.scapi.{ProjectLoadFailedException, UndefinedConstantsInPropertiesException}
-import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
 import munit.FunSuite
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext

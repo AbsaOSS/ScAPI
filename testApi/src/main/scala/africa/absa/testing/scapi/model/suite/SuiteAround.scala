@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
-object SuiteResultType extends Enumeration {
-  val BEFORE_SUITE, TEST_SUITE, AFTER_SUITE = Value
-  type SuiteResultType = Value
+/**
+ * Abstract class that represents a suite support methods.
+ *
+ * @param name The name of the after methods.
+ * @param methods The set of suite after methods.
+ */
+abstract class SuiteAround(name: String, methods: Set[Method]) {
+  /**
+   * Method to resolve references within the before methods instance.
+   *
+   * @param references A map containing the references to be resolved.
+   * @return A new SuiteBefore instance where all references are resolved.
+   */
+  def resolveReferences(references: Map[String, String]): SuiteAround
 }

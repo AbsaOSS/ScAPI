@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.json.factory
 
+import africa.absa.testing.scapi.json.Environment
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.utils.file.JsonUtils
 import spray.json._

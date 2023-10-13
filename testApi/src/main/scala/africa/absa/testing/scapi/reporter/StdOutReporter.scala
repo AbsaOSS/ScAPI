@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.{SuiteResult, SuiteResultType}
+import africa.absa.testing.scapi.model.suite.{SuiteResult, SuiteResultType}
 
 /**
  * A singleton object to manage the standard output reporting of test results.
