@@ -18,12 +18,12 @@ package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType._
 import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType._
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{PropertyNotFoundException, UndefinedResponseActionTypeException}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 /**
  * Singleton object `ResponseLog` that extends the `ResponsePerformer` trait.
@@ -60,12 +60,14 @@ object LogResponseAction extends ResponseActions {
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     val message = responseAction.params.getOrElse("message", return Failure(PropertyNotFoundException("Missing 'message' parameter")))
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
-    action match {
-      case ERROR => logError(message)
-      case WARN => logWarn(message)
-      case INFO => logInfo(message)
-      case DEBUG => logDebug(message)
-      case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported log method [group: log]: ${responseAction.name}"))
+    Try {
+      action match {
+        case ERROR => logError(message)
+        case WARN => logWarn(message)
+        case INFO => logInfo(message)
+        case DEBUG => logDebug(message)
+        case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported log method [group: log]: ${responseAction.name}"))
+      }
     }
   }
 
@@ -77,44 +79,35 @@ object LogResponseAction extends ResponseActions {
    * Logs a message at the ERROR level.
    *
    * @param message The message to be logged.
-   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  private def logError(message: String): Try[Unit] = {
+  private def logError(message: String): Unit = {
     Logger.error(message)
-    Success(())
   }
 
   /**
    * Logs a message at the WARN level.
    *
    * @param message The message to be logged.
-   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  private def logWarn(message: String): Try[Unit] = {
+  private def logWarn(message: String): Unit = {
     Logger.warn(message)
-    Success(())
   }
 
   /**
    * Logs a message at the INFO level.
    *
    * @param message The message to be logged.
-   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  private def logInfo(message: String): Try[Unit] = {
+  private def logInfo(message: String): Unit = {
     Logger.info(message)
-    Success(())
   }
 
   /**
    * Logs a message at the DEBUG level.
    *
    * @param message The message to be logged.
-   * @return A Try[Unit] indicating the success of the logging operation.
    */
-  private def logDebug(message: String): Try[Unit] = {
+  private def logDebug(message: String): Unit = {
     Logger.debug(message)
-    Success(())
   }
-
 }
