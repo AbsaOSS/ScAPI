@@ -18,13 +18,13 @@ package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.rest.response.action.types.AssertResponseActionType._
 import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.action.types.AssertResponseActionType._
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import spray.json._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 import scala.xml.XML
 
 /**
@@ -177,12 +177,12 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that succeeds if the response's duration is below the specified maximum time, and fails with an AssertionException otherwise.
    */
   private def assertResponseTimeIsBelow(response: Response, maxTimeMillis: String): Try[Unit] = {
-    val lMaxTimeMillis: Long = maxTimeMillis.toLong
+    Try {
+      val lMaxTimeMillis: Long = maxTimeMillis.toLong
 
-    if (response.duration <= lMaxTimeMillis) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Expected maximal length '$lMaxTimeMillis' is smaller then received '${response.duration}' one."))
+      if (response.duration > lMaxTimeMillis) {
+        throw AssertionException(s"Expected maximal length '$lMaxTimeMillis' is smaller then received '${response.duration}' one.")
+      }
     }
   }
 
@@ -194,12 +194,12 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the response's duration is greater than or equal to the specified minimum time, and a Failure with an AssertionException otherwise.
    */
   private def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Try[Unit] = {
-    val lMinTimeMillis: Long = minTimeMillis.toLong
+    Try {
+      val lMinTimeMillis: Long = minTimeMillis.toLong
 
-    if (response.duration >= lMinTimeMillis) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Expected minimal length '$lMinTimeMillis' is bigger then received '${response.duration}' one."))
+      if (response.duration < lMinTimeMillis) {
+        throw AssertionException(s"Expected minimal length '$lMinTimeMillis' is bigger then received '${response.duration}' one.")
+      }
     }
   }
 
@@ -212,12 +212,12 @@ object AssertionResponseAction extends ResponseActions {
    * @throws AssertionException if the response's status code does not match the expected code.
    */
   private def assertStatusCodeEquals(response: Response, expectedCode: String): Try[Unit] = {
-    val iExpectedCode: Int = expectedCode.toInt
+    Try {
+      val iExpectedCode: Int = expectedCode.toInt
 
-    if (response.statusCode == iExpectedCode) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Expected $iExpectedCode, but got ${response.statusCode}"))
+      if (response.statusCode != iExpectedCode) {
+        throw AssertionException(s"Expected $iExpectedCode, but got ${response.statusCode}")
+      }
     }
   }
 
@@ -228,10 +228,10 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the status code is within the range 200-299, and a Failure with an AssertionException otherwise.
    */
   private def assertStatusCodeSuccess(response: Response): Try[Unit] = {
-    if (response.statusCode >= 200 && response.statusCode <= 299) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (200 - 299)."))
+    Try {
+      if (!(response.statusCode >= 200 && response.statusCode <= 299)) {
+        throw AssertionException(s"Received status code '${response.statusCode}' is not in expected range (200 - 299).")
+      }
     }
   }
 
@@ -242,10 +242,10 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the status code is within the range 400-499, and a Failure with an AssertionException otherwise.
    */
   private def assertStatusCodeIsClientError(response: Response): Try[Unit] = {
-    if (response.statusCode >= 400 && response.statusCode <= 499) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (400 - 499)."))
+    Try {
+      if (!(response.statusCode >= 400 && response.statusCode <= 499)) {
+        throw AssertionException(s"Received status code '${response.statusCode}' is not in expected range (400 - 499).")
+      }
     }
   }
 
@@ -256,10 +256,10 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the status code is within the range 500-599, and a Failure with an AssertionException otherwise.
    */
   private def assertStatusCodeIsServerError(response: Response): Try[Unit] = {
-    if (response.statusCode >= 500 && response.statusCode <= 599) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Received status code '${response.statusCode}' is not in expected range (500 - 599)."))
+    Try {
+      if (!(response.statusCode >= 500 && response.statusCode <= 599)) {
+        throw AssertionException(s"Received status code '${response.statusCode}' is not in expected range (500 - 599).")
+      }
     }
   }
 
@@ -271,10 +271,10 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the header exists in the response, and a Failure with an AssertionException otherwise.
    */
   private def assertHeaderExists(response: Response, headerName: String): Try[Unit] = {
-    if (response.headers.contains(headerName.toLowerCase)) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Expected header '$headerName' not found."))
+    Try {
+      if (!response.headers.contains(headerName.toLowerCase)) {
+        throw AssertionException(s"Expected header '$headerName' not found.")
+      }
     }
   }
 
@@ -287,16 +287,14 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the header value matches the expected value, and a Failure with an AssertionException otherwise.
    */
   private def assertHeaderValueEquals(response: Response, headerName: String, expectedValue: String): Try[Unit] = {
-    if (assertHeaderExists(response, headerName).isSuccess) {
-      if (expectedValue.equals(response.headers(headerName.toLowerCase).head)) {
-        Success(())
-      } else {
-        Failure(AssertionException(s"Expected header '$headerName' value '$expectedValue' is not equal to " +
-          s"received header value '$response.headers(headerName.toLowerCase).head'."))
+    Try {
+      if (assertHeaderExists(response, headerName).isFailure) {
+        throw AssertionException(s"Expected header '$headerName' not found.")
+      } else if (!expectedValue.equals(response.headers(headerName.toLowerCase).head)) {
+        throw AssertionException(s"Expected header '$headerName' value '$expectedValue' is not equal to " +
+          s"received header value '${response.headers(headerName.toLowerCase).head}'.")
       }
     }
-    else
-      Failure(AssertionException(s"Expected header '$headerName' not found."))
   }
 
   /**
@@ -306,18 +304,18 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the "Content-Type" header value is "application/json", and a Failure with an AssertionException otherwise.
    */
   private def assertContentTypeIsJson(response: Response): Try[Unit] = {
-    val isContentTypeJson = assertHeaderValueEquals(response, "content-type", "application/json")
-    val isBodyJson = try {
-      response.body.parseJson
-      true
-    } catch {
-      case _: JsonParser.ParsingException => false
-    }
+    Try {
+      val isContentTypeJson = assertHeaderValueEquals(response, "content-type", "application/json")
+      val isBodyJson = try {
+        response.body.parseJson
+        true
+      } catch {
+        case _: JsonParser.ParsingException => false
+      }
 
-    if (isContentTypeJson.isSuccess && isBodyJson) {
-      Success(())
-    } else {
-      Failure(AssertionException("Received content is not JSON type."))
+      if (!isContentTypeJson.isSuccess || !isBodyJson) {
+        throw AssertionException("Received content is not JSON type.")
+      }
     }
   }
 
@@ -328,18 +326,18 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the "Content-Type" header value is "application/xml", and a Failure with an AssertionException otherwise.
    */
   private def assertContentTypeIsXml(response: Response): Try[Unit] = {
-    val isContentTypeXml = assertHeaderValueEquals(response, "content-type", "application/xml")
-    val isBodyXml = try {
-      XML.loadString(response.body)
-      true
-    } catch {
-      case _: Exception => false
-    }
+    Try {
+      val isContentTypeXml = assertHeaderValueEquals(response, "content-type", "application/xml")
+      val isBodyXml = try {
+        XML.loadString(response.body)
+        true
+      } catch {
+        case _: Exception => false
+      }
 
-    if (isContentTypeXml.isSuccess && isBodyXml) {
-      Success(())
-    } else {
-      Failure(AssertionException("Received content is not XML type."))
+      if (!isContentTypeXml.isSuccess || !isBodyXml) {
+        throw AssertionException("Received content is not XML type.")
+      }
     }
   }
 
@@ -350,12 +348,12 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the "Content-Type" header value is "text/html", and a Failure with an AssertionException otherwise.
    */
   private def assertContentTypeIsHtml(response: Response): Try[Unit] = {
-    val res = assertHeaderValueEquals(response, "content-type", "text/html")
-
-    res match {
-      case Success(_) => Success(())
-      case Failure(exception) =>
-        Failure(AssertionException(s"Received content is not HTML type. Details: ${exception.getMessage}"))
+    Try {
+      assertHeaderValueEquals(response, "content-type", "text/html") match {
+        case Failure(exception) =>
+          throw AssertionException(s"Received content is not HTML type. Details: ${exception.getMessage}")
+        case _ => // Do nothing for Success
+      }
     }
   }
 
@@ -369,10 +367,10 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the specified cookie exists in the response, and a Failure with an AssertionException otherwise.
    */
   private def assertCookieExists(response: Response, cookieName: String): Try[Unit] = {
-    if (response.cookies.contains(cookieName)) {
-      Success(())
-    } else {
-      Failure(AssertionException(s"Cookie '$cookieName' does not exist in the response."))
+    Try {
+      if (!response.cookies.contains(cookieName)) {
+        throw AssertionException(s"Cookie '$cookieName' does not exist in the response.")
+      }
     }
   }
 
@@ -386,10 +384,10 @@ object AssertionResponseAction extends ResponseActions {
    */
   private def assertCookieValueEquals(response: Response, cookieName: String, expectedValue: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (response.cookies(cookieName).value == expectedValue) {
-        Success(())
-      } else {
-        Failure(AssertionException(s"Cookie '$cookieName' value does not match expected value '$expectedValue'."))
+      Try {
+        if (!(response.cookies(cookieName).value == expectedValue)) {
+          throw AssertionException(s"Cookie '$cookieName' value does not match expected value '$expectedValue'.")
+        }
       }
     }
   }
@@ -403,10 +401,10 @@ object AssertionResponseAction extends ResponseActions {
    */
   private def assertCookieIsSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (response.cookies(cookieName).secured) {
-        Success(())
-      } else {
-        Failure(AssertionException(s"Cookie '$cookieName' is not secured."))
+      Try {
+        if (!response.cookies(cookieName).secured) {
+          throw AssertionException(s"Cookie '$cookieName' is not secured.")
+        }
       }
     }
   }
@@ -420,10 +418,10 @@ object AssertionResponseAction extends ResponseActions {
    */
   private def assertCookieIsNotSecured(response: Response, cookieName: String): Try[Unit] = {
     assertCookieExists(response, cookieName).flatMap { _ =>
-      if (!response.cookies(cookieName).secured) {
-        Success(())
-      } else {
-        Failure(AssertionException(s"Cookie '$cookieName' is secured."))
+      Try {
+        if (response.cookies(cookieName).secured) {
+          throw AssertionException(s"Cookie '$cookieName' is secured.")
+        }
       }
     }
   }
@@ -436,11 +434,11 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the body contains the expected text, and a Failure with an AssertionException otherwise.
    */
   private def assertBodyContainsText(response: Response, text: String): Try[Unit] = {
-    if (response.body.contains(text)) {
-      Success(())
-    } else {
-      Logger.error(s"Expected body to contain $text")
-      Failure(AssertionException(s"Body does not contain expected text '$text'."))
+    Try {
+      if (!response.body.contains(text)) {
+        Logger.error(s"Expected body to contain $text")
+        throw AssertionException(s"Body does not contain expected text '$text'.")
+      }
     }
   }
 }

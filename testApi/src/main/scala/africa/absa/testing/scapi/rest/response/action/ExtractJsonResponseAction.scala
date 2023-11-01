@@ -18,14 +18,14 @@ package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType._
 import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType._
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import spray.json._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 /**
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
@@ -84,14 +84,14 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @return A Try[Unit] indicating whether the string extraction and caching operation was successful or not.
    */
   private def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Try[Unit] = {
-    try {
+    Try {
       val jsonAst = response.body.parseJson
 
       val objects = jsonAst match {
         case JsArray(array) => array
         case _ =>
           Logger.error("Expected a JSON array")
-          return Failure(AssertionException("Expected a JSON array in the response."))
+          throw AssertionException("Expected a JSON array in the response.")
       }
 
       // Extract "jsonKey" from the object at the given index
@@ -100,15 +100,14 @@ object ExtractJsonResponseAction extends ResponseActions {
         case Seq(JsNumber(value)) => value.toString()
         case _ =>
           Logger.error(s"Expected '$jsonKey' field not found in provided json.")
-          return Failure(AssertionException(s"Expected '$jsonKey' field not found in provided json."))
+          throw AssertionException(s"Expected '$jsonKey' field not found in provided json.")
       }
 
       RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
-      Success(())
-    } catch {
+    } recover {
       case e: spray.json.JsonParser.ParsingException =>
         Logger.error(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
-        Failure(AssertionException(s"Expected json string in response body. JSON parsing error: ${e.getMessage}"))
+        throw AssertionException(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
     }
   }
 

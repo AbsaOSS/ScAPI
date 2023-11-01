@@ -16,14 +16,14 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
+import africa.absa.testing.scapi.{AssertionException, ContentValidationFailedException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.response.action.ExtractJsonResponseAction
 import africa.absa.testing.scapi.rest.response.action.types.{ExtractJsonResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 class ResponseExtractTest extends FunSuite {
 
@@ -133,21 +133,45 @@ class ResponseExtractTest extends FunSuite {
 
   test("performAssertion - stringFromList - incorrect parameters - wrong list index") {
     val notValidAssertionStringFromList: ResponseAction = assertionStringFromList.copy(params = assertionStringFromList.params.updated("listIndex", "10"))
-    interceptMessage[IndexOutOfBoundsException]("10 is out of bounds (min 0, max 2)") {
-      ExtractJsonResponseAction.performResponseAction(responseWithID, notValidAssertionStringFromList)
+    val res = ExtractJsonResponseAction.performResponseAction(responseWithID, notValidAssertionStringFromList)
+
+    assert(res.isFailure)
+
+    res match {
+      case Failure(exception: IndexOutOfBoundsException) =>
+        assert(exception.getMessage == "10 is out of bounds (min 0, max 2)")
+      case _ =>
+        fail("Expected a Failure with the specific exception type and message.")
     }
   }
 
   test("performAssertion - stringFromList - incorrect parameters - wrong jsonKey") {
     val notValidAssertionStringFromList: ResponseAction = assertionStringFromList.copy(params = assertionStringFromList.params.updated("jsonKey", "ids"))
     val res = ExtractJsonResponseAction.performResponseAction(responseWithID, notValidAssertionStringFromList)
+
     assert(res.isFailure)
+
+    res match {
+      case Failure(exception: AssertionException) =>
+        assert(exception.getMessage.contains("Expected 'ids' field not found in provided json."))
+      case _ =>
+        fail("Expected a Failure with the specific exception type and message.")
+    }
   }
 
   test("performAssertion - stringFromList - incorrect parameters - no json arrays in response body") {
     val notValidAssertionStringFromList: ResponseAction = assertionStringFromList.copy(params = assertionStringFromList.params.updated("listIndex", "0"))
     val res = ExtractJsonResponseAction.performResponseAction(responseNoJsonBody, notValidAssertionStringFromList)
+
     assert(res.isFailure)
+
+    res match {
+      case Failure(exception: AssertionException) =>
+        assert(exception.getMessage.contains("Expected json string in response body. JSON parsing error:"))
+        assert(exception.getMessage.contains("Unexpected character 'o' at input index 0"))
+      case _ =>
+        fail("Expected a Failure with the specific exception type and message.")
+    }
   }
 
   test("performAssertion - unsupported assertion") {
