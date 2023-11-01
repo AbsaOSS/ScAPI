@@ -19,11 +19,16 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.model.CookieValue
 import africa.absa.testing.scapi.rest.response.action.AssertionResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.AssertResponseActionType.AssertResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
 import munit.FunSuite
 
+import scala.language.implicitConversions
+
 class ResponseAssertionsTest extends FunSuite {
+
+  implicit def assertResponseActionType2String(value: AssertResponseActionType): String = value.toString
 
   /*
     validateContent

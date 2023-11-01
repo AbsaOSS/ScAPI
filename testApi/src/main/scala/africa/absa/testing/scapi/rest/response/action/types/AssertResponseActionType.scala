@@ -52,7 +52,4 @@ object AssertResponseActionType extends Enumeration {
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 
   def fromString(s: String): Option[AssertResponseActionType] = stringToValueMap.get(s)
-
-  // Implicit conversion from AssertResponseActionType to String
-  implicit def enumValueToString(value: AssertResponseActionType): String = value.toString
 }

@@ -29,7 +29,4 @@ object LogResponseActionType extends Enumeration {
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 
   def fromString(s: String): Option[LogResponseActionType] = stringToValueMap.get(s)
-
-  // Implicit conversion from AssertResponseActionType to String
-  implicit def enumValueToString(value: LogResponseActionType): String = value.toString
 }

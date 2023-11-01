@@ -26,9 +26,6 @@ object ExtractJsonResponseActionType extends Enumeration {
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 
   def fromString(s: String): Option[ExtractJsonResponseActionType] = stringToValueMap.get(s)
-
-  // Implicit conversion from AssertResponseActionType to String
-  implicit def enumValueToString(value: ExtractJsonResponseActionType): String = value.toString
 }
 
 

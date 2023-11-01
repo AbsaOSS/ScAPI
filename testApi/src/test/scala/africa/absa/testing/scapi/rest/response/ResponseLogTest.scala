@@ -18,11 +18,16 @@ package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.response.action.LogResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType.LogResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{ResponseActionGroupType, LogResponseActionType => LogType}
 import munit.FunSuite
 
+import scala.language.implicitConversions
+
 
 class ResponseLogTest extends FunSuite {
+
+  implicit def logResponseActionType2String(value: LogResponseActionType): String = value.toString
 
   /*
     validateContent

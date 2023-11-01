@@ -19,13 +19,17 @@ package africa.absa.testing.scapi.rest.response
 import africa.absa.testing.scapi.{AssertionException, ContentValidationFailedException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.response.action.ExtractJsonResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType.ExtractJsonResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{ExtractJsonResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import munit.FunSuite
 
+import scala.language.implicitConversions
 import scala.util.{Failure, Try}
 
 class ResponseExtractTest extends FunSuite {
+
+  implicit def extractJsonResponseActionType2String(value: ExtractJsonResponseActionType): String = value.toString
 
   val assertionStringFromList: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = ExtractJsonResponseActionType.STRING_FROM_LIST, Map("cacheKey" -> "question_id", "listIndex" -> "1", "jsonKey" -> "id", "cacheLevel" -> "suite"))
   val assertionUnsupported: ResponseAction = ResponseAction(group = ResponseActionGroupType.EXTRACT_JSON, name = "Unsupported", Map("cacheKey" -> "key", "listIndex" -> "200", "jsonKey" -> "jsonKey", "cacheLevel" -> "Test"))
