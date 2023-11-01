@@ -20,6 +20,7 @@ import africa.absa.testing.scapi.SuiteBeforeFailedException
 import africa.absa.testing.scapi.json.{Environment, Requestable}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model.suite.types.SuiteResultType
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType.SuiteResultType
 import africa.absa.testing.scapi.model.suite.{Method, Suite, SuiteResult, SuiteTestScenario}
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
@@ -102,7 +103,7 @@ object SuiteRunner {
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteBeforeName, testStartTime, "Before")
+      case e: Exception => handleException(e, suiteName, suiteBeforeName, testStartTime, SuiteResultType.BEFORE_TEST_SET)
     }
   }
 
@@ -132,7 +133,7 @@ object SuiteRunner {
       )
 
     } catch {
-      case e: Exception => handleException(e, suiteName, test.name, testStartTime, "Test", Some(test.categories.mkString(",")))
+      case e: Exception => handleException(e, suiteName, test.name, testStartTime, SuiteResultType.TEST_SET, Some(test.categories.mkString(",")))
     } finally {
       RuntimeCache.expire(TestLevel)
     }
@@ -163,7 +164,7 @@ object SuiteRunner {
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteAfterName, testStartTime, "After")
+      case e: Exception => handleException(e, suiteName, suiteAfterName, testStartTime, SuiteResultType.AFTER_TEST_SET)
     }
   }
 
@@ -205,42 +206,22 @@ object SuiteRunner {
   /**
    * Handles exceptions occurring during suite running.
    *
-   * @param e             The exception to handle.
-   * @param suiteName     Suite's name.
-   * @param name          The name of the suite or test.
-   * @param testStartTime The starting time of the suite or test.
-   * @param resultType    The type of the suite or test ("Before", "Test", or "After").
+   * @param e               The exception to handle.
+   * @param suiteName       Suite's name.
+   * @param name            The name of the suite or test.
+   * @param testStartTime   The starting time of the suite or test.
+   * @param suiteResultType The type of the suite or test ("Before", "Test", or "After").
    * @return SuiteResults after the exception handling.
    */
-  private def handleException(e: Throwable, suiteName: String, name: String, testStartTime: Long, resultType: String, categories: Option[String] = None): SuiteResult = {
+  private def handleException(e: Throwable, suiteName: String, name: String, testStartTime: Long, suiteResultType: SuiteResultType, categories: Option[String] = None): SuiteResult = {
     val testEndTime = System.currentTimeMillis()
-    val message = e match {
-      case _ => s"Request exception occurred while running suite: $suiteName, $resultType: $name. Exception: ${e.getMessage}"
-    }
-    Logger.error(message)
-    resultType match {
-      case "Before" => SuiteResult(
-        resultType = SuiteResultType.BEFORE_TEST_SET,
-        suiteName = suiteName,
-        name = name,
-        result = Failure(e),
-        duration = Some(testEndTime - testStartTime))
+    Logger.error(s"Request exception occurred while running suite: $suiteName, $suiteResultType: $name. Exception: ${e.getMessage}")
 
-      case "Test" => SuiteResult(
-        resultType = SuiteResultType.TEST_SET,
-        suiteName = suiteName,
-        name = name,
-        result = Failure(e),
-        duration = Some(testEndTime - testStartTime),
-        categories = categories
-      )
-
-      case "After" => SuiteResult(
-        resultType = SuiteResultType.AFTER_TEST_SET,
-        suiteName = suiteName,
-        name = name,
-        result = Failure(e),
-        duration = Some(testEndTime - testStartTime))
-    }
+    SuiteResult(
+      resultType = suiteResultType,
+      suiteName = suiteName,
+      name = name,
+      result = Failure(e),
+      duration = Some(testEndTime - testStartTime))
   }
 }
