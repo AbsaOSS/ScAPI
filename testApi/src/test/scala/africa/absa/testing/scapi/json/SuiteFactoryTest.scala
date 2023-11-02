@@ -128,7 +128,7 @@ class SuiteFactoryTest extends FunSuite {
   /*
     filterOnlyOrAll
    */
-  test("filterOnlyOrAll - only used - once".only) {
+  test("filterOnlyOrAll - only used - once") {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
