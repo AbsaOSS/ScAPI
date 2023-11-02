@@ -21,10 +21,10 @@ import scala.language.implicitConversions
 object LogResponseActionType extends Enumeration {
   type LogResponseActionType = Value
 
-  val ERROR: LogResponseActionType.Value = Value("error")
-  val WARN: LogResponseActionType.Value = Value("warn")
-  val INFO: LogResponseActionType.Value = Value("info")
-  val DEBUG: LogResponseActionType.Value = Value("debug")
+  val Error: LogResponseActionType.Value = Value("error")
+  val Warn: LogResponseActionType.Value = Value("warn")
+  val Info: LogResponseActionType.Value = Value("info")
+  val Debug: LogResponseActionType.Value = Value("debug")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 

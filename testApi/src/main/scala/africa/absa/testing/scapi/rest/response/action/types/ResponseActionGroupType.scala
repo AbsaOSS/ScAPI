@@ -17,13 +17,13 @@
 package africa.absa.testing.scapi.rest.response.action.types
 
 object ResponseActionGroupType extends Enumeration {
-  val ASSERT, EXTRACT_JSON, LOG = Value
+  val Assert, ExtractJson, Log = Value
   type ResponseActionGroupType = Value
 
   private val stringToValueMap = Map(
-    "assert" -> ASSERT,
-    "extractJson" -> EXTRACT_JSON,
-    "log" -> LOG
+    "assert" -> Assert,
+    "extractJson" -> ExtractJson,
+    "log" -> Log
   )
 
   def fromString(s: String): Option[ResponseActionGroupType] = stringToValueMap.get(s)

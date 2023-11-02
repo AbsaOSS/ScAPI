@@ -42,7 +42,7 @@ object ExtractJsonResponseAction extends ResponseActions {
   def validateContent(responseAction: ResponseAction): Unit = {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
-      case STRING_FROM_LIST => validateStringFromList(responseAction)
+      case StringFromList => validateStringFromList(responseAction)
       case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
@@ -57,7 +57,7 @@ object ExtractJsonResponseAction extends ResponseActions {
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
-      case STRING_FROM_LIST =>
+      case StringFromList =>
         val cacheKey = responseAction.params("cacheKey")
         val listIndex = responseAction.params("listIndex").toInt
         val jsonKey = responseAction.params("jsonKey")
@@ -119,17 +119,17 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @param assertion The ResponseAction instance containing the response action details.
    */
   private def validateStringFromList(assertion: ResponseAction): Unit = {
-    val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $STRING_FROM_LIST logic"))
-    val listIndex = assertion.params.getOrElse("listIndex", throw new IllegalArgumentException(s"Missing required 'listIndex' parameter for extract $STRING_FROM_LIST logic"))
-    val jsonKey = assertion.params.getOrElse("jsonKey", throw new IllegalArgumentException(s"Missing required 'jsonKey' parameter for extract $STRING_FROM_LIST logic"))
-    val cacheLevel = assertion.params.getOrElse("cacheLevel", throw new IllegalArgumentException(s"Missing required 'cacheLevel' parameter for extract $STRING_FROM_LIST logic"))
+    val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $StringFromList logic"))
+    val listIndex = assertion.params.getOrElse("listIndex", throw new IllegalArgumentException(s"Missing required 'listIndex' parameter for extract $StringFromList logic"))
+    val jsonKey = assertion.params.getOrElse("jsonKey", throw new IllegalArgumentException(s"Missing required 'jsonKey' parameter for extract $StringFromList logic"))
+    val cacheLevel = assertion.params.getOrElse("cacheLevel", throw new IllegalArgumentException(s"Missing required 'cacheLevel' parameter for extract $StringFromList logic"))
 
-    ContentValidator.validateNonEmptyString(cacheKey, s"ExtractJson.$STRING_FROM_LIST.cacheKey")
-    ContentValidator.validateNonEmptyString(listIndex, s"ExtractJson.$STRING_FROM_LIST.listIndex")
-    ContentValidator.validateNonEmptyString(jsonKey, s"ExtractJson.$STRING_FROM_LIST.jsonKey")
-    ContentValidator.validateNonEmptyString(cacheLevel, s"ExtractJson.$STRING_FROM_LIST.cacheLevel")
+    ContentValidator.validateNonEmptyString(cacheKey, s"ExtractJson.$StringFromList.cacheKey")
+    ContentValidator.validateNonEmptyString(listIndex, s"ExtractJson.$StringFromList.listIndex")
+    ContentValidator.validateNonEmptyString(jsonKey, s"ExtractJson.$StringFromList.jsonKey")
+    ContentValidator.validateNonEmptyString(cacheLevel, s"ExtractJson.$StringFromList.cacheLevel")
 
-    ContentValidator.validateIntegerString(listIndex, s"ExtractJson.$STRING_FROM_LIST.listIndex")
+    ContentValidator.validateIntegerString(listIndex, s"ExtractJson.$StringFromList.listIndex")
   }
 
 }

@@ -32,7 +32,7 @@ class SuiteRunnerTest extends FunSuite {
   val header: Header = Header(name = RequestHeaders.AUTHORIZATION, value = "Basic abcdefg")
   val action: Action = Action(methodName = "get", url = "nice url")
   val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
-  val responseAction: ResponseAction = ResponseAction(group = ResponseActionGroupType.ASSERT, name = AssertResponseActionType.STATUS_CODE_EQUALS.toString, Map("code" -> "200"))
+  val responseAction: ResponseAction = ResponseAction(group = ResponseActionGroupType.Assert, name = AssertResponseActionType.StatusCodeEquals.toString, Map("code" -> "200"))
   val method: Method = Method(name = "test", headers = Seq(header), actions = Seq(action), responseActions = Seq(responseAction))
   val methodNotSupported: Method = Method(name = "test", headers = Seq(header), actions = Seq(actionNotSupported), responseActions = Seq(responseAction))
 
@@ -105,7 +105,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.BeforeTestSet && result.suiteName == "name2").get
 
     assert(5 == clue(suiteResults.size))
     assert("test" == clue(beforeSuiteResult.name))
@@ -116,7 +116,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoBefore, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2")
+      result.resultType == SuiteResultType.BeforeTestSet && result.suiteName == "name2")
 
     assert(2 == clue(suiteResults.size))
     assert(beforeSuiteResult.isEmpty)
@@ -126,7 +126,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2").get
 
     assert(5 == clue(suiteResults.size))
     assert("test" == clue(afterSuiteResult.name))
@@ -137,7 +137,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoAfter, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2")
+      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2")
 
     assert(2 == clue(suiteResults.size))
     assert(afterSuiteResult.isEmpty)
@@ -147,7 +147,7 @@ class SuiteRunnerTest extends FunSuite {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleAfterMethodNotSupported, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2").get
 
     assert(2 == clue(suiteResults.size))
     assert(clue(!afterSuiteResult.isSuccess))

@@ -40,7 +40,7 @@ object LogResponseAction extends ResponseActions {
   def validateContent(responseAction: ResponseAction): Unit = {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
-      case ERROR | WARN | INFO | DEBUG =>
+      case Error | Warn | Info | Debug =>
         responseAction.params.get("message") match {
           case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
           case None => throw new IllegalArgumentException(s"Missing required 'message' for assertion ${responseAction.name} logic.")
@@ -62,10 +62,10 @@ object LogResponseAction extends ResponseActions {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     Try {
       action match {
-        case ERROR => logError(message)
-        case WARN => logWarn(message)
-        case INFO => logInfo(message)
-        case DEBUG => logDebug(message)
+        case Error => logError(message)
+        case Warn => logWarn(message)
+        case Info => logInfo(message)
+        case Debug => logDebug(message)
         case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported log method [group: log]: ${responseAction.name}"))
       }
     }

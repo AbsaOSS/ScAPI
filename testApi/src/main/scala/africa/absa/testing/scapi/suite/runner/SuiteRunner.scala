@@ -58,7 +58,7 @@ object SuiteRunner {
 
         // add failed Test suite result instance and it will not be started
         suiteResult = suiteResult :+ SuiteResult(
-          resultType = SuiteResultType.TEST_SET,
+          resultType = SuiteResultType.TestSet,
           suiteName = suiteBundle.suite.name,
           name = "SKIPPED",
           result = Failure(SuiteBeforeFailedException(errorMsg)),
@@ -96,14 +96,14 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Before: method '${method.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.BEFORE_TEST_SET,
+        resultType = SuiteResultType.BeforeTestSet,
         suiteName = suiteName,
         name = method.name,
         result = result,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteBeforeName, testStartTime, SuiteResultType.BEFORE_TEST_SET)
+      case e: Exception => handleException(e, suiteName, suiteBeforeName, testStartTime, SuiteResultType.BeforeTestSet)
     }
   }
 
@@ -124,7 +124,7 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Test: '${test.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.TEST_SET,
+        resultType = SuiteResultType.TestSet,
         suiteName = suiteName,
         name = test.name,
         result = result,
@@ -133,7 +133,7 @@ object SuiteRunner {
       )
 
     } catch {
-      case e: Exception => handleException(e, suiteName, test.name, testStartTime, SuiteResultType.TEST_SET, Some(test.categories.mkString(",")))
+      case e: Exception => handleException(e, suiteName, test.name, testStartTime, SuiteResultType.TestSet, Some(test.categories.mkString(",")))
     } finally {
       RuntimeCache.expire(TestLevel)
     }
@@ -157,14 +157,14 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"After method '${method.name}' ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.AFTER_TEST_SET,
+        resultType = SuiteResultType.AfterTestSet,
         suiteName = suiteName,
         name = method.name,
         result = result,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteAfterName, testStartTime, SuiteResultType.AFTER_TEST_SET)
+      case e: Exception => handleException(e, suiteName, suiteAfterName, testStartTime, SuiteResultType.AfterTestSet)
     }
   }
 

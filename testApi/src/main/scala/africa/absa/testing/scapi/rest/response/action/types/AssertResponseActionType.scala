@@ -22,32 +22,32 @@ object AssertResponseActionType extends Enumeration {
   type AssertResponseActionType = Value
 
   // response-time-...
-  val RESPONSE_TIME_IS_BELOW: AssertResponseActionType.Value = Value("response-time-is-below")
-  val RESPONSE_TIME_IS_ABOVE: AssertResponseActionType.Value = Value("response-time-is-above")
+  val ResponseTimeIsBelow: AssertResponseActionType.Value = Value("response-time-is-below")
+  val ResponseTimeIsAbove: AssertResponseActionType.Value = Value("response-time-is-above")
 
   // status-code-...
-  val STATUS_CODE_EQUALS: AssertResponseActionType.Value = Value("status-code-equals")
-  val STATUS_CODE_IS_SUCCESS: AssertResponseActionType.Value = Value("status-code-is-success")
-  val STATUS_CODE_IS_CLIENT_ERROR: AssertResponseActionType.Value = Value("status-code-is-client-error")
-  val STATUS_CODE_IS_SERVER_ERROR: AssertResponseActionType.Value = Value("status-code-is-server-error")
+  val StatusCodeEquals: AssertResponseActionType.Value = Value("status-code-equals")
+  val StatusCodeIsSuccess: AssertResponseActionType.Value = Value("status-code-is-success")
+  val StatusCodeIsClientError: AssertResponseActionType.Value = Value("status-code-is-client-error")
+  val StatusCodeIsServerError: AssertResponseActionType.Value = Value("status-code-is-server-error")
 
   // header-...
-  val HEADER_EXISTS: AssertResponseActionType.Value = Value("header-exists")
-  val HEADER_VALUE_EQUALS: AssertResponseActionType.Value = Value("header-value-equals")
+  val HeaderExists: AssertResponseActionType.Value = Value("header-exists")
+  val HeaderValueEquals: AssertResponseActionType.Value = Value("header-value-equals")
 
   // content-type-...
-  val CONTENT_TYPE_IS_JSON: AssertResponseActionType.Value = Value("content-type-is-json")
-  val CONTENT_TYPE_IS_XML: AssertResponseActionType.Value = Value("content-type-is-xml")
-  val CONTENT_TYPE_IS_HTML: AssertResponseActionType.Value = Value("content-type-is-html")
+  val ContentTypeIsJson: AssertResponseActionType.Value = Value("content-type-is-json")
+  val ContentTypeIsXml: AssertResponseActionType.Value = Value("content-type-is-xml")
+  val ContentTypeIsHtml: AssertResponseActionType.Value = Value("content-type-is-html")
 
   // cookies-...
-  val COOKIE_EXISTS: AssertResponseActionType.Value = Value("cookie-exists")
-  val COOKIE_VALUE_EQUALS: AssertResponseActionType.Value = Value("cookie-value-equals")
-  val COOKIE_IS_SECURED: AssertResponseActionType.Value = Value("cookie-is-secured")
-  val COOKIE_IS_NOT_SECURED: AssertResponseActionType.Value = Value("cookie-is-not-secured")
+  val CookieExists: AssertResponseActionType.Value = Value("cookie-exists")
+  val CookieValueEquals: AssertResponseActionType.Value = Value("cookie-value-equals")
+  val CookieIsSecured: AssertResponseActionType.Value = Value("cookie-is-secured")
+  val CookieIsNotSecured: AssertResponseActionType.Value = Value("cookie-is-not-secured")
 
   // body-...
-  val BODY_CONTAINS_TEXT: AssertResponseActionType.Value = Value("body-contains-text")
+  val BodyContainsText: AssertResponseActionType.Value = Value("body-contains-text")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 

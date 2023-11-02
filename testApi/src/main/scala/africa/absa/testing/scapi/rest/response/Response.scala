@@ -46,9 +46,9 @@ object Response {
    */
   def validate(responseAction: ResponseAction): Unit = {
     responseAction.group match {
-      case ResponseActionGroupType.ASSERT => AssertionResponseAction.validateContent(responseAction)
-      case ResponseActionGroupType.EXTRACT_JSON => ExtractJsonResponseAction.validateContent(responseAction)
-      case ResponseActionGroupType.LOG => LogResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.Assert => AssertionResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.ExtractJson => ExtractJsonResponseAction.validateContent(responseAction)
+      case ResponseActionGroupType.Log => LogResponseAction.validateContent(responseAction)
       case _ => throw new IllegalArgumentException(s"Unsupported assertion group: ${responseAction.group}")
     }
   }
@@ -85,9 +85,9 @@ object Response {
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - Started.")
 
       val res: Try[Unit] = resolvedResponseAction.group match {
-        case ResponseActionGroupType.ASSERT => AssertionResponseAction.performResponseAction(response, assertion)
-        case ResponseActionGroupType.EXTRACT_JSON => ExtractJsonResponseAction.performResponseAction(response, assertion)
-        case ResponseActionGroupType.LOG => LogResponseAction.performResponseAction(response, assertion)
+        case ResponseActionGroupType.Assert => AssertionResponseAction.performResponseAction(response, assertion)
+        case ResponseActionGroupType.ExtractJson => ExtractJsonResponseAction.performResponseAction(response, assertion)
+        case ResponseActionGroupType.Log => LogResponseAction.performResponseAction(response, assertion)
         case _ => Failure(new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}"))
       }
 

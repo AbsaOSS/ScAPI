@@ -21,7 +21,7 @@ import scala.language.implicitConversions
 object ExtractJsonResponseActionType extends Enumeration {
   type ExtractJsonResponseActionType = Value
 
-  val STRING_FROM_LIST: ExtractJsonResponseActionType.Value = Value("string-from-list")
+  val StringFromList: ExtractJsonResponseActionType.Value = Value("string-from-list")
 
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
 

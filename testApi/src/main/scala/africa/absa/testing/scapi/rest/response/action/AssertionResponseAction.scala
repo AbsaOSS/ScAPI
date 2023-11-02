@@ -44,58 +44,58 @@ object AssertionResponseAction extends ResponseActions {
     action match {
 
       // response-time-...
-      case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
+      case ResponseTimeIsBelow | ResponseTimeIsAbove =>
         responseAction.params.getOrElse("limit", None) match {
           case limit: String => ContentValidator.validateLongString(limit, s"ResponseAssertion.${responseAction.name}.limit")
           case None => throw new IllegalArgumentException(s"Missing required 'limit' parameter for assertion ${responseAction.name} logic.")
         }
 
       // status-code-...
-      case STATUS_CODE_EQUALS =>
+      case StatusCodeEquals =>
         responseAction.params.getOrElse("code", None) match {
-          case code: String => ContentValidator.validateIntegerString(code, s"ResponseAssertion.$STATUS_CODE_EQUALS.code")
-          case None => throw new IllegalArgumentException(s"Missing required 'code' parameter for assertion $STATUS_CODE_EQUALS logic.")
+          case code: String => ContentValidator.validateIntegerString(code, s"ResponseAssertion.$StatusCodeEquals.code")
+          case None => throw new IllegalArgumentException(s"Missing required 'code' parameter for assertion $StatusCodeEquals logic.")
         }
-      case STATUS_CODE_IS_SUCCESS | STATUS_CODE_IS_CLIENT_ERROR | STATUS_CODE_IS_SERVER_ERROR => ()
+      case StatusCodeIsSuccess | StatusCodeIsClientError | StatusCodeIsServerError => ()
 
       // header-...
-      case HEADER_EXISTS | HEADER_VALUE_EQUALS =>
+      case HeaderExists | HeaderValueEquals =>
         responseAction.params.getOrElse("headerName", None) match {
           case headerName: String => ContentValidator.validateNonEmptyString(headerName, s"ResponseAssertion.${responseAction.name}.headerName")
           case None => throw new IllegalArgumentException(s"Missing required 'headerName' parameter for assertion ${responseAction.name} logic.")
         }
         action match {
-          case HEADER_VALUE_EQUALS =>
+          case HeaderValueEquals =>
             responseAction.params.getOrElse("expectedValue", None) match {
-              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$HEADER_VALUE_EQUALS.expectedValue")
-              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $HEADER_VALUE_EQUALS logic.")
+              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$HeaderValueEquals.expectedValue")
+              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $HeaderValueEquals logic.")
             }
           case _ => ()
         }
 
       // content-type-...
-      case CONTENT_TYPE_IS_JSON | CONTENT_TYPE_IS_XML | CONTENT_TYPE_IS_HTML => ()
+      case ContentTypeIsJson | ContentTypeIsXml | ContentTypeIsHtml => ()
 
       // cookies-...
-      case COOKIE_EXISTS | COOKIE_VALUE_EQUALS | COOKIE_IS_SECURED | COOKIE_IS_NOT_SECURED =>
+      case CookieExists | CookieValueEquals | CookieIsSecured | CookieIsNotSecured =>
         responseAction.params.getOrElse("cookieName", None) match {
           case cookieName: String => ContentValidator.validateNonEmptyString(cookieName, s"ResponseAssertion.${responseAction.name}.cookieName")
           case None => throw new IllegalArgumentException(s"Missing required 'cookieName' parameter for assertion ${responseAction.name} logic.")
         }
         action match {
-          case COOKIE_VALUE_EQUALS =>
+          case CookieValueEquals =>
             responseAction.params.getOrElse("expectedValue", None) match {
-              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$COOKIE_VALUE_EQUALS.expectedValue")
-              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $COOKIE_VALUE_EQUALS logic.")
+              case expectedValue: String => ContentValidator.validateNonEmptyString(expectedValue, s"ResponseAssertion.$CookieValueEquals.expectedValue")
+              case None => throw new IllegalArgumentException(s"Missing required 'expectedValue' parameter for assertion $CookieValueEquals logic.")
             }
           case _ => ()
         }
 
       // body-...
-      case BODY_CONTAINS_TEXT =>
+      case BodyContainsText =>
         responseAction.params.getOrElse("text", None) match {
-          case text: String => ContentValidator.validateNonEmptyString(text, s"ResponseAssertion.$BODY_CONTAINS_TEXT.text")
-          case None => throw new IllegalArgumentException(s"Missing required 'text' parameter for assertion $BODY_CONTAINS_TEXT logic.")
+          case text: String => ContentValidator.validateNonEmptyString(text, s"ResponseAssertion.$BodyContainsText.text")
+          case None => throw new IllegalArgumentException(s"Missing required 'text' parameter for assertion $BodyContainsText logic.")
         }
       case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
@@ -114,50 +114,50 @@ object AssertionResponseAction extends ResponseActions {
     action match {
 
       // response-time-...
-      case RESPONSE_TIME_IS_BELOW | RESPONSE_TIME_IS_ABOVE =>
+      case ResponseTimeIsBelow | ResponseTimeIsAbove =>
         val limit = responseAction.params("limit")
         action match {
-          case RESPONSE_TIME_IS_BELOW => assertResponseTimeIsBelow(response, limit)
-          case RESPONSE_TIME_IS_ABOVE => assertResponseTimeIsAbove(response, limit)
+          case ResponseTimeIsBelow => assertResponseTimeIsBelow(response, limit)
+          case ResponseTimeIsAbove => assertResponseTimeIsAbove(response, limit)
         }
 
       // status-code-...
-      case STATUS_CODE_EQUALS =>
+      case StatusCodeEquals =>
         val code = responseAction.params("code")
         assertStatusCodeEquals(response, code)
-      case STATUS_CODE_IS_SUCCESS => assertStatusCodeSuccess(response)
-      case STATUS_CODE_IS_CLIENT_ERROR => assertStatusCodeIsClientError(response)
-      case STATUS_CODE_IS_SERVER_ERROR => assertStatusCodeIsServerError(response)
+      case StatusCodeIsSuccess => assertStatusCodeSuccess(response)
+      case StatusCodeIsClientError => assertStatusCodeIsClientError(response)
+      case StatusCodeIsServerError => assertStatusCodeIsServerError(response)
 
       // header-...
-      case HEADER_EXISTS | HEADER_VALUE_EQUALS =>
+      case HeaderExists | HeaderValueEquals =>
         val headerName = responseAction.params("headerName")
         action match {
-          case HEADER_EXISTS => assertHeaderExists(response, headerName)
-          case HEADER_VALUE_EQUALS =>
+          case HeaderExists => assertHeaderExists(response, headerName)
+          case HeaderValueEquals =>
             val expectedValue = responseAction.params("expectedValue")
             assertHeaderValueEquals(response, headerName, expectedValue)
         }
 
       // content-type-...
-      case CONTENT_TYPE_IS_JSON => assertContentTypeIsJson(response)
-      case CONTENT_TYPE_IS_XML => assertContentTypeIsXml(response)
-      case CONTENT_TYPE_IS_HTML => assertContentTypeIsHtml(response)
+      case ContentTypeIsJson => assertContentTypeIsJson(response)
+      case ContentTypeIsXml => assertContentTypeIsXml(response)
+      case ContentTypeIsHtml => assertContentTypeIsHtml(response)
 
       // cookies-...
-      case COOKIE_EXISTS | COOKIE_VALUE_EQUALS | COOKIE_IS_SECURED | COOKIE_IS_NOT_SECURED =>
+      case CookieExists | CookieValueEquals | CookieIsSecured | CookieIsNotSecured =>
         val cookieName = responseAction.params("cookieName")
         action match {
-          case COOKIE_EXISTS => assertCookieExists(response, cookieName)
-          case COOKIE_VALUE_EQUALS =>
+          case CookieExists => assertCookieExists(response, cookieName)
+          case CookieValueEquals =>
             val expectedValue = responseAction.params("expectedValue")
             assertCookieValueEquals(response, cookieName, expectedValue)
-          case COOKIE_IS_SECURED => assertCookieIsSecured(response, cookieName)
-          case COOKIE_IS_NOT_SECURED => assertCookieIsNotSecured(response, cookieName)
+          case CookieIsSecured => assertCookieIsSecured(response, cookieName)
+          case CookieIsNotSecured => assertCookieIsNotSecured(response, cookieName)
         }
 
       // body-...
-      case BODY_CONTAINS_TEXT =>
+      case BodyContainsText =>
         val text = responseAction.params("text")
         assertBodyContainsText(response, text)
 
