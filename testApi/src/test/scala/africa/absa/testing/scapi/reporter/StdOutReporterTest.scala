@@ -83,11 +83,11 @@ class StdOutReporterTest extends FunSuite {
     val output = baos.toString
 
     // Assertions
-    assertEquals(true, clue(output.contains("Simple Text Report")))
-    assertEquals(true, clue(output.contains("Number of tests run: 0")))
-    assertEquals(true, clue(output.contains("Number of successful tests: 0")))
-    assertEquals(true, clue(output.contains("Number of failed tests: 0")))
-    assertEquals(true, clue(output.contains("End Report")))
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 0")))
+    assert(clue(output.contains("Number of successful tests: 0")))
+    assert(clue(output.contains("Number of failed tests: 0")))
+    assert(clue(output.contains("End Report")))
   }
 
   test("full results with failed") {
@@ -110,24 +110,24 @@ class StdOutReporterTest extends FunSuite {
 
     // Assertions
     // report header & tail
-    assertEquals(true, clue(output.contains("Simple Text Report")))
-    assertEquals(true, clue(output.contains("Number of tests run: 3")))
-    assertEquals(true, clue(output.contains("Number of successful tests: 2")))
-    assertEquals(true, clue(output.contains("Number of failed tests: 1")))
-    assertEquals(true, clue(output.contains("End Report")))
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 3")))
+    assert(clue(output.contains("Number of successful tests: 2")))
+    assert(clue(output.contains("Number of failed tests: 1")))
+    assert(clue(output.contains("End Report")))
 
     // suite summary
-    assertEquals(true, clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 1, Failed: 1")))
-    assertEquals(true, clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
+    assert(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 1, Failed: 1")))
+    assert(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
 
     // summary of all tests
     val updatedOutput = output.replace(" ", "")
-    assertEquals(true, clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
-    assertEquals(true, clue(updatedOutput.contains("|Suite1|Test2|200|Failure|Category2|")))
-    assertEquals(true, clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test2|200|Failure|Category2|")))
+    assert(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
 
     // error from detail
-    assertEquals(true, clue(output.contains("Assertion failed: Error message")))
+    assert(clue(output.contains("Assertion failed: Error message")))
   }
 
   test("results all success") {
@@ -142,20 +142,20 @@ class StdOutReporterTest extends FunSuite {
 
     // Assertions
     // report header & tail
-    assertEquals(true, clue(output.contains("Simple Text Report")))
-    assertEquals(true, clue(output.contains("Number of tests run: 3")))
-    assertEquals(true, clue(output.contains("Number of successful tests: 3")))
-    assertEquals(true, clue(output.contains("Number of failed tests: 0")))
-    assertEquals(true, clue(output.contains("End Report")))
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 3")))
+    assert(clue(output.contains("Number of successful tests: 3")))
+    assert(clue(output.contains("Number of failed tests: 0")))
+    assert(clue(output.contains("End Report")))
 
     // suite summary
-    assertEquals(true, clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 2, Failed: 0")))
-    assertEquals(true, clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
+    assert(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 2, Failed: 0")))
+    assert(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
 
     // summary of all tests
     val updatedOutput = output.replace(" ", "")
-    assertEquals(true, clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
-    assertEquals(true, clue(updatedOutput.contains("|Suite1|Test2|200|Success|Category2|")))
-    assertEquals(true, clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test2|200|Success|Category2|")))
+    assert(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
   }
 }

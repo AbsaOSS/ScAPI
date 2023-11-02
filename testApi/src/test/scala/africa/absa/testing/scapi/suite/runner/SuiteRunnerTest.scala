@@ -18,7 +18,6 @@ package africa.absa.testing.scapi.suite.runner
 
 import africa.absa.testing.scapi.json.{Action, Environment, Header, ResponseAction}
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.model._
 import africa.absa.testing.scapi.model.suite._
 import africa.absa.testing.scapi.model.suite.types.SuiteResultType
 import africa.absa.testing.scapi.rest.RestClient
@@ -108,9 +107,9 @@ class SuiteRunnerTest extends FunSuite {
     val beforeSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2").get
 
-    assertEquals(5, clue(suiteResults.size))
-    assertEquals("test", clue(beforeSuiteResult.name))
-    assertEquals(true, clue(beforeSuiteResult.isSuccess))
+    assert(5 == clue(suiteResults.size))
+    assert("test" == clue(beforeSuiteResult.name))
+    assert(clue(beforeSuiteResult.isSuccess))
   }
 
   test("runSuite - SuiteBefore empty") {
@@ -119,7 +118,7 @@ class SuiteRunnerTest extends FunSuite {
     val beforeSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
       result.resultType == SuiteResultType.BEFORE_TEST_SET && result.suiteName == "name2")
 
-    assertEquals(2, clue(suiteResults.size))
+    assert(2 == clue(suiteResults.size))
     assert(beforeSuiteResult.isEmpty)
   }
 
@@ -129,9 +128,9 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
 
-    assertEquals(5, clue(suiteResults.size))
-    assertEquals("test", clue(afterSuiteResult.name))
-    assertEquals(true, clue(afterSuiteResult.isSuccess))
+    assert(5 == clue(suiteResults.size))
+    assert("test" == clue(afterSuiteResult.name))
+    assert(clue(afterSuiteResult.isSuccess))
   }
 
   test("runSuite - SuiteAfter empty") {
@@ -140,7 +139,7 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2")
 
-    assertEquals(2, clue(suiteResults.size))
+    assert(2 == clue(suiteResults.size))
     assert(afterSuiteResult.isEmpty)
   }
 
@@ -150,8 +149,8 @@ class SuiteRunnerTest extends FunSuite {
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
       result.resultType == SuiteResultType.AFTER_TEST_SET && result.suiteName == "name2").get
 
-    assertEquals(2, clue(suiteResults.size))
-    assertEquals(false, clue(afterSuiteResult.isSuccess))
-    assertEquals("RestClient:sendRequest - unexpected action method called", afterSuiteResult.errorMsg.get)
+    assert(2 == clue(suiteResults.size))
+    assert(clue(!afterSuiteResult.isSuccess))
+    assert("RestClient:sendRequest - unexpected action method called" == afterSuiteResult.errorMsg.get)
   }
 }

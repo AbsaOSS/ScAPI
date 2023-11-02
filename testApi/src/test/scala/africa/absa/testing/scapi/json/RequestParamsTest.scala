@@ -29,25 +29,25 @@ class RequestParamsTest extends FunSuite {
   test("buildParams - no params") {
     val paramsSet: Option[Set[Param]] = None
     val result: Map[String, String] = RequestParams.buildParams(paramsSet)
-    assertEquals(clue(Map.empty[String, String]), clue(result))
+    assert(clue(Map.empty[String, String]) == clue(result))
   }
 
   test("buildParams - single valid param") {
     val paramsSet: Option[Set[Param]] = Some(Set(Param("name", "value")))
     val result: Map[String, String] = RequestParams.buildParams(paramsSet)
-    assertEquals(clue(Map("name" -> "value")), clue(result))
+    assert(clue(Map("name" -> "value")) == clue(result))
   }
 
   test("buildParams - multiple valid params") {
     val paramsSet: Option[Set[Param]] = Some(Set(Param("name1", "value1"), Param("name2", "value2")))
     val result: Map[String, String] = RequestParams.buildParams(paramsSet)
-    assertEquals(clue(Map("name1" -> "value1", "name2" -> "value2")), clue(result))
+    assert(clue(Map("name1" -> "value1", "name2" -> "value2")) == clue(result))
   }
 
   test("buildParams - params with empty name or value should be ignored") {
     val paramsSet: Option[Set[Param]] = Some(Set(Param("name", ""), Param("", "value"), Param("name2", "value2")))
     val result: Map[String, String] = RequestParams.buildParams(paramsSet)
-    assertEquals(clue(Map("name2" -> "value2")), clue(result))
+    assert(clue(Map("name2" -> "value2")) == clue(result))
   }
 
   /*

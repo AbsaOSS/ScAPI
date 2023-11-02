@@ -40,7 +40,7 @@ class RequestHeadersTest extends FunSuite {
     )
 
     val actualMap = RequestHeaders.buildHeaders(headersSeq)
-    assertEquals(clue(expectedMap), clue(actualMap))
+    assert(clue(expectedMap) == clue(actualMap))
   }
 
   test("buildHeaders - should return an empty map if no headers are provided") {
@@ -48,7 +48,7 @@ class RequestHeadersTest extends FunSuite {
     val expectedMap = Map.empty[String, String]
 
     val actualMap = RequestHeaders.buildHeaders(headersSeq)
-    assertEquals(clue(expectedMap), clue(actualMap))
+    assert(clue(expectedMap) == clue(actualMap))
   }
 
   /*

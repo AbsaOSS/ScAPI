@@ -101,7 +101,7 @@ class SuiteFactoryTest extends FunSuite {
 
     val actual: Map[String, String] = SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 
   test("loadJsonSuite - no constants file exist") {
@@ -112,7 +112,7 @@ class SuiteFactoryTest extends FunSuite {
 
     val actual: Map[String, String] = SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 
   test("loadJsonSuite - not all references resolved") {
@@ -128,7 +128,7 @@ class SuiteFactoryTest extends FunSuite {
   /*
     filterOnlyOrAll
    */
-  test("filterOnlyOrAll - only used - once") {
+  test("filterOnlyOrAll - only used - once".only) {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
@@ -147,12 +147,12 @@ class SuiteFactoryTest extends FunSuite {
     assertEquals(filteredSuiteBundles.size, 1)
 
     val filteredSuite = filteredSuiteBundles.head.suite
-    assertEquals(clue("name1"), clue(filteredSuite.name))
-    assertEquals(clue(1), clue(filteredSuite.tests.size))
+    assert("name1" == clue(filteredSuite.name))
+    assert(1 == clue(filteredSuite.tests.size))
 
     val filteredTest = filteredSuite.tests.head
-    assertEquals(clue("test2"), clue(filteredTest.name))
-    assertEquals(clue(Some(true)), clue(filteredTest.only))
+    assert("test2" == clue(filteredTest.name))
+    assert(clue(Some(true)) == clue(filteredTest.only))
   }
 
   test("fromFile - only used - twice") {
@@ -167,6 +167,6 @@ class SuiteFactoryTest extends FunSuite {
 
     val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
-    assertEquals(clue(0), clue(filteredSuiteBundles.size))
+    assert(0 == clue(filteredSuiteBundles.size))
   }
 }
