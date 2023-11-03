@@ -16,8 +16,9 @@
 
 package africa.absa.testing.scapi.json
 
+import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType.ResponseActionGroupType
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
-import africa.absa.testing.scapi.{PropertyNotFound, UndefinedConstantsInProperties}
+import africa.absa.testing.scapi.{PropertyNotFoundException, UndefinedConstantsInPropertiesException}
 
 import scala.util.matching.Regex
 
@@ -56,10 +57,10 @@ sealed protected trait ReferenceResolver {
    * If there are any unresolved references, it throws an exception.
    *
    * @param notResolvedReferences A set of unresolved reference keys.
-   * @throws UndefinedConstantsInProperties If there are any unresolved references.
+   * @throws UndefinedConstantsInPropertiesException If there are any unresolved references.
    */
   private def notResolved(notResolvedReferences: Set[String]): Unit =
-    if (notResolvedReferences.nonEmpty) throw UndefinedConstantsInProperties(notResolvedReferences, s"'${getClass.getSimpleName}' action.")
+    if (notResolvedReferences.nonEmpty) throw UndefinedConstantsInPropertiesException(notResolvedReferences, s"'${getClass.getSimpleName}' action.")
 
   /**
    * Resolve a map of references to their actual values. It iteratively updates the map with resolved values.
@@ -114,7 +115,7 @@ case class Environment private(constants: Map[String, String], properties: Map[S
    * @param key The key to retrieve the value for.
    * @return The value corresponding to the key.
    */
-  def apply(key: String): String = properties.getOrElse(key, constants.getOrElse(key, throw PropertyNotFound(key)))
+  def apply(key: String): String = properties.getOrElse(key, constants.getOrElse(key, throw PropertyNotFoundException(key)))
 
   /**
    * Method to resolve all the references in the environment's properties.
@@ -198,22 +199,19 @@ case class Action private(methodName: String, url: String, body: Option[String] 
 }
 
 /**
- * Case class that represents ResponseAction.
- * This class is used to hold test response action.
- * It implements the `ReferenceResolver` trait to support resolution of reference constants.
+ * Represents a `ResponseAction` case class.
  *
- * @constructor create a new ResponseAction with a name and value.
- * @param method the "group and name" of the response action.
- * @param params the map containing the parameters of the response action. Each key-value pair in the map
- * represents a parameter name and its corresponding value.
+ * <p>This class encapsulates the details of a test response action and provides
+ * functionality to resolve reference constants through the `ReferenceResolver` trait.</p>
+ *
+ * @param group   The type of the response action group.
+ * @param name    The name that identifies the response action.
+ * @param params  A map containing the parameters of the response action. Each entry in the map
+ *                corresponds to a parameter name and its associated value.
  */
-case class ResponseAction private(method: String,
+case class ResponseAction private(group: ResponseActionGroupType,
+                                  name: String,
                                   params: Map[String, String]) extends ReferenceResolver {
-
-  private def splitter: Seq[String] = method.split("\\.").toSeq
-
-  def group : String = splitter.head
-  def name : String = splitter.tail.head
 
   /**
    * Method to resolve references.

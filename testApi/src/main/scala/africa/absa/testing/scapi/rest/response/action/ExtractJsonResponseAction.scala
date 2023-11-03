@@ -14,53 +14,57 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
-import africa.absa.testing.scapi.UndefinedResponseActionType
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.logging.Logger
+import africa.absa.testing.scapi.rest.response.Response
+import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType._
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
+import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
 import spray.json._
+
+import scala.util.Try
 
 /**
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
  * It is designed to extract specific data from a JSON response and perform validations.
  */
-object ExtractJsonResponseAction extends ResponsePerformer {
-
-  val STRING_FROM_LIST = "string-from-list"
+object ExtractJsonResponseAction extends ResponseActions {
 
   /**
    * Validates the content of an extract response action object depending on its type.
    *
    * @param responseAction The ResponseAction instance to be validated.
-   * @throws UndefinedResponseActionType if an unsupported assertion type is encountered.
+   * @throws UndefinedResponseActionTypeException if an unsupported assertion type is encountered.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
-    responseAction.name.toLowerCase match {
-      case STRING_FROM_LIST => validateStringFromList(responseAction)
-      case _ => throw UndefinedResponseActionType(responseAction.name)
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
+      case StringFromList => validateStringFromList(responseAction)
+      case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
 
   /**
    * Performs extract actions on a response depending on the type of assertion method provided.
    *
-   * @param response  The Response instance to perform response action on.
+   * @param response       The Response instance to perform response action on.
    * @param responseAction The ResponseAction instance containing the response action details.
-   * @throws IllegalArgumentException if an unsupported response action name is encountered.
+   * @throws UndefinedResponseActionTypeException if an unsupported response action name is encountered.
    */
-  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean = {
-    responseAction.name match {
-      case STRING_FROM_LIST =>
+  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
+    val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
+    action match {
+      case StringFromList =>
         val cacheKey = responseAction.params("cacheKey")
         val listIndex = responseAction.params("listIndex").toInt
         val jsonKey = responseAction.params("jsonKey")
         val cacheLevel = responseAction.params("cacheLevel")
 
         stringFromList(response, cacheKey, listIndex, jsonKey, cacheLevel)
-      case _ => throw new IllegalArgumentException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
+      case _ => throw UndefinedResponseActionTypeException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
     }
   }
 
@@ -77,17 +81,17 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    * @param listIndex            The index in the JSON array from which to extract the string.
    * @param jsonKey              The key in the JSON object from which to extract the string.
    * @param runtimeCacheLevel    The expiration level to use when storing the extracted string in the runtime cache.
-   * @return Boolean indicating whether the string extraction and caching operation was successful.
+   * @return A Try[Unit] indicating whether the string extraction and caching operation was successful or not.
    */
-  def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Boolean = {
-    try {
+  private def stringFromList(response: Response, cacheKey: String, listIndex: Int, jsonKey: String, runtimeCacheLevel: String): Try[Unit] = {
+    Try {
       val jsonAst = response.body.parseJson
 
       val objects = jsonAst match {
         case JsArray(array) => array
         case _ =>
           Logger.error("Expected a JSON array")
-          return false
+          throw AssertionException("Expected a JSON array in the response.")
       }
 
       // Extract "jsonKey" from the object at the given index
@@ -96,15 +100,14 @@ object ExtractJsonResponseAction extends ResponsePerformer {
         case Seq(JsNumber(value)) => value.toString()
         case _ =>
           Logger.error(s"Expected '$jsonKey' field not found in provided json.")
-          return false
+          throw AssertionException(s"Expected '$jsonKey' field not found in provided json.")
       }
 
       RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
-      true
-    } catch {
+    } recover {
       case e: spray.json.JsonParser.ParsingException =>
         Logger.error(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
-        false
+        throw AssertionException(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")
     }
   }
 
@@ -115,18 +118,18 @@ object ExtractJsonResponseAction extends ResponsePerformer {
    *
    * @param assertion The ResponseAction instance containing the response action details.
    */
-  def validateStringFromList(assertion: ResponseAction): Unit = {
-    val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $STRING_FROM_LIST logic"))
-    val listIndex = assertion.params.getOrElse("listIndex", throw new IllegalArgumentException(s"Missing required 'listIndex' parameter for extract $STRING_FROM_LIST logic"))
-    val jsonKey = assertion.params.getOrElse("jsonKey", throw new IllegalArgumentException(s"Missing required 'jsonKey' parameter for extract $STRING_FROM_LIST logic"))
-    val cacheLevel = assertion.params.getOrElse("cacheLevel", throw new IllegalArgumentException(s"Missing required 'cacheLevel' parameter for extract $STRING_FROM_LIST logic"))
+  private def validateStringFromList(assertion: ResponseAction): Unit = {
+    val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $StringFromList logic"))
+    val listIndex = assertion.params.getOrElse("listIndex", throw new IllegalArgumentException(s"Missing required 'listIndex' parameter for extract $StringFromList logic"))
+    val jsonKey = assertion.params.getOrElse("jsonKey", throw new IllegalArgumentException(s"Missing required 'jsonKey' parameter for extract $StringFromList logic"))
+    val cacheLevel = assertion.params.getOrElse("cacheLevel", throw new IllegalArgumentException(s"Missing required 'cacheLevel' parameter for extract $StringFromList logic"))
 
-    ContentValidator.validateNonEmptyString(cacheKey, s"ExtractJson.$STRING_FROM_LIST.cacheKey")
-    ContentValidator.validateNonEmptyString(listIndex, s"ExtractJson.$STRING_FROM_LIST.listIndex")
-    ContentValidator.validateNonEmptyString(jsonKey, s"ExtractJson.$STRING_FROM_LIST.jsonKey")
-    ContentValidator.validateNonEmptyString(cacheLevel, s"ExtractJson.$STRING_FROM_LIST.cacheLevel")
+    ContentValidator.validateNonEmptyString(cacheKey, s"ExtractJson.$StringFromList.cacheKey")
+    ContentValidator.validateNonEmptyString(listIndex, s"ExtractJson.$StringFromList.listIndex")
+    ContentValidator.validateNonEmptyString(jsonKey, s"ExtractJson.$StringFromList.jsonKey")
+    ContentValidator.validateNonEmptyString(cacheLevel, s"ExtractJson.$StringFromList.cacheLevel")
 
-    ContentValidator.validateIntegerString(listIndex, s"ExtractJson.$STRING_FROM_LIST.listIndex")
+    ContentValidator.validateIntegerString(listIndex, s"ExtractJson.$StringFromList.listIndex")
   }
 
 }

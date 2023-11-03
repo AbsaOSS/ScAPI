@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.rest.model
 
-/**
- * Case class that represents a suite after methods.
- *
- * @param name The name of the after methods.
- * @param methods The set of suite after methods.
- */
-case class SuiteAfter(name: String, methods: Set[Method]) extends SuiteAround(name, methods) {
-  override def resolveReferences(references: Map[String, String]): SuiteAround = {
-    SuiteAfter(
-      name,
-      methods.map(c => c.resolveReferences(references))
-    )
-  }
-}
+case class CookieValue(value: String, secured: Boolean)

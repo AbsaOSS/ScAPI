@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.rest.response.action.types
 
-/**
- * Abstract class that represents a suite support methods.
- *
- * @param name The name of the after methods.
- * @param methods The set of suite after methods.
- */
-abstract class SuiteAround(name: String, methods: Set[Method]) {
-  /**
-   * Method to resolve references within the before methods instance.
-   *
-   * @param references A map containing the references to be resolved.
-   * @return A new SuiteBefore instance where all references are resolved.
-   */
-  def resolveReferences(references: Map[String, String]): SuiteAround
+object ResponseActionGroupType extends Enumeration {
+  val Assert, ExtractJson, Log = Value
+  type ResponseActionGroupType = Value
+
+  private val stringToValueMap = Map(
+    "assert" -> Assert,
+    "extractJson" -> ExtractJson,
+    "log" -> Log
+  )
+
+  def fromString(s: String): Option[ResponseActionGroupType] = stringToValueMap.get(s)
 }
+
+
+

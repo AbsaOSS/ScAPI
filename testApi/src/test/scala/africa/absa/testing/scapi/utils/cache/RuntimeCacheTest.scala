@@ -31,28 +31,28 @@ class RuntimeCacheTest extends FunSuite {
 
   test("put") {
     RuntimeCache.put("key", "value")
-    assertEquals(RuntimeCache.get("key"), Some("value"))
+    assert(clue(Some("value")) == clue(RuntimeCache.get("key")))
   }
 
   test("put - with level") {
     RuntimeCache.put("g", "g", GlobalLevel)
     RuntimeCache.put("s", "s", SuiteLevel)
     RuntimeCache.put("t", "t", TestLevel)
-    assertEquals(RuntimeCache.get("g"), Some("g"))
-    assertEquals(RuntimeCache.get("s"), Some("s"))
-    assertEquals(RuntimeCache.get("t"), Some("t"))
+    assert(clue(Some("g")) == clue(RuntimeCache.get("g")))
+    assert(clue(Some("s")) == clue(RuntimeCache.get("s")))
+    assert(clue(Some("t")) == clue(RuntimeCache.get("t")))
   }
 
   test("put - already exists - on same level") {
     RuntimeCache.put("key", "valueA")
     RuntimeCache.put("key", "valueB")
-    assertEquals(RuntimeCache.get("key"), Some("valueA"))
+    assert(clue(Some("valueA")) == clue(RuntimeCache.get("key")))
   }
 
   test("put - already exists - on different level") {
     RuntimeCache.put("key", "valueA", TestLevel)
     RuntimeCache.put("key", "valueB", SuiteLevel)
-    assertEquals(RuntimeCache.get("key"), Some("valueA"))
+    assert(clue(Some("valueA")) == clue(RuntimeCache.get("key")))
   }
 
   /*
@@ -61,7 +61,7 @@ class RuntimeCacheTest extends FunSuite {
   // smoke possitive tested during put tests - skipped here
 
   test("get - nonexistent key") {
-    assertEquals(None, RuntimeCache.get("nonexistent"))
+    assert(clue(RuntimeCache.get("nonexistent")).isEmpty)
   }
 
   /*
@@ -71,11 +71,11 @@ class RuntimeCacheTest extends FunSuite {
   test("update") {
     RuntimeCache.put("key", "value")
     RuntimeCache.update("key", "newValue")
-    assertEquals(RuntimeCache.get("key"), Some("newValue"))
+    assert(clue(Some("newValue")) == clue(RuntimeCache.get("key")))
   }
 
   test("update - nonexistent key") {
-    intercept[NoSuchElementException] {
+    interceptMessage[NoSuchElementException]("Key nonexistent not found in cache") {
       RuntimeCache.update("nonexistent", "value")
     }
   }
@@ -86,7 +86,7 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.expire(TestLevel)
 
-    assertEquals(RuntimeCache.get("key"), Some("newValue"))
+    assert(clue(Some("newValue")) == clue(RuntimeCache.get("key")))
   }
 
   test("update - with level down") {
@@ -95,7 +95,7 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.expire(TestLevel)
 
-    assertEquals(None, RuntimeCache.get("nonexistent"))
+    assert(clue(RuntimeCache.get("nonexistent")).isEmpty)
   }
 
   /*
@@ -106,7 +106,7 @@ class RuntimeCacheTest extends FunSuite {
     RuntimeCache.put("key", "value")
     RuntimeCache.remove("key")
 
-    assertEquals(None, RuntimeCache.get("nonexistent"))
+    assert(RuntimeCache.get("nonexistent").isEmpty)
   }
 
   test("remove - key no exist") {
@@ -125,9 +125,9 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.expire(GlobalLevel)
 
-    assertEquals(None, RuntimeCache.get("key1"))
-    assertEquals(None, RuntimeCache.get("key2"))
-    assertEquals(None, RuntimeCache.get("key3"))
+    assert(clue(RuntimeCache.get("key1")).isEmpty)
+    assert(clue(RuntimeCache.get("key2")).isEmpty)
+    assert(clue(RuntimeCache.get("key3")).isEmpty)
   }
 
   test("expire - suite level") {
@@ -136,8 +136,8 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.expire(SuiteLevel)
 
-    assertEquals(None, RuntimeCache.get("key1"))
-    assertEquals(None, RuntimeCache.get("key2"))
+    assert(clue(RuntimeCache.get("key1")).isEmpty)
+    assert(clue(RuntimeCache.get("key2")).isEmpty)
   }
 
   test("expire - test level") {
@@ -146,8 +146,8 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.expire(TestLevel)
 
-    assertEquals(None, RuntimeCache.get("key2"))
-    assertEquals(RuntimeCache.get("key1"), Some("value1"))
+    assert(clue(RuntimeCache.get("key2")).isEmpty)
+    assert(clue(Some("value1")) == clue(RuntimeCache.get("key1")))
   }
 
   /*
@@ -161,9 +161,9 @@ class RuntimeCacheTest extends FunSuite {
 
     RuntimeCache.reset()
 
-    assertEquals(None, RuntimeCache.get("key1"))
-    assertEquals(None, RuntimeCache.get("key2"))
-    assertEquals(None, RuntimeCache.get("key3"))
+    assert(clue(RuntimeCache.get("key1")).isEmpty)
+    assert(clue(RuntimeCache.get("key2")).isEmpty)
+    assert(clue(RuntimeCache.get("key3")).isEmpty)
   }
 
   /*
@@ -171,10 +171,10 @@ class RuntimeCacheTest extends FunSuite {
    */
 
   test("determineLevel") {
-    assertEquals(RuntimeCache.determineLevel("global"), GlobalLevel)
-    assertEquals(RuntimeCache.determineLevel("suite"), SuiteLevel)
-    assertEquals(RuntimeCache.determineLevel("test"), TestLevel)
-    assertEquals(RuntimeCache.determineLevel("unknown"), TestLevel)
+    assert(GlobalLevel == clue(RuntimeCache.determineLevel("global")))
+    assert(SuiteLevel == clue(RuntimeCache.determineLevel("suite")))
+    assert(TestLevel == clue(RuntimeCache.determineLevel("test")))
+    assert(TestLevel == clue(RuntimeCache.determineLevel("unknown")))
   }
 
   /*
@@ -183,11 +183,11 @@ class RuntimeCacheTest extends FunSuite {
 
   test("resolve") {
     RuntimeCache.put("key", "value")
-    assertEquals(RuntimeCache.resolve("{{ cache.key }}"), "value")
+    assert("value".==(clue(RuntimeCache.resolve("{{ cache.key }}"))))
   }
 
   test("resolve - key not exist") {
-    intercept[NoSuchElementException] {
+    interceptMessage[NoSuchElementException]("Key not found in cache: notExist") {
       RuntimeCache.resolve("{{ cache.notExist }}")
     }
   }
@@ -201,22 +201,22 @@ class RuntimeCacheTest extends FunSuite {
 
   test("resolve - no placeholder to resolve") {
     RuntimeCache.put("key", "value")
-    assertEquals(RuntimeCache.resolve("cache.key"), "cache.key")
+    assert("cache.key" == clue(RuntimeCache.resolve("cache.key")))
   }
 
   test("resolve - mixed placeholders") {
     RuntimeCache.put("key", "value")
-    assertEquals(RuntimeCache.resolve("{{ cache.key }} and {{ not.cache.key }}"), "value and {{ not.cache.key }}")
+    assert("value and {{ not.cache.key }}" == clue(RuntimeCache.resolve("{{ cache.key }} and {{ not.cache.key }}")))
   }
 
   test("resolve - empty key") {
-    intercept[NoSuchElementException] {
+    interceptMessage[NoSuchElementException]("Key not found in cache: ") {
       RuntimeCache.resolve("{{ cache. }}")
     }
   }
 
   test("resolve - empty value") {
     RuntimeCache.put("key", "")
-    assertEquals(RuntimeCache.resolve("{{ cache.key }}"), "")
+    assert("".==(clue(RuntimeCache.resolve("{{ cache.key }}"))))
   }
 }

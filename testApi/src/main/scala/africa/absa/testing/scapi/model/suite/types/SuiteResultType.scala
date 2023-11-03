@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.logging
+package africa.absa.testing.scapi.model.suite.types
 
-object LoggerConfig {
-  var logLevel: String = _
+object SuiteResultType extends Enumeration {
+  type SuiteResultType = Value
+
+  val BeforeTestSet: SuiteResultType.Value = Value("before-test-set")
+  val TestSet: SuiteResultType.Value = Value("test-set")
+  val AfterTestSet: SuiteResultType.Value = Value("after-test-set")
 }

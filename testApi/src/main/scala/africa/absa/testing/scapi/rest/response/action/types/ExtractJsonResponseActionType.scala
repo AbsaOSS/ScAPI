@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.rest.response.action.types
 
-/**
- * Case class that represents a suite before methods.
- *
- * @param name The name of the before methods.
- * @param methods The set of suite before methods.
- */
-case class SuiteBefore(name: String, methods: Set[Method]) extends SuiteAround(name, methods) {
-  override def resolveReferences(references: Map[String, String]): SuiteAround = {
-    SuiteBefore(
-      name,
-      methods.map(c => c.resolveReferences(references))
-    )
-  }
+import scala.language.implicitConversions
+
+object ExtractJsonResponseActionType extends Enumeration {
+  type ExtractJsonResponseActionType = Value
+
+  val StringFromList: ExtractJsonResponseActionType.Value = Value("string-from-list")
+
+  private val stringToValueMap = values.map(v => v.toString -> v).toMap
+
+  def fromString(s: String): Option[ExtractJsonResponseActionType] = stringToValueMap.get(s)
 }
+
+
+

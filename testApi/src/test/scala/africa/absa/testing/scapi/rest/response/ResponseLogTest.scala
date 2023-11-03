@@ -16,24 +16,49 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.UndefinedResponseActionType
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.rest.response.action.LogResponseAction
+import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType.LogResponseActionType
+import africa.absa.testing.scapi.rest.response.action.types.{ResponseActionGroupType, LogResponseActionType => LogType}
 import munit.FunSuite
 
+import scala.language.implicitConversions
+
+
 class ResponseLogTest extends FunSuite {
+
+  implicit def logResponseActionType2String(value: LogResponseActionType): String = value.toString
 
   /*
     validateContent
    */
-  test("validateContent - INFO supported") {
-    val responseActionInfo = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.INFO}", Map("message" -> "Non-empty string"))
+  test("validateContent - ERROR supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Error, Map("message" -> "Non-empty string"))
     // no exception thrown, meaning validation passed
-    LogResponseAction.validateContent(responseActionInfo)
+    LogResponseAction.validateContent(responseAction)
   }
 
-  test("validateContent - not supported validation type") {
-    val responseAction = ResponseAction(method = s"${Response.GROUP_LOG}.not_info", Map("message" -> "Some string"))
-    intercept[UndefinedResponseActionType] {
+  test("validateContent - WARN supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Warn, Map("message" -> "Non-empty string"))
+    // no exception thrown, meaning validation passed
+    LogResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - INFO supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Info, Map("message" -> "Non-empty string"))
+    // no exception thrown, meaning validation passed
+    LogResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - DEBUG supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "Non-empty string"))
+    // no exception thrown, meaning validation passed
+    LogResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - no message provided") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Info, Map.empty)
+    interceptMessage[IllegalArgumentException]("Missing required 'message' for assertion info logic.") {
       LogResponseAction.validateContent(responseAction)
     }
   }
@@ -42,25 +67,27 @@ class ResponseLogTest extends FunSuite {
     performResponseAction
    */
 
+  test("performAssertion - ERROR supported") {
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Error, Map("message" -> "info message"))
+    val response = Response(500, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
+  }
+
+  test("performAssertion - WARN supported") {
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Warn, Map("message" -> "info message"))
+    val response = Response(401, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
+  }
+
   test("performAssertion - INFO supported") {
-    val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.${LogResponseAction.INFO}", Map("message" -> "info message"))
-    val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
-    assertEquals(LogResponseAction.performResponseAction(response, assertion), true)
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Info, Map("message" -> "info message"))
+    val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
-  test("performAssertion - not supported validation type") {
-    val assertion = ResponseAction(method = s"${Response.GROUP_LOG}.not_info", Map("message" -> "info message"))
-    val response = Response(200, "OK", Map("Content-Type" -> Seq("application/json")))
-    intercept[IllegalArgumentException] {
-      LogResponseAction.performResponseAction(response, assertion)
-    }
-  }
-
-  /*
-    logInfo
-   */
-
-  test("logInfo") {
-    assertEquals(LogResponseAction.logInfo("log message"), true)
+  test("performAssertion - DEBUG supported") {
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "info message"))
+    val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 }

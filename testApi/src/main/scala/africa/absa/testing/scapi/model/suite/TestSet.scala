@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
 /**
- * A suite case class that represents a collection of test scenarios for a specific endpoint.
+ * A suite case class that represents a collection of test scenarios.
  *
- * @param endpoint  The endpoint which the suite of tests is targeting.
- * @param tests     A set of `SuiteTestScenario` which define the tests in this suite.
- * @constructor Creates a new instance of a Suite.
+ * @param name    The name of the suite.
+ * @param tests   A set of `SuiteTestScenario` which define the tests in this suite.
+ * @constructor   Creates a new instance of a Suite.
  */
-case class Suite(endpoint: String, tests: Set[SuiteTestScenario]) {
+case class TestSet(name: String, tests: Set[SuiteTestScenario]) {
 
   /**
    * Method to resolve references in the test scenarios using a provided map of references.
@@ -31,7 +31,7 @@ case class Suite(endpoint: String, tests: Set[SuiteTestScenario]) {
    * @param references A map of string keys and values which will be used to resolve references in the test scenarios.
    * @return Returns a new Suite with resolved references in its test scenarios.
    */
-  def resolveReferences(references: Map[String, String]): Suite = {
-    Suite(endpoint, tests.map(c => c.resolveReferences(references)))
+  def resolveReferences(references: Map[String, String]): TestSet = {
+    TestSet(name, tests.map(c => c.resolveReferences(references)))
   }
 }

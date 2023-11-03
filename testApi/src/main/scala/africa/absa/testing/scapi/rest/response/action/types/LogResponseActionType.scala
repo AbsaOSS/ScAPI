@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.json
+package africa.absa.testing.scapi.rest.response.action.types
 
-trait Requestable {
-  def name: String
+import scala.language.implicitConversions
 
-  def headers: Seq[Header]
+object LogResponseActionType extends Enumeration {
+  type LogResponseActionType = Value
 
-  def actions: Seq[Action]
+  val Error: LogResponseActionType.Value = Value("error")
+  val Warn: LogResponseActionType.Value = Value("warn")
+  val Info: LogResponseActionType.Value = Value("info")
+  val Debug: LogResponseActionType.Value = Value("debug")
 
-  def responseActions: Seq[ResponseAction]
+  private val stringToValueMap = values.map(v => v.toString -> v).toMap
+
+  def fromString(s: String): Option[LogResponseActionType] = stringToValueMap.get(s)
 }

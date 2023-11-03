@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.rest.response.Response
 
-trait ResponsePerformer {
+import scala.util.Try
+
+trait ResponseActions {
   def validateContent(responseAction: ResponseAction): Unit
-  def performResponseAction(response: Response, responseAction: ResponseAction): Boolean
+  def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit]
 }

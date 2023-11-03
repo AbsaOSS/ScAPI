@@ -1,5 +1,5 @@
 {
-  "endpoint" : "deleteQuestion",
+  "name" : "deleteQuestion",
   "tests": [
     {
       "name" : "test-name-1",
@@ -22,7 +22,7 @@
       ],
       "responseActions": [
         {
-          "method": "assert.status-code",
+          "method": "assert.status-code-equals",
           "code": "200"
         }
       ]

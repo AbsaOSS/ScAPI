@@ -36,7 +36,7 @@ class JsonUtilsTest extends FunSuite {
     emptyFile.deleteOnExit()
 
     val result = JsonUtils.stringFromPath(emptyFile.getAbsolutePath)
-    assertEquals("", clue(result))
+    assert("" == clue(result))
   }
 
   test("jsonStringFromPath with valid JSON file") {
@@ -48,6 +48,6 @@ class JsonUtilsTest extends FunSuite {
     }
 
     val result = JsonUtils.stringFromPath(jsonFile.getAbsolutePath)
-    assertEquals("""{"name": "test"}""", clue(result))
+    assert("""{"name": "test"}""" == clue(result))
   }
 }

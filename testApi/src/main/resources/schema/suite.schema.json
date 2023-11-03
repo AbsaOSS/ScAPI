@@ -7,9 +7,9 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "endpoint": {
+        "name": {
           "type": "string",
-          "description": "The user endpoint name which suite cover by tests."
+          "description": "The suite name."
         },
         "tests": {
           "type": "array",
@@ -20,7 +20,7 @@
         }
       },
       "required": [
-        "endpoint",
+        "name",
         "tests"
       ],
       "title": "suite",
@@ -133,7 +133,7 @@
       "properties": {
         "method": {
           "type": "string",
-          "enum": ["assert.status-code", "assert.body-contains", "log.info", "extractJson.string-from-list"],
+          "enum": ["assert.response-time-is-below", "assert.response-time-is-above", "assert.status-code-equals", "assert.status-code-is-success", "assert.status-code-is-client-error", "assert.status-code-is-server-error", "assert.header-exists", "assert.header-value-equals", "assert.content-type-is-json", "assert.content-type-is-xml", "assert.content-type-is-html", "assert.cookie-exists", "assert.cookie-value-equals", "assert.cookie-is-secured", "assert.cookie-is-not-secured", "assert.body-contains-text", "log.error", "log.warn", "log.info", "log.debug", "extractJson.string-from-list"],
           "description": "The method to be used for the response action."
         }
       },
@@ -156,7 +156,7 @@
             {
               "properties": {
                 "method": {
-                  "const": "assert.status-code"
+                  "const": "assert.status-code-equals"
                 }
               },
               "required": ["code"]
@@ -190,7 +190,7 @@
                   {
                     "properties": {
                       "method": {
-                        "const": "assert.status-code"
+                        "const": "assert.status-code-equals"
                       }
                     }
                   },

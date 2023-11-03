@@ -1,5 +1,5 @@
 {
-  "endpoint" : "getUserCurrent",
+  "name" : "getUserCurrent",
   "tests": [
     {
       "name" : "get current user",
@@ -22,8 +22,35 @@
       ],
       "responseActions": [
         {
-          "method": "assert.status-code",
+          "method": "assert.status-code-equals",
           "code": "200"
+        },
+        {
+          "method": "assert.status-code-is-success"
+        },
+        {
+          "method": "log.error",
+          "message": "Dummy error log message."
+        },
+        {
+          "method": "log.warn",
+          "message": "Dummy warn log message."
+        },
+        {
+          "method": "log.info",
+          "message": "Dummy info log message."
+        },
+        {
+          "method": "log.debug",
+          "message": "Dummy debug log message."
+        },
+        {
+          "method": "assert.response-time-is-below",
+          "limit": "600000"
+        },
+        {
+          "method": "assert.response-time-is-above",
+          "limit": "1"
         }
       ]
     }

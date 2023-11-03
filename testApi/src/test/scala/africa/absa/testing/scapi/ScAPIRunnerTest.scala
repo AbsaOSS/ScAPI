@@ -64,7 +64,7 @@ class ScAPIRunnerTest extends FunSuite {
       "--env", "localhost.env.json",
       "--test-root-path", "/random/path/without/suite")
 
-    interceptMessage[SuiteLoadFailed]("Problems during project loading. Details: 'suites' directory have to exist in project root.") {
+    interceptMessage[SuiteLoadFailedException]("Problems during project loading. Details: 'suites' directory have to exist in project root.") {
       ScAPIRunner.main(args)
     }
   }

@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.request
 
-import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.ContentValidationFailedException
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import spray.json._
 
@@ -33,7 +33,7 @@ object RequestBody {
    *
    * @param jsonBody An optional string containing the JSON body. If None or empty string, an empty JSON object ("{}") is returned.
    * @return A string representing the HTTP request body.
-   * @throws ContentValidationFailed if JSON body parsing to a string fails at runtime.
+   * @throws ContentValidationFailedException if JSON body parsing to a string fails at runtime.
    */
   def buildBody(jsonBody: Option[String] = None): String = {
     jsonBody match {
@@ -47,7 +47,7 @@ object RequestBody {
    * If the JSON body cannot be parsed, a ContentValidationFailed exception is thrown.
    *
    * @param jsonBody An optional string containing the JSON body to validate. If None or empty, the method simply returns.
-   * @throws ContentValidationFailed if the provided JSON body cannot be parsed.
+   * @throws ContentValidationFailedException if the provided JSON body cannot be parsed.
    */
   def validateContent(jsonBody: Option[String]): Unit = {
     jsonBody match {
@@ -57,7 +57,7 @@ object RequestBody {
           body.parseJson
         } match {
           case Failure(e) =>
-            throw ContentValidationFailed(body, s"Received value cannot be parsed to json: ${e.getMessage}")
+            throw ContentValidationFailedException(body, s"Received value cannot be parsed to json: ${e.getMessage}")
           case _ => ()
         }
       case _ => ()

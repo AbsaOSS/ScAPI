@@ -16,53 +16,55 @@
 
 package africa.absa.testing.scapi.reporter
 
-import africa.absa.testing.scapi.model.SuiteResults
+import africa.absa.testing.scapi.AssertionException
+import africa.absa.testing.scapi.model.suite.SuiteResult
+import africa.absa.testing.scapi.model.suite.types.SuiteResultType
 import munit.FunSuite
 
 import java.io.ByteArrayOutputStream
+import scala.util.{Failure, Success}
 
 class StdOutReporterTest extends FunSuite {
 
-  val successTestResults: List[SuiteResults] = List(
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+  val successTestResults: List[SuiteResult] = List(
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 1",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 1",
       name = "Test 2",
-      status = true,
+      result = Success(()),
       duration = Some(200L),
       categories = Some("Category 2")
     ),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 2",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(50L),
       categories = Some("Category 3"))
   )
 
-  val mixedSuccessTestResults: List[SuiteResults] = List(
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+  val mixedSuccessTestResults: List[SuiteResult] = List(
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 1",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 1",
       name = "Test 2",
-      status = false,
+      result = Failure(AssertionException("Error message")),
       duration = Some(200L),
-      categories = Some("Category 2"),
-      errMessage = Some("Error message")),
-    SuiteResults.withBooleanStatus(SuiteResults.RESULT_TYPE_TEST,
+      categories = Some("Category 2")),
+    SuiteResult(SuiteResultType.TestSet,
       suiteName = "Suite 2",
       name = "Test 1",
-      status = true,
+      result = Success(()),
       duration = Some(50L),
       categories = Some("Category 3"))
   )
@@ -81,11 +83,11 @@ class StdOutReporterTest extends FunSuite {
     val output = baos.toString
 
     // Assertions
-    assertEquals(clue(output.contains("Simple Text Report")), true)
-    assertEquals(clue(output.contains("Number of tests run: 0")), true)
-    assertEquals(clue(output.contains("Number of successful tests: 0")), true)
-    assertEquals(clue(output.contains("Number of failed tests: 0")), true)
-    assertEquals(clue(output.contains("End Report")), true)
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 0")))
+    assert(clue(output.contains("Number of successful tests: 0")))
+    assert(clue(output.contains("Number of failed tests: 0")))
+    assert(clue(output.contains("End Report")))
   }
 
   test("full results with failed") {
@@ -96,7 +98,6 @@ class StdOutReporterTest extends FunSuite {
         min 2 Suites
         min 1 suites with min 2 tests
      */
-    var failedTestResults = successTestResults
 
     val baos = new ByteArrayOutputStream()
 
@@ -109,24 +110,24 @@ class StdOutReporterTest extends FunSuite {
 
     // Assertions
     // report header & tail
-    assertEquals(clue(output.contains("Simple Text Report")), true)
-    assertEquals(clue(output.contains("Number of tests run: 3")), true)
-    assertEquals(clue(output.contains("Number of successful tests: 2")), true)
-    assertEquals(clue(output.contains("Number of failed tests: 1")), true)
-    assertEquals(clue(output.contains("End Report")), true)
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 3")))
+    assert(clue(output.contains("Number of successful tests: 2")))
+    assert(clue(output.contains("Number of failed tests: 1")))
+    assert(clue(output.contains("End Report")))
 
     // suite summary
-    assertEquals(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 1, Failed: 1")), true)
-    assertEquals(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")), true)
+    assert(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 1, Failed: 1")))
+    assert(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
 
     // summary of all tests
     val updatedOutput = output.replace(" ", "")
-    assertEquals(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")), true)
-    assertEquals(clue(updatedOutput.contains("|Suite1|Test2|200|Failure|Category2|")), true)
-    assertEquals(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")), true)
+    assert(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test2|200|Failure|Category2|")))
+    assert(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
 
     // error from detail
-    assertEquals(clue(output.contains("Error: Error message")), true)
+    assert(clue(output.contains("Assertion failed: Error message")))
   }
 
   test("results all success") {
@@ -141,20 +142,20 @@ class StdOutReporterTest extends FunSuite {
 
     // Assertions
     // report header & tail
-    assertEquals(clue(output.contains("Simple Text Report")), true)
-    assertEquals(clue(output.contains("Number of tests run: 3")), true)
-    assertEquals(clue(output.contains("Number of successful tests: 3")), true)
-    assertEquals(clue(output.contains("Number of failed tests: 0")), true)
-    assertEquals(clue(output.contains("End Report")), true)
+    assert(clue(output.contains("Simple Text Report")))
+    assert(clue(output.contains("Number of tests run: 3")))
+    assert(clue(output.contains("Number of successful tests: 3")))
+    assert(clue(output.contains("Number of failed tests: 0")))
+    assert(clue(output.contains("End Report")))
 
     // suite summary
-    assertEquals(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 2, Failed: 0")), true)
-    assertEquals(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")), true)
+    assert(clue(output.contains("Suite: Suite 1, Total tests: 2, Successful: 2, Failed: 0")))
+    assert(clue(output.contains("Suite: Suite 2, Total tests: 1, Successful: 1, Failed: 0")))
 
     // summary of all tests
     val updatedOutput = output.replace(" ", "")
-    assertEquals(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")), true)
-    assertEquals(clue(updatedOutput.contains("|Suite1|Test2|200|Success|Category2|")), true)
-    assertEquals(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")), true)
+    assert(clue(updatedOutput.contains("|Suite1|Test1|100|Success|Category1|")))
+    assert(clue(updatedOutput.contains("|Suite1|Test2|200|Success|Category2|")))
+    assert(clue(updatedOutput.contains("|Suite2|Test1|50|Success|Category3|")))
   }
 }

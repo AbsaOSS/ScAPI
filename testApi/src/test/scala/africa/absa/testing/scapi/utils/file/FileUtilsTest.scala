@@ -45,7 +45,7 @@ class FileUtilsTest extends FunSuite {
 
     val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString)
 
-    assertEquals(clue(expectedFiles), clue(matchingFiles))
+    assert(clue(expectedFiles) == clue(matchingFiles))
   }
 
   test("find matching files - custom filter") {
@@ -54,7 +54,7 @@ class FileUtilsTest extends FunSuite {
 
     val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).json")
 
-    assertEquals(clue(expectedFiles), clue(matchingFiles))
+    assert(clue(expectedFiles) == clue(matchingFiles))
   }
 
   test("find matching files - no found") {
@@ -63,7 +63,7 @@ class FileUtilsTest extends FunSuite {
 
     val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).nonsense")
 
-    assertEquals(clue(expectedFiles), clue(matchingFiles))
+    assert(clue(expectedFiles) == clue(matchingFiles))
   }
 
   test("find matching files - subdirectories") {
@@ -72,7 +72,7 @@ class FileUtilsTest extends FunSuite {
 
     val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).xml")
 
-    assertEquals(clue(expectedFiles), clue(matchingFiles))
+    assert(clue(expectedFiles) == clue(matchingFiles))
   }
 
   /*
@@ -85,8 +85,8 @@ class FileUtilsTest extends FunSuite {
 
     val (actualPath, actualFileName) = FileUtils.splitPathAndFileName(filePath)
 
-    assertEquals(clue(expectedPath), clue(actualPath))
-    assertEquals(clue(expectedFileName), clue(actualFileName))
+    assert(clue(expectedPath) == clue(actualPath))
+    assert(clue(expectedFileName) == clue(actualFileName))
   }
 
   test("split to path and fileName - empty input") {
@@ -94,8 +94,8 @@ class FileUtilsTest extends FunSuite {
 
     val (actualPath, actualFileName) = FileUtils.splitPathAndFileName(filePath)
 
-    assertEquals("", clue(actualPath))
-    assertEquals("", clue(actualFileName))
+    assert("".==(clue(actualPath)))
+    assert("".==(clue(actualFileName)))
   }
 
   test("split to path and fileName - fileName only") {
@@ -103,8 +103,8 @@ class FileUtilsTest extends FunSuite {
 
     val (path, fileName) = FileUtils.splitPathAndFileName(filePath)
 
-    assertEquals(clue(path), "")
-    assertEquals(clue(fileName), "filename.txt")
+    assert("".==(clue(path)))
+    assert("filename.txt".==(clue(fileName)))
   }
 
   test("split to path and fileName - dir path only") {
@@ -115,9 +115,9 @@ class FileUtilsTest extends FunSuite {
     val (actualPath, actualFileName) = FileUtils.splitPathAndFileName(filePath)
     val (actualPathEndSlash, actualFileNameEndSlash) = FileUtils.splitPathAndFileName(filePathEndSlash)
 
-    assertEquals(clue(expectedPath), clue(actualPath))
-    assertEquals(clue(expectedPath), clue(actualPathEndSlash))
-    assertEquals("to", clue(actualFileName))
-    assertEquals("to", clue(actualFileNameEndSlash))
+    assert(clue(expectedPath) == clue(actualPath))
+    assert(clue(expectedPath) == clue(actualPathEndSlash))
+    assert("to".==(clue(actualFileName)))
+    assert("to".==(clue(actualFileNameEndSlash)))
   }
 }

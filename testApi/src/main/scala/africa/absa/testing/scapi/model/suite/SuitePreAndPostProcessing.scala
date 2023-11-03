@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
 /**
- * Represents a suite of tests, with optional "before" and "after" setup/teardown.
+ * Abstract class that represents a suite support methods.
  *
- * @constructor Create a new suite bundle with a suite and optional "before" and "after" actions.
- * @param suite The core suite of tests to be run.
- * @param suiteBefore An optional SuiteBefore object, representing any setup actions to be run before the suite.
- * @param suiteAfter An optional SuiteAfter object, representing any teardown actions to be run after the suite.
+ * @param name The name of the after methods.
+ * @param methods The set of suite after methods.
  */
-case class SuiteBundle(suite: Suite, suiteBefore: Option[SuiteBefore] = None, suiteAfter: Option[SuiteAfter] = None)
+abstract class SuitePreAndPostProcessing(name: String, methods: Set[Method]) {
+  /**
+   * Method to resolve references within the before methods instance.
+   *
+   * @param references A map containing the references to be resolved.
+   * @return A new SuiteBefore instance where all references are resolved.
+   */
+  def resolveReferences(references: Map[String, String]): SuitePreAndPostProcessing
+}

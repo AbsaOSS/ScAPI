@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.model
+package africa.absa.testing.scapi.model.suite
 
 import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseAction}
 
@@ -27,9 +27,9 @@ import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseActi
  * @param responseActions The set of responseAction objects for the method.
  */
 case class Method(name: String,
-                  headers: Set[Header],
-                  actions: Set[Action],
-                  responseActions: Set[ResponseAction]) extends Requestable {
+                  headers: Seq[Header],
+                  actions: Seq[Action],
+                  responseActions: Seq[ResponseAction]) extends Requestable {
   /**
    * Method to resolve references within the Method instance.
    *

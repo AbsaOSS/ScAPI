@@ -130,10 +130,9 @@ object RuntimeCache {
       case "global" => GlobalLevel
       case "suite" => SuiteLevel
       case "test" => TestLevel
-      case _ => {
+      case _ =>
         Logger.warn(s"Not known expiration cache level: '$level'. Used default TEST level.")
         TestLevel
-      }
     }
   }
 

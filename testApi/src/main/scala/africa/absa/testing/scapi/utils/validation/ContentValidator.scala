@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.utils.validation
 
-import africa.absa.testing.scapi.ContentValidationFailed
+import africa.absa.testing.scapi.ContentValidationFailedException
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -28,12 +28,25 @@ object ContentValidator {
    * Validates that a string can be parsed to an integer. Throws an exception if the string cannot be parsed.
    *
    * @param input The string to be validated.
-   * @throws ContentValidationFailed if the input string cannot be parsed to an integer.
+   * @throws ContentValidationFailedException if the input string cannot be parsed to an integer.
    */
   def validateIntegerString(input: String, param: String): Unit = {
     Try(input.toInt) match {
       case Success(_) => // Do nothing
-      case Failure(e) => throw ContentValidationFailed(input, s"Received value of '$param' cannot be parsed to an integer: ${e.getMessage}")
+      case Failure(e) => throw ContentValidationFailedException(input, s"Received value of '$param' cannot be parsed to an integer: ${e.getMessage}")
+    }
+  }
+
+  /**
+   * Validates that a string can be parsed to a long. Throws an exception if the string cannot be parsed.
+   *
+   * @param input The string to be validated.
+   * @throws ContentValidationFailedException if the input string cannot be parsed to a long.
+   */
+  def validateLongString(input: String, param: String): Unit = {
+    Try(input.toLong) match {
+      case Success(_) => // Do nothing
+      case Failure(e) => throw ContentValidationFailedException(input, s"Received value of '$param' cannot be parsed to a long: ${e.getMessage}")
     }
   }
 
@@ -41,11 +54,11 @@ object ContentValidator {
    * Validates that a string is not empty. Throws an exception if the string is empty.
    *
    * @param input The string to be validated.
-   * @throws ContentValidationFailed if the input string is empty.
+   * @throws ContentValidationFailedException if the input string is empty.
    */
   def validateNonEmptyString(input: String, param: String): Unit = {
     if (input.isEmpty) {
-      throw ContentValidationFailed(input, s"Received string value of '$param' is empty.")
+      throw ContentValidationFailedException(input, s"Received string value of '$param' is empty.")
     }
   }
 
@@ -54,12 +67,12 @@ object ContentValidator {
    *
    * @param input     The Option[String] to be validated.
    * @param paramName The name of the parameter, used in error messaging.
-   * @throws ContentValidationFailed if the input Option[String] is None.
+   * @throws ContentValidationFailedException if the input Option[String] is None.
    */
   def validateNotNone(input: Option[String], paramName: String): Unit = {
     input match {
       case Some(_) => // do nothing, input is valid
-      case None => throw new ContentValidationFailed(paramName, "Input cannot be None")
+      case None => throw ContentValidationFailedException(paramName, "Input cannot be None")
     }
   }
 }

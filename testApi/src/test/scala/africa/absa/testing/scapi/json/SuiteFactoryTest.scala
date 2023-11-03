@@ -16,8 +16,9 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.{ProjectLoadFailed, UndefinedConstantsInProperties}
-import africa.absa.testing.scapi.model.{Suite, SuiteBundle, SuiteTestScenario}
+import africa.absa.testing.scapi.json.factory.SuiteFactory
+import africa.absa.testing.scapi.model.suite.{TestSet, Suite, SuiteTestScenario}
+import africa.absa.testing.scapi.{ProjectLoadFailedException, UndefinedConstantsInPropertiesException}
 import munit.FunSuite
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
@@ -66,11 +67,11 @@ class SuiteFactoryTest extends FunSuite {
     initTestLogger()
 
     try {
-      val caught = intercept[ProjectLoadFailed] {
+      val caught = intercept[ProjectLoadFailedException] {
         SuiteFactory.fromFiles(environment, testRootPath, "(.*)", "json")
       }
 
-      assert(caught.isInstanceOf[ProjectLoadFailed])
+      assert(caught.isInstanceOf[ProjectLoadFailedException])
       assert(out.toString.contains("Undefined constant(s): 'constants.no_provided' in ''Header' action."))
       assert(out.toString.contains("Not all suites loaded. Failed suites:"))
     } finally {
@@ -100,7 +101,7 @@ class SuiteFactoryTest extends FunSuite {
 
     val actual: Map[String, String] = SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 
   test("loadJsonSuite - no constants file exist") {
@@ -111,7 +112,7 @@ class SuiteFactoryTest extends FunSuite {
 
     val actual: Map[String, String] = SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 
   test("loadJsonSuite - not all references resolved") {
@@ -119,7 +120,7 @@ class SuiteFactoryTest extends FunSuite {
     val suiteName = "getUserCurrent"
     val properties: Map[String, String] = Map.empty
 
-    intercept[UndefinedConstantsInProperties] {
+    interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'env.basic_token' in ''SuiteConstants' action.'.") {
       SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
     }
   }
@@ -129,43 +130,43 @@ class SuiteFactoryTest extends FunSuite {
    */
   test("filterOnlyOrAll - only used - once") {
     val suitesBundles = Set(
-      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(true))
+      Suite(suite = TestSet(name = "name1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
       ))),
-      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(true))
+      Suite(suite = TestSet(name = "name1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
       ))),
-      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(false)),
+      Suite(suite = TestSet(name = "name2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
       ))))
 
-    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
+    val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
     assertEquals(filteredSuiteBundles.size, 1)
 
     val filteredSuite = filteredSuiteBundles.head.suite
-    assertEquals(filteredSuite.endpoint, "endpoint1")
-    assertEquals(filteredSuite.tests.size, 1)
+    assert("name1" == clue(filteredSuite.name))
+    assert(1 == clue(filteredSuite.tests.size))
 
     val filteredTest = filteredSuite.tests.head
-    assertEquals(filteredTest.name, "test2")
-    assertEquals(filteredTest.only, Some(true))
+    assert("test2" == clue(filteredTest.name))
+    assert(clue(Some(true)) == clue(filteredTest.only))
   }
 
   test("fromFile - only used - twice") {
     val suitesBundles = Set(
-      SuiteBundle(suite = Suite(endpoint = "endpoint1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(true))
+      Suite(suite = TestSet(name = "name1", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
       ))),
-      SuiteBundle(suite = Suite(endpoint = "endpoint2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Set("SMOKE"), headers = Set.empty, actions = Set.empty, responseActions = Set.empty, only = Some(true)),
+      Suite(suite = TestSet(name = "name2", tests = Set(
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true)),
       ))))
 
-    val filteredSuiteBundles: Set[SuiteBundle] = SuiteFactory.filterOnlyOrAll(suitesBundles)
+    val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)
 
-    assertEquals(filteredSuiteBundles.size, 0)
+    assert(0 == clue(filteredSuiteBundles.size))
   }
 }

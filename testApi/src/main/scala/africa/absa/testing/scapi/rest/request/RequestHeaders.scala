@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.request
 
-import africa.absa.testing.scapi.UndefinedHeaderType
+import africa.absa.testing.scapi.UndefinedHeaderTypeException
 import africa.absa.testing.scapi.json.Header
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
@@ -35,7 +35,7 @@ object RequestHeaders {
    * @param headersSet A set of Header objects to be processed.
    * @return A Map where the key is the header name (lowercase) and the value is the resolved header value.
    */
-  def buildHeaders(headersSet: Set[Header]): Map[String, String] = {
+  def buildHeaders(headersSet: Seq[Header]): Map[String, String] = {
     headersSet.foldLeft(Map.empty[String, String]) {
       (acc, header) => header.name.toLowerCase match {
         case CONTENT_TYPE => acc + (header.name -> RuntimeCache.resolve(header.value))
@@ -52,13 +52,13 @@ object RequestHeaders {
    * For any other header type, it throws an UndefinedHeaderType exception.
    *
    * @param header The Header object to be validated.
-   * @throws UndefinedHeaderType If an undefined header type is encountered.
+   * @throws UndefinedHeaderTypeException If an undefined header type is encountered.
    */
   def validateContent(header: Header): Unit = {
     header.name.toLowerCase match {
       case CONTENT_TYPE => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
       case AUTHORIZATION => ContentValidator.validateNonEmptyString(header.value, s"Header.${header.name}")
-      case _ => throw UndefinedHeaderType(header.name)
+      case _ => throw UndefinedHeaderTypeException(header.name)
     }
   }
 }

@@ -17,9 +17,10 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.json.{Environment, EnvironmentFactory, SuiteFactory}
+import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
+import africa.absa.testing.scapi.json.Environment
 import africa.absa.testing.scapi.logging.Logger
-import africa.absa.testing.scapi.model.{SuiteBundle, SuiteResults}
+import africa.absa.testing.scapi.model.suite.{Suite, SuiteResult}
 import africa.absa.testing.scapi.reporter.StdOutReporter
 import africa.absa.testing.scapi.rest.RestClient
 import africa.absa.testing.scapi.rest.request.sender.ScAPIRequestSender
@@ -47,11 +48,11 @@ object ScAPIRunner {
     Logger.setLevel(if (cmd.debug) Level.DEBUG else Level.INFO)
     cmd.logConfigInfo()
 
-    if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailed("'suites' directory have to exist in project root.")
+    if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailedException("'suites' directory have to exist in project root.")
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suiteBundles: Set[SuiteBundle] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
+    val suiteBundles: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
     SuiteFactory.validateSuiteContent(suiteBundles)
 
     // run tests and result reporting - use categories for test filtering
@@ -59,8 +60,8 @@ object ScAPIRunner {
       Logger.info("Validate only => end run.")
     } else {
       Logger.info("Running tests")
-      val testResults: List[SuiteResults] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
-      StdOutReporter.printReport(testResults)
+      val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
+      StdOutReporter.printReport(suiteResults)
     }
   }
 }

@@ -16,7 +16,8 @@
 
 package africa.absa.testing.scapi.json
 
-import africa.absa.testing.scapi.PropertyNotFound
+import africa.absa.testing.scapi.PropertyNotFoundException
+import africa.absa.testing.scapi.json.factory.EnvironmentFactory
 import munit.FunSuite
 
 class EnvironmentTest extends FunSuite {
@@ -52,13 +53,13 @@ class EnvironmentTest extends FunSuite {
     val actual_value_from_properties: String = env("url")
     val actual_value_from_constants: String = env("server")
 
-    assertEquals(clue(expected_value_from_properties), clue(actual_value_from_properties))
-    assertEquals(clue(expected_value_from_constants), clue(actual_value_from_constants))
+    assert(clue(expected_value_from_properties) == clue(actual_value_from_properties))
+    assert(clue(expected_value_from_constants) == clue(actual_value_from_constants))
   }
 
   test("apply - properties does not exist") {
     val env: Environment = Environment(constants, propertiesResolved)
-    interceptMessage[PropertyNotFound]("Property not found: 'no_exist'.") {
+    interceptMessage[PropertyNotFoundException]("Property not found: 'no_exist'.") {
       env("no_exist")
     }
   }
@@ -70,7 +71,7 @@ class EnvironmentTest extends FunSuite {
     val expected: String = propertyPort
     val actual: String = env("port")
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 
   /*
@@ -94,6 +95,6 @@ class EnvironmentTest extends FunSuite {
 
     val actual: Environment = notResolverEnv.resolveReferences
 
-    assertEquals(clue(expected), clue(actual))
+    assert(clue(expected) == clue(actual))
   }
 }

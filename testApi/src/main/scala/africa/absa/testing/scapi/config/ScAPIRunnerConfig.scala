@@ -115,23 +115,23 @@ object ScAPIRunnerConfig {
     opt[String]("filter")
       .optional()
       .action((value, config) => { config.copy(filter = value) })
-      .text(s"Filter rule to select test definitions file (recursive) to include into test suite. Default is all '${DefaultFilter}'")
+      .text(s"Filter rule to select test definitions file (recursive) to include into test suite. Default is all '$DefaultFilter'")
 
     opt[Seq[String]]("categories")
       .optional()
       .valueName("<v1>,<v2>")
       .action((value, config) => { config.copy(categories = value.toSet) })
-      .text(s"Select which test categories will be included into test suite. Default is all '${DefaultCategories}'")
+      .text(s"Select which test categories will be included into test suite. Default is all '$DefaultCategories'")
 
     opt[Int]("thread-count")
       .optional()
       .action((value, config) => { config.copy(threadCount = value) })
-      .text(s"Maximum count of thread used to run test suite. Default is '${DefaultThreadCount}'")
+      .text(s"Maximum count of thread used to run test suite. Default is '$DefaultThreadCount'")
 
     opt[String]("file-format")
       .optional()
       .action((value, config) => { config.copy(fileFormat = value) })
-      .text(s"Format of definition files. Default is all '${DefaultFileFormat}'")
+      .text(s"Format of definition files. Default is all '$DefaultFileFormat'")
 
     opt[String]("report")
       .optional()
