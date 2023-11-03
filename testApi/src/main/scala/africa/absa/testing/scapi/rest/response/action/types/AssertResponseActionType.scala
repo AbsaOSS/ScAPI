@@ -47,9 +47,21 @@ object AssertResponseActionType extends Enumeration {
   val CookieIsNotSecured: AssertResponseActionType.Value = Value("cookie-is-not-secured")
 
   // body-...
+  val BodyEquals: AssertResponseActionType.Value = Value("body-equals")
   val BodyContainsText: AssertResponseActionType.Value = Value("body-contains-text")
+  val BodyIsEmpty: AssertResponseActionType.Value = Value("body-is-empty")
+  val BodyIsNotEmpty: AssertResponseActionType.Value = Value("body-is-not-empty")
+  val BodyLengthEquals: AssertResponseActionType.Value = Value("body-length-equals")
+  val BodyStartsWith: AssertResponseActionType.Value = Value("body-starts-with")
+  val BodyEndsWith: AssertResponseActionType.Value = Value("body-ends-with")
+  val BodyMatchesRegex: AssertResponseActionType.Value = Value("body-matches-regex")
 
+  // body-json-...
+  val BodyJsonIsJsonArray: AssertResponseActionType.Value = Value("body-json-is-json-array")
+  val BodyJsonIsJsonObject: AssertResponseActionType.Value = Value("body-json-is-json-object")
+  val BodyJsonPathExists: AssertResponseActionType.Value = Value("body-json-path-exists")
+
+  // utils
   private val stringToValueMap = values.map(v => v.toString -> v).toMap
-
   def fromString(s: String): Option[AssertResponseActionType] = stringToValueMap.get(s)
 }
