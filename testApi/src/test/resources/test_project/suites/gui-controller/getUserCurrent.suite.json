@@ -51,6 +51,40 @@
         {
           "method": "assert.response-time-is-above",
           "limit": "1"
+        },
+        {
+          "method": "assert.body-equals",
+          "body": "TODO"
+        },
+        {
+          "method": "assert.body-contains-text",
+          "text": "TODO"
+        },
+        {
+          "method": "assert.body-is-not-empty"
+        },
+        {
+          "method": "assert.body-length-equals",
+          "length": "1"
+        },
+        {
+          "method": "assert.body-starts-with",
+          "prefix": "testValue"
+        },
+        {
+          "method": "assert.body-ends-with",
+          "suffix": "testValue"
+        },
+        {
+          "method": "assert.body-matches-regex",
+          "regex": "testValue"
+        },
+        {
+          "method": "assert.body-json-is-json-array"
+        },
+        {
+          "method": "assert.body-json-path-exists",
+          "jsonPath": "testValue"
         }
       ]
     }

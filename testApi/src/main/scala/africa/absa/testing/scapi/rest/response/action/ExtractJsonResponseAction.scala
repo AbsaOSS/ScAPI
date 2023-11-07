@@ -112,7 +112,7 @@ object ExtractJsonResponseAction extends ResponseActions {
   }
 
   /**
-   * This method validates the parameters of the STRING_FROM_LIST type of response action.
+   * This method validates the parameters of the StringFromList type of response action.
    * It ensures none of the required parameters are None and validates that they are non-empty strings.
    * Additionally, it ensures param_2 is a valid integer.
    *
