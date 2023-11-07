@@ -26,7 +26,7 @@ class ScAPIRunnerTest extends FunSuite {
     }
   }
 
-  test("call main with minimum params") {
+  test("call main with minimum params - report of failures") {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
       "--test-root-path", getClass.getResource("/test_project").getPath)

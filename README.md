@@ -1,13 +1,52 @@
 # ScAPI
 
-## How to run api tests
+  - [How to run api tests with ScAPI](#how-to-run-api-tests-with-scapi)
+  - [How to run unit tests](#how-to-run-unit-tests)
+  - [How to run integration tests](#how-to-run-integration-test)
+  - [How to generate JaCoCo code coverage report](#how-to-generate-jacoco-code-coverage-report)
+  - [How to generate jars](#how-to-generate-jars)
+  - [How to run tests from jar file](#how-to-run-tests-from-jar-file)
+  - [How to create env.json file](#how-to-create-envjson-file)
+    - [Example of env.json file](#example-of-envjson-file)
+    - [Rules to follow](#rules-to-follow)
+  - [How to create suite.json file](#how-to-create-suitejson-file)
+    - [Headers](#headers)
+    - [Action](#action)
+    - [Response actions](#response-actions)
+      - [Assertions - response](#assertions---response)
+      - [Assertions - status code](#assertions---status-code)
+      - [Assertions - headers](#assertions---headers)
+      - [Assertions - content](#assertions---content)
+      - [Assertions - cookies](#assertions---cookies)
+      - [Assertions - body](#assertions---body)
+      - [Assertions - body - json](#assertions---body---json)
+      - [Logging](#logging)
+      - [Extract from JSON](#extract-from-json)
+
+## How to run api tests with ScAPI
 TODO - work in progress
 
+
+---
 ## How to run unit tests
 Run unit tests from path `{project-root}`
 ```
 sbt test
 ```
+
+## How to run integration test
+Prepare testing environment:
+- build assembly jar file of testApi module
+- get running instance of [spring-petclinic-rest](https://github.com/spring-petclinic/spring-petclinic-rest) project
+  - accessible swagger on path `http://localhost:9966/petclinic/swagger-ui/index.html`
+  - re-run of instance is required after each test run (to reset database)
+
+Run integration test from path `{project-root}/testApi/target/scala-2.13`
+```
+scala testApi-assembly-0.1.0-SNAPSHOT.jar --env ./../../src/test/resources/test_project/localhost.env.json --test-root-path ./../../src/test/resources/test_project/
+```
+
+Check report printed into console. All tests should be passed.
 
 ## How to generate JaCoCo code coverage report
 Run command from path `{project-root}`
@@ -56,7 +95,7 @@ User(.*)        .... find all suite files which begin with 'User'
 ```
 
 ## How to create env.json file
-### Example of **env.json** file:
+### Example of env.json file
 ```json
 {
   "constants": {
@@ -69,7 +108,7 @@ User(.*)        .... find all suite files which begin with 'User'
 }
 ```
 
-### Rules to follow:
+### Rules to follow
 - **Constants** and **Properties** can contain only `String` type of values.
 - **Constants** cannot contain reference `{{ key }}`.
 - **Properties** can reference from **Constants** only.
@@ -77,7 +116,7 @@ User(.*)        .... find all suite files which begin with 'User'
 - Json elements follows `camelCase`.
 - Json element methods follows `this-case`. 
 
-### Supported options
+## How to create suite.json file
 #### Headers
 - methods
   - "content-type"
@@ -233,10 +272,10 @@ line break:\\nAnd a tab:\\tEnd            ....    Matches the string "line break
 ```
 
 #### Assertions - body - json
-- `assert.body-is-json-array`
+- `assert.body-json-is-json-array`
   - description: Checks if the body of the response is a JSON array.
 
-- `assert.body-is-json-object`
+- `assert.body-json-is-json-object`
   - description: Checks if the body of the response is a JSON object.
 
 - `assert.body-json-path-exists`
@@ -273,3 +312,11 @@ line break:\\nAnd a tab:\\tEnd            ....    Matches the string "line break
     - listIndex: The index in the JSON array from which to extract the string. [0+]
     - jsonKey: The key in the JSON object from which to extract the string.
     - runtimeCacheLevel: The expiration level to use when storing the extracted string in the runtime cache. [Global, Suite, Test]
+
+
+## Known issue
+- Error in Response.perform.
+  - Missing logic for retrieve of data from cache.
+  - `{{ cache.neme }}` is not replaced by value from cache.
+- Login in debug regime even if debug is not enabled.
+- Missing several useful methods for building api tests.

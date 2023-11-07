@@ -1,22 +1,21 @@
 {
-  "name" : "getUserCurrent",
-  "tests": [
+  "name" : "getOwner_5_demo",
+  "methods" : [
     {
-      "name" : "get current user",
-      "categories": ["SMOKE"],
+      "name" : "getOwner_5",
       "headers" : [
         {
           "name": "authorization",
-          "value": "{{ constants.header_basic_token }}"
+          "value": "{{ constants.headerBasicToken }}"
         },
         {
           "name": "content-type",
-          "value": "{{ constants.content_type }}"
+          "value": "application/json"
         }
       ],
       "action": {
           "methodName": "get",
-          "url": "{{ env.url }}/GUI/user"
+          "url": "{{ env.url }}/api/owners"
       },
       "responseActions": [
         {
@@ -35,10 +34,6 @@
           "message": "Dummy warn log message."
         },
         {
-          "method": "log.info",
-          "message": "Dummy info log message."
-        },
-        {
           "method": "log.debug",
           "message": "Dummy debug log message."
         },
@@ -51,38 +46,36 @@
           "limit": "1"
         },
         {
-          "method": "assert.body-equals",
-          "body": "TODO"
-        },
-        {
           "method": "assert.body-contains-text",
-          "text": "TODO"
+          "text": "firstName"
         },
         {
           "method": "assert.body-is-not-empty"
         },
         {
-          "method": "assert.body-length-equals",
-          "length": "1"
-        },
-        {
-          "method": "assert.body-starts-with",
-          "prefix": "testValue"
-        },
-        {
-          "method": "assert.body-ends-with",
-          "suffix": "testValue"
-        },
-        {
-          "method": "assert.body-matches-regex",
-          "regex": "testValue"
-        },
-        {
           "method": "assert.body-json-is-json-array"
         },
         {
-          "method": "assert.body-json-path-exists",
-          "jsonPath": "testValue"
+          "method": "extractJson.string-from-list",
+          "cacheKey": "ownerCellPhoneNumber",
+          "listIndex": "1",
+          "jsonKey": "telephone",
+          "cacheLevel": "global"
+        },
+        {
+          "method": "log.info",
+          "message": "{{ cache.ownerCellPhoneNumber }}"
+        },
+        {
+          "method": "extractJson.string-from-list",
+          "cacheKey": "ownerId",
+          "listIndex": "1",
+          "jsonKey": "id",
+          "cacheLevel": "global"
+        },
+        {
+          "method": "log.info",
+          "message": "{{ cache.ownerId }}"
         }
       ]
     }

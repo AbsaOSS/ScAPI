@@ -564,6 +564,9 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] indicating success or containing an exception if the assertion fails.
    */
   private def assertBodyStartsWith(response: Response, prefix: String): Try[Unit] = Try {
+    Logger.debug(s"Asserting that the body of the response starts with $prefix")
+    Logger.debug(s"Response body: ${response.body}")
+
     if (!response.body.startsWith(prefix)) {
       val errMsg = s"Expected body to start with $prefix"
       Logger.error(errMsg)

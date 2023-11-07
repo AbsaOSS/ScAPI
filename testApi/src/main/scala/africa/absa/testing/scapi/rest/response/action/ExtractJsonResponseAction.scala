@@ -104,6 +104,7 @@ object ExtractJsonResponseAction extends ResponseActions {
       }
 
       RuntimeCache.put(key = cacheKey, value = value, RuntimeCache.determineLevel(runtimeCacheLevel))
+      Logger.debug(s"Extracted string '$value' from json array at index $listIndex and stored it in runtime cache with key '$cacheKey' and expiration level '$runtimeCacheLevel'.")
     } recover {
       case e: spray.json.JsonParser.ParsingException =>
         Logger.error(s"Expected json string in response body. JSON parsing error: ${e.getMessage}")

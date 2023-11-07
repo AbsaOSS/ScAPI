@@ -1,12 +1,12 @@
 {
-  "name" : "before.name.1",
+  "name" : "after.name.1",
   "methods" : [
     {
       "name" : "action-name-1",
       "headers" : [
         {
           "name": "authorization",
-          "value": "{{ constants.header_basic_token }}"
+          "value": "{{ constants.headerBasicToken }}"
         },
         {
           "name": "content-type",
@@ -15,7 +15,7 @@
       ],
       "action": {
           "methodName": "get",
-          "url": "{{ env.url }}/AULGUI/user"
+          "url": "{{ env.url }}/api/owners"
       },
       "responseActions": [
         {

@@ -89,8 +89,8 @@ class SuiteFactoryTest extends FunSuite {
     loadJsonSuiteConstants
    */
   test("loadJsonSuite - constants loaded") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
-    val suiteName = "getUserCurrent"
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
+    val suiteName = "getOwners"
     val properties: Map[String, String] = Map("env.basic_token" -> "token#value")
     val expected: Map[String, String] = Map(
       "constants.header_auth" -> "Authorization",
@@ -105,7 +105,7 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - no constants file exist") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
     val suiteName = "notExist"
     val properties: Map[String, String] = Map.empty
     val expected: Map[String, String] = Map.empty
@@ -116,8 +116,8 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - not all references resolved") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
-    val suiteName = "getUserCurrent"
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
+    val suiteName = "getOwners"
     val properties: Map[String, String] = Map.empty
 
     interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'env.basic_token' in ''SuiteConstants' action.'.") {
