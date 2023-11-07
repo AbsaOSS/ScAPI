@@ -14,12 +14,10 @@
           "value": "{{ constants.content_type }}"
         }
       ],
-      "actions": [
-        {
+      "action": {
           "methodName": "get",
           "url": "{{ env.url }}/GUI/user"
-        }
-      ],
+      },
       "responseActions": [
         {
           "method": "assert.status-code-equals",

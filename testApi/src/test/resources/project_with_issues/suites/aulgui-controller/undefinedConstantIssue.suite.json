@@ -10,12 +10,10 @@
           "value": "{{ constants.no_provided }}"
         }
       ],
-      "actions": [
-        {
+      "action": {
           "methodName": "get",
           "url": "{{ env.url }}/AULGUI/user"
-        }
-      ],
+      },
       "responseActions": [
         {
           "method": "assert.status-code-equals",

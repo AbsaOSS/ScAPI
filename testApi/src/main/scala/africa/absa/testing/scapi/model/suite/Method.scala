@@ -23,12 +23,12 @@ import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseActi
  *
  * @param name The name of the method.
  * @param headers The set of header options for the method.
- * @param actions The set of action objects for the method.
+ * @param action The action object for the method.
  * @param responseActions The set of responseAction objects for the method.
  */
 case class Method(name: String,
                   headers: Seq[Header],
-                  actions: Seq[Action],
+                  action: Action,
                   responseActions: Seq[ResponseAction]) extends Requestable {
   /**
    * Method to resolve references within the Method instance.
@@ -40,7 +40,7 @@ case class Method(name: String,
     Method(
       name,
       headers.map(c => c.resolveReferences(references)),
-      actions.map(c => c.resolveReferences(references)),
+      action.resolveReferences(references),
       responseActions.map(c => c.resolveReferences(references))
     )
   }

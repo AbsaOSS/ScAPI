@@ -24,14 +24,14 @@ import africa.absa.testing.scapi.json.{Action, Header, Requestable, ResponseActi
  * @param name The name of the test scenario.
  * @param categories The required test categories of the test scenario.
  * @param headers The set of header options for the test scenario.
- * @param actions The set of action objects for the test scenario.
+ * @param action The action object for the test scenario.
  * @param responseActions The set of responseAction objects for the test scenario.
  * @param only The control if test should be only be running when set to true.
  */
 case class SuiteTestScenario(name: String,
                              categories: Seq[String],
                              headers: Seq[Header],
-                             actions: Seq[Action],
+                             action: Action,
                              responseActions: Seq[ResponseAction],
                              only: Option[Boolean] = Some(false)) extends Requestable {
   /**
@@ -45,7 +45,7 @@ case class SuiteTestScenario(name: String,
       name,
       categories,
       headers.map(c => c.resolveReferences(references)),
-      actions.map(c => c.resolveReferences(references)),
+      action.resolveReferences(references),
       responseActions.map(c => c.resolveReferences(references)),
       only
     )

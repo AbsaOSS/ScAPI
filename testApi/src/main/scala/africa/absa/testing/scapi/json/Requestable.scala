@@ -21,7 +21,7 @@ trait Requestable {
 
   def headers: Seq[Header]
 
-  def actions: Seq[Action]
+  def action: Action
 
   def responseActions: Seq[ResponseAction]
 }

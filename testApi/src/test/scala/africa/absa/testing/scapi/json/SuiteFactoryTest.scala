@@ -131,15 +131,15 @@ class SuiteFactoryTest extends FunSuite {
   test("filterOnlyOrAll - only used - once") {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
       ))))
 
     val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)
@@ -158,11 +158,11 @@ class SuiteFactoryTest extends FunSuite {
   test("fromFile - only used - twice") {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true)),
       ))))
 
     val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)

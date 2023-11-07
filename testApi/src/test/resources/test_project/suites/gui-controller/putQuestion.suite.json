@@ -14,12 +14,10 @@
           "value": "{{ constants.content_type }}"
         }
       ],
-      "actions": [
-        {
+      "action": {
           "methodName": "put",
           "url": "{{ env.url }}/path/question"
-        }
-      ],
+      },
       "responseActions": [
         {
           "method": "assert.status-code-equals",

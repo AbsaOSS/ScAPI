@@ -52,11 +52,8 @@
           },
           "description": "Headers to be sent with the test request."
         },
-        "actions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Action"
-          },
+        "action": {
+          "$ref": "#/definitions/Action",
           "description": "Actions to be performed during the test."
         },
         "responseActions": {
@@ -71,7 +68,7 @@
         "name",
         "categories",
         "headers",
-        "actions",
+        "action",
         "responseActions"
       ],
       "title": "Test",

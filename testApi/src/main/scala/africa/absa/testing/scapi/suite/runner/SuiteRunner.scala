@@ -177,11 +177,11 @@ object SuiteRunner {
    */
   private def sendRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Response = {
     restClientCreator().sendRequest(
-      method = requestable.actions.head.methodName,
-      url = RuntimeCache.resolve(requestable.actions.head.url),
+      method = requestable.action.methodName,
+      url = RuntimeCache.resolve(requestable.action.url),
       headers = RequestHeaders.buildHeaders(requestable.headers),
-      body = RequestBody.buildBody(requestable.actions.head.body),
-      params = RequestParams.buildParams(requestable.actions.head.params),
+      body = RequestBody.buildBody(requestable.action.body),
+      params = RequestParams.buildParams(requestable.action.params),
       verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
     )
   }
