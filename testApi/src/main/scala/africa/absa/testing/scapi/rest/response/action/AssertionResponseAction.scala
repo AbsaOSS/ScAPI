@@ -409,7 +409,7 @@ object AssertionResponseAction extends ResponseActions {
    */
   private def assertContentTypeIsHtml(response: Response): Try[Unit] = {
     assertHeaderValueEquals(response, "content-type", "text/html").recover {
-      f => Failure(AssertionException(s"Received content is not HTML type. Details: ${f.getMessage}"))
+      f => throw AssertionException(s"Received content is not HTML type. Details: ${f.getMessage}")
     }
   }
 
