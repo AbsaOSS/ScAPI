@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.rest.response
 
-import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.json.{Environment, ResponseAction}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.model.CookieValue
 import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType
@@ -59,12 +59,13 @@ object Response {
    * The appropriate group's performAssertions method is called based on the group type of each Assertion.
    * Returns true only if all assertions return true, and false as soon as any assertion returns false.
    *
+   * @param environment The current environment.
    * @param response   The response on which actions will be performed.
-   * @param responseAction The set of response actions that dictate what actions will be performed on the response.
+   * @param responseActions The set of response actions that dictate what actions will be performed on the response.
    * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false). TODO
    * @throws IllegalArgumentException If an response action group is not supported.
    */
-  def perform(response: Response, responseAction: Seq[ResponseAction]): Try[Unit] = {
+  def perform(environment: Environment, response: Response, responseActions: Seq[ResponseAction]): Try[Unit] = {
     def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {
       val filteredParams = resolvedResponseAction.params.filter(_._1 != "method").map { case (k, v) => s"$k->$v" }.mkString(", ")
       val baseLog =
@@ -80,15 +81,15 @@ object Response {
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
     }
 
-    responseAction.iterator.map { assertion =>
-      val resolvedResponseAction: ResponseAction = assertion.resolveByRuntimeCache()
+    responseActions.iterator.map { responseAction =>
+      val resolvedResponseAction: ResponseAction = responseAction.resolveByRuntimeCache()
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - Started.")
 
       val res: Try[Unit] = resolvedResponseAction.group match {
-        case ResponseActionGroupType.Assert => AssertionResponseAction.performResponseAction(response, assertion)
-        case ResponseActionGroupType.ExtractJson => ExtractJsonResponseAction.performResponseAction(response, assertion)
-        case ResponseActionGroupType.Log => LogResponseAction.performResponseAction(response, assertion)
-        case _ => Failure(new IllegalArgumentException(s"Unsupported assertion group: ${assertion.group}"))
+        case ResponseActionGroupType.Assert => AssertionResponseAction.performResponseAction(response, resolvedResponseAction)
+        case ResponseActionGroupType.ExtractJson => ExtractJsonResponseAction.performResponseAction(response, resolvedResponseAction)
+        case ResponseActionGroupType.Log => LogResponseAction.performResponseAction(response, resolvedResponseAction)
+        case _ => Failure(new IllegalArgumentException(s"Unsupported assertion group: ${resolvedResponseAction.group}"))
       }
 
       res match {

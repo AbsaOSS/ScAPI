@@ -1,8 +1,8 @@
 {
-  "name" : "getOwners_demo",
+  "name" : "getOwners Demo Suite",
   "tests": [
     {
-      "name" : "getOwner5NotFound",
+      "name" : "Owner ID:5 not found",
       "categories": ["SMOKE"],
       "headers" : [],
       "action": {
@@ -20,7 +20,7 @@
       ]
     },
     {
-      "name" : "getOwner5Found",
+      "name" : "Owner ID:5 found",
       "categories": ["SMOKE"],
       "headers" : [],
       "action": {

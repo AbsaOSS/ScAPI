@@ -46,8 +46,14 @@ object SuiteRunner {
     suiteBundles.foldLeft(List[SuiteResult]()) { (resultList, suiteBundle) =>
       Logger.debug(s"Suite: ${suiteBundle.suite.name} - Started")
 
+      // TODO - One suite can define only one Before, so why iteration across list items???
       val suiteBeforeResult: List[SuiteResult] = suiteBundle.suiteBefore.toList.flatMap { suiteBefore =>
-        suiteBefore.methods.map { method => runSuiteBefore(suiteBundle.suite.name, suiteBefore.name, method, environment, restClientCreator) }
+        suiteBefore.methods.map { method => runSuiteBefore(
+          suiteBundle.suite.name,
+          suiteBefore.name,
+          method,
+          environment,
+          restClientCreator) }
       }
 
       var suiteResult: List[SuiteResult] = List.empty
@@ -65,11 +71,22 @@ object SuiteRunner {
           duration = Some(0L),
           categories = Some("SKIPPED"))
       } else {
+        // TODO - One suite can define only one TestSuite, so why iteration across list items???
         suiteResult = suiteBundle.suite.tests.toList.map(test =>
-          this.runSuiteTest(suiteBundle.suite.name, test, environment, restClientCreator))
+          this.runSuiteTest(
+            suiteBundle.suite.name,
+            test,
+            environment,
+            restClientCreator))
 
+        // TODO - One suite can define only one After, so why iteration across list items???
         suiteAfterResult = suiteBundle.suiteAfter.toList.flatMap { suiteAfter =>
-          suiteAfter.methods.map { method => runSuiteAfter(suiteBundle.suite.name, suiteAfter.name, method, environment, restClientCreator) }
+          suiteAfter.methods.map { method => runSuiteAfter(
+            suiteBundle.suite.name,
+            suiteAfter.name,
+            method,
+            environment,
+            restClientCreator) }
         }
       }
 
@@ -176,12 +193,14 @@ object SuiteRunner {
    * @return Response to the sent request.
    */
   private def sendRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Response = {
+    val resolvedAction = requestable.action.resolveByRuntimeCache()
+
     restClientCreator().sendRequest(
-      method = requestable.action.methodName,
-      url = RuntimeCache.resolve(requestable.action.url),
-      headers = RequestHeaders.buildHeaders(requestable.headers),
-      body = RequestBody.buildBody(requestable.action.body),
-      params = RequestParams.buildParams(requestable.action.params),
+      method = resolvedAction.methodName,
+      url = RuntimeCache.resolve(resolvedAction.url),
+      headers = RequestHeaders.buildHeaders(requestable.headers.map(header => header.resolveByRuntimeCache())),
+      body = RequestBody.buildBody(resolvedAction.body),
+      params = RequestParams.buildParams(resolvedAction.params),
       verifySslCerts = Some(environment.constants.get("verifySslCerts").exists(_.toLowerCase == "true")).getOrElse(false)
     )
   }
@@ -196,11 +215,11 @@ object SuiteRunner {
    */
   private def processRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Try[Unit] = {
     val response: Response = sendRequest(requestable, environment, restClientCreator)
-    val result: Try[Unit] = Response.perform(
+    Response.perform(
+      environment = environment,
       response = response,
-      responseAction = requestable.responseActions
+      responseActions = requestable.responseActions
     )
-    result
   }
 
   /**
