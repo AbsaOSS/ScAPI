@@ -1,0 +1,83 @@
+{
+  "name" : "getOwner_5_demo",
+  "methods" : [
+    {
+      "name" : "getOwner_5",
+      "headers" : [
+        {
+          "name": "authorization",
+          "value": "{{ constants.headerBasicToken }}"
+        },
+        {
+          "name": "content-type",
+          "value": "application/json"
+        }
+      ],
+      "action": {
+          "methodName": "get",
+          "url": "{{ env.url }}/api/owners"
+      },
+      "responseActions": [
+        {
+          "method": "assert.status-code-equals",
+          "code": "200"
+        },
+        {
+          "method": "assert.status-code-is-success"
+        },
+        {
+          "method": "log.error",
+          "message": "Dummy error log message."
+        },
+        {
+          "method": "log.warn",
+          "message": "Dummy warn log message."
+        },
+        {
+          "method": "log.debug",
+          "message": "Dummy debug log message."
+        },
+        {
+          "method": "assert.response-time-is-below",
+          "limit": "600000"
+        },
+        {
+          "method": "assert.response-time-is-above",
+          "limit": "1"
+        },
+        {
+          "method": "assert.body-contains-text",
+          "text": "firstName"
+        },
+        {
+          "method": "assert.body-is-not-empty"
+        },
+        {
+          "method": "assert.body-json-is-json-array"
+        },
+        {
+          "method": "extractJson.string-from-list",
+          "cacheKey": "ownerCellPhoneNumber",
+          "listIndex": "1",
+          "jsonKey": "telephone",
+          "cacheLevel": "global"
+        },
+        {
+          "method": "log.info",
+          "message": "{{ cache.ownerCellPhoneNumber }}"
+        },
+        {
+          "method": "extractJson.string-from-list",
+          "cacheKey": "ownerId",
+          "listIndex": "1",
+          "jsonKey": "id",
+          "cacheLevel": "global"
+        },
+        {
+          "method": "log.info",
+          "message": "{{ cache.ownerId }}"
+        }
+      ]
+    }
+  ]
+}

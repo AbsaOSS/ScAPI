@@ -1,0 +1,81 @@
+{
+  "name" : "getOwners_demo",
+  "tests": [
+    {
+      "name" : "getOwner5NotFound",
+      "categories": ["SMOKE"],
+      "headers" : [],
+      "action": {
+          "methodName": "get",
+          "url": "{{ env.url }}/api/owner/5"
+      },
+      "responseActions": [
+        {
+          "method": "assert.status-code-equals",
+          "code": "404"
+        },
+        {
+          "method": "assert.status-code-is-client-error"
+        }
+      ]
+    },
+    {
+      "name" : "getOwner5Found",
+      "categories": ["SMOKE"],
+      "headers" : [],
+      "action": {
+          "methodName": "get",
+          "url": "{{ env.url }}/api/owners/5"
+      },
+      "responseActions": [
+        {
+          "method": "assert.status-code-equals",
+          "code": "200"
+        },
+        {
+          "method": "assert.content-type-is-json"
+        },
+        {
+          "method": "assert.body-json-is-json-object"
+        },
+        {
+          "method": "assert.body-starts-with",
+          "prefix": "{\"firstName\":\"Peter\","
+        },
+        {
+          "method": "assert.body-ends-with",
+          "suffix": "\"visits\":[]}]}"
+        },
+        {
+          "method": "assert.body-json-path-exists",
+          "jsonPath": "$.city"
+        },
+        {
+          "method": "assert.body-json-path-exists",
+          "jsonPath": "$.pets[0].name"
+        },
+        {
+          "method": "assert.body-matches-regex",
+          "regex": "\"telephone\":\"6085552765\""
+        },
+        {
+          "method": "assert.body-length-equals",
+          "length": "235"
+        },
+        {
+          "method": "assert.body-equals",
+          "body": "{\"firstName\":\"Peter\",\"lastName\":\"McTavish\",\"address\":\"2387 S. Fair Way\",\"city\":\"Madison\",\"telephone\":\"6085552765\",\"id\":5,\"pets\":[{\"name\":\"George\",\"birthDate\":\"2010-01-20\",\"type\":{\"name\":\"snake\",\"id\":4},\"id\":6,\"ownerId\":5,\"visits\":[]}]}"
+        },
+        {
+          "method": "assert.header-exists",
+          "headerName": "Content-Type"
+        },
+        {
+          "method": "assert.header-value-equals",
+          "headerName": "Content-Type",
+          "expectedValue": "application/json"
+        }
+      ]
+    }
+  ]
+}

@@ -66,7 +66,7 @@ class ResponseExtractTest extends FunSuite {
     validateContent
    */
 
-  test("validateContent - STRING_FROM_LIST") {
+  test("validateContent - StringFromList") {
     ExtractJsonResponseAction.validateContent(assertionStringFromList)
   }
 
@@ -127,7 +127,7 @@ class ResponseExtractTest extends FunSuite {
     performResponseAction
    */
 
-  test("performAssertion - STRING_FROM_LIST") {
+  test("performAssertion - StringFromList") {
     val result: Try[Unit] = ExtractJsonResponseAction.performResponseAction(responseWithID, assertionStringFromList)
     assert(result.isSuccess)
     assertEquals("382be85a-1f00-4c15-b607-cbda03ccxxx2", RuntimeCache.get("question_id").get)

@@ -21,7 +21,7 @@ import africa.absa.testing.scapi.json._
 import africa.absa.testing.scapi.json.schema.{JsonSchemaValidator, ScAPIJsonSchema}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model._
-import africa.absa.testing.scapi.model.suite.{Method, TestSet, AfterTestSet, SuitePreAndPostProcessing, BeforeTestSet, Suite, SuiteTestScenario}
+import africa.absa.testing.scapi.model.suite._
 import africa.absa.testing.scapi.rest.request.{RequestBody, RequestHeaders, RequestParams}
 import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.action.types.ResponseActionGroupType
@@ -271,8 +271,8 @@ object SuiteFactory {
     Logger.debug(s"Validation content of suite: ${suiteBundle.suite.name}")
     suiteBundle.suite.tests.foreach(test => {
       test.headers.foreach(header => RequestHeaders.validateContent(header))
-      RequestBody.validateContent(test.actions.head.body)
-      RequestParams.validateContent(test.actions.head.params)
+      RequestBody.validateContent(test.action.body)
+      RequestParams.validateContent(test.action.params)
       test.responseActions.foreach(responseAction => Response.validate(responseAction))
     })
   }

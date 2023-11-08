@@ -89,14 +89,14 @@ class SuiteFactoryTest extends FunSuite {
     loadJsonSuiteConstants
    */
   test("loadJsonSuite - constants loaded") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
-    val suiteName = "getUserCurrent"
-    val properties: Map[String, String] = Map("env.basic_token" -> "token#value")
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
+    val suiteName = "getOwners"
+    val properties: Map[String, String] = Map("env.basicToken" -> "token#value")
     val expected: Map[String, String] = Map(
-      "constants.header_auth" -> "Authorization",
-      "constants.content_type" -> "application/json",
-      "constants.header_basic_token" -> "Basic token#value",
-      "constants.unique-key-name-2" -> "value"
+      "constants.headerAuth" -> "Authorization",
+      "constants.contentType" -> "application/json",
+      "constants.headerBasicToken" -> "Basic token#value",
+      "constants.uniqueKeyName2" -> "value"
     )
 
     val actual: Map[String, String] = SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
@@ -105,7 +105,7 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - no constants file exist") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
     val suiteName = "notExist"
     val properties: Map[String, String] = Map.empty
     val expected: Map[String, String] = Map.empty
@@ -116,11 +116,11 @@ class SuiteFactoryTest extends FunSuite {
   }
 
   test("loadJsonSuite - not all references resolved") {
-    val suiteFilePath = getClass.getResource("/test_project/suites/gui-controller").getPath
-    val suiteName = "getUserCurrent"
+    val suiteFilePath = getClass.getResource("/test_project/suites/demo").getPath
+    val suiteName = "getOwners"
     val properties: Map[String, String] = Map.empty
 
-    interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'env.basic_token' in ''SuiteConstants' action.'.") {
+    interceptMessage[UndefinedConstantsInPropertiesException]("Undefined constant(s): 'env.basicToken' in ''SuiteConstants' action.'.") {
       SuiteFactory.loadJsonSuiteConstants(suiteFilePath, suiteName, properties).constants
     }
   }
@@ -131,15 +131,15 @@ class SuiteFactoryTest extends FunSuite {
   test("filterOnlyOrAll - only used - once") {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
       ))))
 
     val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)
@@ -158,11 +158,11 @@ class SuiteFactoryTest extends FunSuite {
   test("fromFile - only used - twice") {
     val suitesBundles = Set(
       Suite(suite = TestSet(name = "name1", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(false)),
-        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true))
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(false)),
+        SuiteTestScenario(name = "test2", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true))
       ))),
       Suite(suite = TestSet(name = "name2", tests = Set(
-        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, actions = Seq.empty, responseActions = Seq.empty, only = Some(true)),
+        SuiteTestScenario(name = "test1", categories = Seq("SMOKE"), headers = Seq.empty, action = Action("", ""), responseActions = Seq.empty, only = Some(true)),
       ))))
 
     val filteredSuiteBundles: Set[Suite] = SuiteFactory.filterOnlyOrAll(suitesBundles)

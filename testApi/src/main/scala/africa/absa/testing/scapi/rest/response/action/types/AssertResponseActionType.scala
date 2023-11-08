@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
+import scala.util.Try
 
 object AssertResponseActionType extends Enumeration {
   type AssertResponseActionType = Value
@@ -47,9 +48,20 @@ object AssertResponseActionType extends Enumeration {
   val CookieIsNotSecured: AssertResponseActionType.Value = Value("cookie-is-not-secured")
 
   // body-...
+  val BodyEquals: AssertResponseActionType.Value = Value("body-equals")
   val BodyContainsText: AssertResponseActionType.Value = Value("body-contains-text")
+  val BodyIsEmpty: AssertResponseActionType.Value = Value("body-is-empty")
+  val BodyIsNotEmpty: AssertResponseActionType.Value = Value("body-is-not-empty")
+  val BodyLengthEquals: AssertResponseActionType.Value = Value("body-length-equals")
+  val BodyStartsWith: AssertResponseActionType.Value = Value("body-starts-with")
+  val BodyEndsWith: AssertResponseActionType.Value = Value("body-ends-with")
+  val BodyMatchesRegex: AssertResponseActionType.Value = Value("body-matches-regex")
 
-  private val stringToValueMap = values.map(v => v.toString -> v).toMap
+  // body-json-...
+  val BodyJsonIsJsonArray: AssertResponseActionType.Value = Value("body-json-is-json-array")
+  val BodyJsonIsJsonObject: AssertResponseActionType.Value = Value("body-json-is-json-object")
+  val BodyJsonPathExists: AssertResponseActionType.Value = Value("body-json-path-exists")
 
-  def fromString(s: String): Option[AssertResponseActionType] = stringToValueMap.get(s)
+  // utils
+  def fromString(s: String): Option[AssertResponseActionType] = Try(this.withName(s)).toOption
 }

@@ -1,9 +1,0 @@
-{
-  "version" : "1.0.0",
-  "constants" : {
-    "header_auth": "Authorization",
-    "header_bearer_token": "Basic {{ env.basic_token }}",
-    "content_type": "application/json",
-    "unique_key_name_2": "value"
-    }
-}

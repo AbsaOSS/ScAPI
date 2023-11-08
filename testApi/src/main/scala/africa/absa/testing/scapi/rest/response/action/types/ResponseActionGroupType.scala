@@ -16,17 +16,16 @@
 
 package africa.absa.testing.scapi.rest.response.action.types
 
+import scala.util.Try
+
 object ResponseActionGroupType extends Enumeration {
-  val Assert, ExtractJson, Log = Value
   type ResponseActionGroupType = Value
 
-  private val stringToValueMap = Map(
-    "assert" -> Assert,
-    "extractJson" -> ExtractJson,
-    "log" -> Log
-  )
+  val Assert: ResponseActionGroupType.Value = Value("assert")
+  val ExtractJson: ResponseActionGroupType.Value = Value("extractJson")
+  val Log: ResponseActionGroupType.Value = Value("log")
 
-  def fromString(s: String): Option[ResponseActionGroupType] = stringToValueMap.get(s)
+  def fromString(s: String): Option[ResponseActionGroupType] = Try(this.withName(s)).toOption
 }
 
 
