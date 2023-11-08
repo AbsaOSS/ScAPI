@@ -407,9 +407,9 @@ object AssertionResponseAction extends ResponseActions {
    * @param response      The response object containing the headers.
    * @return A Try[Unit] that is a Success if the "Content-Type" header value is "text/html", and a Failure with an AssertionException otherwise.
    */
-  private def assertContentTypeIsHtml(response: Response): Try[Unit] = Try {
-    assertHeaderValueEquals(response, "content-type", "text/html").recover { f =>
-      Failure(AssertionException(s"Received content is not HTML type. Details: ${f.getMessage}"))
+  private def assertContentTypeIsHtml(response: Response): Try[Unit] = {
+    assertHeaderValueEquals(response, "content-type", "text/html").recoverWith {
+      case f => Failure(throw AssertionException(s"Received content is not HTML type. Details: ${f.getMessage}"))
     }
   }
 

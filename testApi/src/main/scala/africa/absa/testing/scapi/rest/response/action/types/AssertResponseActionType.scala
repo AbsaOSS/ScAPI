@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
+import scala.util.Try
 
 object AssertResponseActionType extends Enumeration {
   type AssertResponseActionType = Value
@@ -62,6 +63,5 @@ object AssertResponseActionType extends Enumeration {
   val BodyJsonPathExists: AssertResponseActionType.Value = Value("body-json-path-exists")
 
   // utils
-  private val stringToValueMap = values.map(v => v.toString -> v).toMap
-  def fromString(s: String): Option[AssertResponseActionType] = stringToValueMap.get(s)
+  def fromString(s: String): Option[AssertResponseActionType] = Try(this.withName(s)).toOption
 }

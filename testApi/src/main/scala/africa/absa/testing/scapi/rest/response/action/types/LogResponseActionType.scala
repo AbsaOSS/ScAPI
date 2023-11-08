@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
+import scala.util.Try
 
 object LogResponseActionType extends Enumeration {
   type LogResponseActionType = Value
@@ -26,7 +27,5 @@ object LogResponseActionType extends Enumeration {
   val Info: LogResponseActionType.Value = Value("info")
   val Debug: LogResponseActionType.Value = Value("debug")
 
-  private val stringToValueMap = values.map(v => v.toString -> v).toMap
-
-  def fromString(s: String): Option[LogResponseActionType] = stringToValueMap.get(s)
+  def fromString(s: String): Option[LogResponseActionType] = Try(this.withName(s)).toOption
 }

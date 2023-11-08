@@ -22,7 +22,7 @@ import africa.absa.testing.scapi.rest.response.action.AssertionResponseAction
 import africa.absa.testing.scapi.rest.response.action.types.AssertResponseActionType.AssertResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}
-import munit.{Clue, FunSuite}
+import munit.FunSuite
 
 import scala.language.implicitConversions
 import scala.util.Failure

@@ -17,15 +17,14 @@
 package africa.absa.testing.scapi.rest.response.action.types
 
 import scala.language.implicitConversions
+import scala.util.Try
 
 object ExtractJsonResponseActionType extends Enumeration {
   type ExtractJsonResponseActionType = Value
 
   val StringFromList: ExtractJsonResponseActionType.Value = Value("string-from-list")
 
-  private val stringToValueMap = values.map(v => v.toString -> v).toMap
-
-  def fromString(s: String): Option[ExtractJsonResponseActionType] = stringToValueMap.get(s)
+  def fromString(s: String): Option[ExtractJsonResponseActionType] = Try(this.withName(s)).toOption
 }
 
 
