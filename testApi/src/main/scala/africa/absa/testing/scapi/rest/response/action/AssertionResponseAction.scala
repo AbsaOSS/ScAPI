@@ -268,14 +268,14 @@ object AssertionResponseAction extends ResponseActions {
    * Asserts that the response duration is greater than or equal to the specified minimum time.
    *
    * @param response      The response object containing the duration to be checked.
-   * @param minTimeMillis The minimum required duration in milliseconds, provided as a string.
+   * @param minTimeMillisString The minimum required duration in milliseconds, provided as a string.
    * @return A Try[Unit] that is a Success if the response's duration is greater than or equal to the specified minimum time, and a Failure with an AssertionException otherwise.
    */
-  private def assertResponseTimeIsAbove(response: Response, minTimeMillis: String): Try[Unit] = Try {
-    val lMinTimeMillis: Long = minTimeMillis.toLong
+  private def assertResponseTimeIsAbove(response: Response, minTimeMillisString: String): Try[Unit] = Try {
+    val minTimeMillis: Long = minTimeMillisString.toLong
 
-    if (response.duration < lMinTimeMillis) {
-      throw AssertionException(s"Expected minimal length '$lMinTimeMillis' is bigger then received '${response.duration}' one.")
+    if (response.duration < minTimeMillis) {
+      throw AssertionException(s"Expected minimal length '$minTimeMillis' is bigger then received '${response.duration}' one.")
     }
   }
 
@@ -283,15 +283,15 @@ object AssertionResponseAction extends ResponseActions {
    * Compares the status code of the given response with the expected status code.
    *
    * @param response     The HTTP response object to be evaluated.
-   * @param expectedCode The expected HTTP status code as a string.
+   * @param expectedCodeString The expected HTTP status code as a string.
    * @return A Try[Unit] that is successful if the response's status code matches the expected code, and contains an exception otherwise.
    * @throws AssertionException if the response's status code does not match the expected code.
    */
-  private def assertStatusCodeEquals(response: Response, expectedCode: String): Try[Unit] = Try {
-    val iExpectedCode: Int = expectedCode.toInt
+  private def assertStatusCodeEquals(response: Response, expectedCodeString: String): Try[Unit] = Try {
+    val expectedCode: Int = expectedCodeString.toInt
 
-    if (response.statusCode != iExpectedCode) {
-      throw AssertionException(s"Expected $iExpectedCode, but got ${response.statusCode}")
+    if (response.statusCode != expectedCode) {
+      throw AssertionException(s"Expected $expectedCode, but got ${response.statusCode}")
     }
   }
 
@@ -408,10 +408,8 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] that is a Success if the "Content-Type" header value is "text/html", and a Failure with an AssertionException otherwise.
    */
   private def assertContentTypeIsHtml(response: Response): Try[Unit] = Try {
-    assertHeaderValueEquals(response, "content-type", "text/html") match {
-      case Failure(exception) =>
-        throw AssertionException(s"Received content is not HTML type. Details: ${exception.getMessage}")
-      case _ => // Do nothing for Success
+    assertHeaderValueEquals(response, "content-type", "text/html").recover { f =>
+      Failure(AssertionException(s"Received content is not HTML type. Details: ${f.getMessage}"))
     }
   }
 
