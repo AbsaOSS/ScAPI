@@ -85,9 +85,8 @@ class ResponseLogTest extends FunSuite {
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
-  test("performAssertion - DEBUG supported".only) {
-//    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "debug message"))
-    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Error, Map("message" -> "error message"))
+  test("performAssertion - DEBUG supported") {
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "debug message"))
     val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
