@@ -2,12 +2,12 @@
   "name" : "getOwners Demo Suite",
   "tests": [
     {
-      "name" : "Owner ID:5 not found",
+      "name" : "Owner ID:999 not found",
       "categories": ["SMOKE"],
       "headers" : [],
       "action": {
           "methodName": "get",
-          "url": "{{ env.url }}/api/owner/5"
+          "url": "{{ env.url }}/api/owner/999"
       },
       "responseActions": [
         {

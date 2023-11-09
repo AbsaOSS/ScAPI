@@ -46,7 +46,6 @@ object SuiteRunner {
     suiteBundles.foldLeft(List[SuiteResult]()) { (resultList, suiteBundle) =>
       Logger.debug(s"Suite: ${suiteBundle.suite.name} - Started")
 
-      // TODO - One suite can define only one Before, so why iteration across list items???
       val suiteBeforeResult: List[SuiteResult] = suiteBundle.suiteBefore.toList.flatMap { suiteBefore =>
         suiteBefore.methods.map { method => runSuiteBefore(
           suiteBundle.suite.name,
@@ -71,7 +70,6 @@ object SuiteRunner {
           duration = Some(0L),
           categories = Some("SKIPPED"))
       } else {
-        // TODO - One suite can define only one TestSuite, so why iteration across list items???
         suiteResult = suiteBundle.suite.tests.toList.map(test =>
           this.runSuiteTest(
             suiteBundle.suite.name,
@@ -79,7 +77,6 @@ object SuiteRunner {
             environment,
             restClientCreator))
 
-        // TODO - One suite can define only one After, so why iteration across list items???
         suiteAfterResult = suiteBundle.suiteAfter.toList.flatMap { suiteAfter =>
           suiteAfter.methods.map { method => runSuiteAfter(
             suiteBundle.suite.name,
