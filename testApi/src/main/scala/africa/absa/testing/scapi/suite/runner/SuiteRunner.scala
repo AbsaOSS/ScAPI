@@ -213,7 +213,6 @@ object SuiteRunner {
   private def processRequest(requestable: Requestable, environment: Environment, restClientCreator: RestClientCreator): Try[Unit] = {
     val response: Response = sendRequest(requestable, environment, restClientCreator)
     Response.perform(
-      environment = environment,
       response = response,
       responseActions = requestable.responseActions
     )

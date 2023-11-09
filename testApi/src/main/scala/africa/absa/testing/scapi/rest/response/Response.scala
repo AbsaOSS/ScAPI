@@ -59,15 +59,19 @@ object Response {
    * The appropriate group's performAssertions method is called based on the group type of each Assertion.
    * Returns true only if all assertions return true, and false as soon as any assertion returns false.
    *
-   * @param environment The current environment.
    * @param response   The response on which actions will be performed.
    * @param responseActions The set of response actions that dictate what actions will be performed on the response.
    * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false). TODO
    * @throws IllegalArgumentException If an response action group is not supported.
    */
-  def perform(environment: Environment, response: Response, responseActions: Seq[ResponseAction]): Try[Unit] = {
+  def perform(response: Response, responseActions: Seq[ResponseAction]): Try[Unit] = {
     def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {
-      val filteredParams = resolvedResponseAction.params.filter(_._1 != "method").map { case (k, v) => s"$k->$v" }.mkString(", ")
+      val filteredParams = resolvedResponseAction.params
+        .flatMap {
+          case (k, v) if k != "method" => Some(s"$k->$v")
+          case _ => None
+        }
+        .mkString(", ")
       val baseLog =
         s"""
            |Parameters received:
@@ -81,7 +85,7 @@ object Response {
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
     }
 
-    responseActions.iterator.map { responseAction =>
+    responseActions.map { responseAction =>
       val resolvedResponseAction: ResponseAction = responseAction.resolveByRuntimeCache()
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - Started.")
 

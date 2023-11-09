@@ -68,13 +68,13 @@ class ResponseLogTest extends FunSuite {
    */
 
   test("performAssertion - ERROR supported") {
-    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Error, Map("message" -> "info message"))
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Error, Map("message" -> "error message"))
     val response = Response(500, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 
   test("performAssertion - WARN supported") {
-    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Warn, Map("message" -> "info message"))
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Warn, Map("message" -> "warn message"))
     val response = Response(401, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
@@ -86,7 +86,7 @@ class ResponseLogTest extends FunSuite {
   }
 
   test("performAssertion - DEBUG supported") {
-    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "info message"))
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "debug message"))
     val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
