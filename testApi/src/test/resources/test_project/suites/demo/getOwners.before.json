@@ -1,8 +1,8 @@
 {
-  "name" : "getOwner_5_demo",
+  "name" : "getOwners Demo Before",
   "methods" : [
     {
-      "name" : "getOwner_5",
+      "name" : "Get Owner ID:5 data",
       "headers" : [
         {
           "name": "authorization",
@@ -76,6 +76,10 @@
         {
           "method": "log.info",
           "message": "{{ cache.ownerId }}"
+        },
+        {
+          "method": "log.info",
+          "message": "{{ cache.ownerName }}"
         }
       ]
     }

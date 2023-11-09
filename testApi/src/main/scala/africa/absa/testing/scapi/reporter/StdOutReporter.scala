@@ -102,7 +102,11 @@ object StdOutReporter {
         printInnerHeader("Details of failed tests")
         testResults.filter(!_.isSuccess).sortBy(_.name).foreach { result =>
           println(s"Suite: ${result.suiteName}")
-          println(s"Test: ${result.name}")
+          result.resultType match {
+            case SuiteResultType.BeforeTestSet => println(s"Before: ${result.name}")
+            case SuiteResultType.TestSet => println(s"Test: ${result.name}")
+            case SuiteResultType.AfterTestSet => println(s"After: ${result.name}")
+          }
           println(s"Error: ${result.errorMsg.getOrElse("No details available")}")
           println(s"Duration: ${result.duration.getOrElse("NA")} ms")
           println(s"Category: ${result.categories}")

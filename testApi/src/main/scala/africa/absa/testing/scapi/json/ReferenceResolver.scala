@@ -171,6 +171,15 @@ case class Header private(name: String, value: String) extends ReferenceResolver
    * @return a new Header option instance with resolved references.
    */
   def resolveReferences(references: Map[String, String]): Header = this.copy(value = getResolved(value, references))
+
+  /**
+   * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
+   *
+   * @return A new Header instance with resolved references.
+   */
+  def resolveByRuntimeCache(): Header = this.copy(
+    value = RuntimeCache.resolve(this.value)
+  )
 }
 
 /**
@@ -195,6 +204,17 @@ case class Action private(methodName: String, url: String, body: Option[String] 
     url = getResolved(url, references),
     body = body.map(b => getResolved(b, references)),
     params = params.map(_.map(param => param.resolveReferences(references)))
+  )
+
+  /**
+   * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
+   *
+   * @return A new Action instance with resolved references.
+   */
+  def resolveByRuntimeCache(): Action = this.copy(
+    url = RuntimeCache.resolve(this.url),
+    body = this.body.fold(this.body)(body => Option(RuntimeCache.resolve(body))),
+    params = this.params.fold(this.params)(params => Option(params.map(param => param.resolveByRuntimeCache())))
   )
 }
 
@@ -250,4 +270,13 @@ case class Param private(name: String, value: String) extends ReferenceResolver 
    * @return a new Param option instance with resolved references.
    */
   def resolveReferences(references: Map[String, String]): Param = this.copy(value = getResolved(value, references))
+
+  /**
+   * Method to resolve references using Runtime Cache. This method is used when the resolution of a reference is not possible at compile-time.
+   *
+   * @return A new Param instance with resolved references.
+   */
+  def resolveByRuntimeCache(): Param = this.copy(
+    value = RuntimeCache.resolve(value)
+  )
 }

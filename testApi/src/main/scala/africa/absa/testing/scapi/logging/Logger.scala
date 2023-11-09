@@ -25,13 +25,16 @@ object Logger {
     level = newLevel
   }
 
-  private def log(level: Level, message: String): Unit = {
-    val callerClassName = new Exception().getStackTrace.drop(1)
-      .find(_.getClassName != getClass.getName)
-      .map(_.getClassName)
-      .getOrElse("unknown")
-    val logger = LogManager.getLogger(callerClassName)
-    if (logger.isEnabled(level)) logger.log(level, message)
+  private def log(messageLevel: Level, message: String): Unit = {
+    if (messageLevel.isMoreSpecificThan(level)) {
+      val callerClassName = new Exception().getStackTrace.drop(1)
+        .find(_.getClassName != getClass.getName)
+        .map(_.getClassName)
+        .getOrElse("unknown")
+      val logger = LogManager.getLogger(callerClassName)
+
+      if (logger.isEnabled(messageLevel)) logger.log(messageLevel, message)
+    }
   }
 
   def debug(message: String): Unit = {
