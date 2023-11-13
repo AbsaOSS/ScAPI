@@ -69,6 +69,7 @@ object ScAPIRunner {
   }
 
   def main(args: Array[String]): Unit = {
-    println(run(args))
+    val output = run(args)
+    Logger.info(s"\n$output")
   }
 }
