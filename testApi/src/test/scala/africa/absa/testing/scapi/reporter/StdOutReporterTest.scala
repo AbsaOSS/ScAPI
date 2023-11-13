@@ -21,7 +21,6 @@ import africa.absa.testing.scapi.model.suite.SuiteResult
 import africa.absa.testing.scapi.model.suite.types.SuiteResultType
 import munit.FunSuite
 
-import java.io.ByteArrayOutputStream
 import scala.util.{Failure, Success}
 
 class StdOutReporterTest extends FunSuite {
@@ -73,14 +72,7 @@ class StdOutReporterTest extends FunSuite {
     printReport
    */
   test("empty results") {
-    val baos = new ByteArrayOutputStream()
-
-    Console.withOut(baos) {
-      StdOutReporter.printReport(List.empty)
-    }
-
-    // Get the output as a string
-    val output = baos.toString
+    val output = StdOutReporter.printReport(List.empty)
 
     // Assertions
     assert(clue(output.contains("Simple Text Report")))
@@ -99,14 +91,7 @@ class StdOutReporterTest extends FunSuite {
         min 1 suites with min 2 tests
      */
 
-    val baos = new ByteArrayOutputStream()
-
-    Console.withOut(baos) {
-      StdOutReporter.printReport(mixedSuccessTestResults)
-    }
-
-    // Get the output as a string
-    val output = baos.toString
+    val output = StdOutReporter.printReport(mixedSuccessTestResults)
 
     // Assertions
     // report header & tail
@@ -131,14 +116,7 @@ class StdOutReporterTest extends FunSuite {
   }
 
   test("results all success") {
-    val baos = new ByteArrayOutputStream()
-
-    Console.withOut(baos) {
-      StdOutReporter.printReport(successTestResults)
-    }
-
-    // Get the output as a string
-    val output = baos.toString
+    val output = StdOutReporter.printReport(successTestResults)
 
     // Assertions
     // report header & tail

@@ -34,12 +34,14 @@ import scala.util.{Failure, Success}
  * Object `ScAPIRunner` serves as the main entry point for the ScAPI runner.
  */
 object ScAPIRunner {
+
+
   /**
    * The main method that is being invoked to run the ScAPI runner.
    *
    * @param args Command-line arguments.
    */
-  def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): String = {
     val cmd = ScAPIRunnerConfig.getCmdLineArguments(args) match {
       case Success(value) => value
       case Failure(exception) => throw exception
@@ -58,10 +60,15 @@ object ScAPIRunner {
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {
       Logger.info("Validate only => end run.")
+      ""
     } else {
       Logger.info("Running tests")
       val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
       StdOutReporter.printReport(suiteResults)
     }
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(run(args))
   }
 }

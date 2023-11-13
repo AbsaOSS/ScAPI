@@ -40,6 +40,8 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @throws UndefinedResponseActionTypeException if an unsupported assertion type is encountered.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
+    Logger.debug(s"Validating content for response action. \nResponseAction: $responseAction")
+
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case StringFromList => validateStringFromList(responseAction)
@@ -55,6 +57,8 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @throws UndefinedResponseActionTypeException if an unsupported response action name is encountered.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
+    Logger.debug(s"Performing response action: \nResponse: $response, \nResponseAction: $responseAction")
+
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case StringFromList =>
