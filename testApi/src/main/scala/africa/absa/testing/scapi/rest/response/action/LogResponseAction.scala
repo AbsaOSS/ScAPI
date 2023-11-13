@@ -38,6 +38,8 @@ object LogResponseAction extends ResponseActions {
    * @throws UndefinedResponseActionTypeException if the response action's name is not recognized.
    */
   def validateContent(responseAction: ResponseAction): Unit = {
+    Logger.debug(s"Validating content for response action. \nResponseAction: $responseAction")
+
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case Error | Warn | Info | Debug =>
@@ -58,6 +60,8 @@ object LogResponseAction extends ResponseActions {
    * @throws PropertyNotFoundException if the required 'message' parameter is missing.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
+    Logger.debug(s"Performing response action. \nResponse: $response, \nResponseAction: $responseAction")
+
     val message = responseAction.params.getOrElse("message", return Failure(PropertyNotFoundException("Missing 'message' parameter")))
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     Try {

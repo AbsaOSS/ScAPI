@@ -26,6 +26,20 @@ class ScAPIRunnerTest extends FunSuite {
     }
   }
 
+  test("call main with minimum params - report of failures") {
+    val args: Array[String] = Array(
+      "--env", getClass.getResource("/test_project/localhostBadPort.env.json").getPath,
+      "--test-root-path", getClass.getResource("/test_project").getPath)
+    val report = ScAPIRunner.run(args)
+
+    assert(report.contains("* Simple Text Report *"))
+    assert(report.contains("| getOwners Demo Suite    | SKIPPED                  |             0 | Failure | SKIPPED    |"))
+    assert(report.contains("Before: getOwners Demo Before"))
+    assert(report.contains("Error: Connection refused"))
+    assert(report.contains("Test: SKIPPED"))
+    assert(report.contains("Error: Problems during running before suite logic. Details: Suite-Before for Suite: getOwners Demo Suite has failed methods. Not executing main tests and Suite-After."))
+  }
+
   test("call main with minimum params - validate only") {
     val args: Array[String] = Array(
       "--env", getClass.getResource("/test_project/localhost.env.json").getPath,

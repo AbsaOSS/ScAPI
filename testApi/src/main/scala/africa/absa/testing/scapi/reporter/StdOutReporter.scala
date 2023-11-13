@@ -28,7 +28,10 @@ object StdOutReporter {
    *
    * @param testResults The set of test suite results to be reported.
    */
-  def printReport(testResults: List[SuiteResult]): Unit = {
+  def printReport(testResults: List[SuiteResult]): String = {
+    val report = new StringBuilder()
+
+    def addToReport(text: String): Unit = report.append(text + "\n")
     def createFormattedLine(line: Option[String] = None, maxChars: Int = 80, repeatChar: Char = '*'): String =
       line match {
         case Some(text) => s"${repeatChar.toString * ((maxChars - text.length - 2) / 2)} $text ${repeatChar.toString * ((maxChars - text.length - 2) / 2)}"
@@ -42,18 +45,18 @@ object StdOutReporter {
     else math.max(testResults.flatMap(_.categories.flatMap(c => Option(c).map(_.split(",").length))).maxOption.getOrElse(0) + 3, 10)
     val maxChars = 33 + maxSuiteLength + maxTestLength + maxTestCategoriesLength
 
-    def printTableRowSplitter(): Unit = println(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
-    def printFormattedLineHeader(): Unit = println(createFormattedLine(maxChars = maxChars))
-    def printFormattedLineNoHeader(): Unit = println(createFormattedLine(repeatChar = '-', maxChars = maxChars))
+    def printTableRowSplitter(): Unit = addToReport(s"| ${"-" * maxSuiteLength} | ${"-" * maxTestLength} | ${"-" * 13} | ${"-" * 7} | ${"-" * maxTestCategoriesLength} |")
+    def printFormattedLineHeader(): Unit = addToReport(createFormattedLine(maxChars = maxChars))
+    def printFormattedLineNoHeader(): Unit = addToReport(createFormattedLine(repeatChar = '-', maxChars = maxChars))
     def printHeader(title: String): Unit = {
       printFormattedLineHeader()
-      println(createFormattedLine(Some(title), maxChars = maxChars))
+      addToReport(createFormattedLine(Some(title), maxChars = maxChars))
       printFormattedLineHeader()
     }
     def printInnerHeader(title: String): Unit = {
-      println()
+      addToReport("")
       printFormattedLineNoHeader()
-      println(s"$title:")
+      addToReport(s"$title:")
       printFormattedLineNoHeader()
     }
 
@@ -62,9 +65,9 @@ object StdOutReporter {
     val successCount = testResults.count(r => r.isSuccess && r.resultType == SuiteResultType.TestSet)
     val failureCount = testResults.count(r => !r.isSuccess && r.resultType == SuiteResultType.TestSet)
 
-    println(s"Number of tests run: ${successCount + failureCount}")
-    println(s"Number of successful tests: $successCount")
-    println(s"Number of failed tests: $failureCount")
+    addToReport(s"Number of tests run: ${successCount + failureCount}")
+    addToReport(s"Number of successful tests: $successCount")
+    addToReport(s"Number of failed tests: $failureCount")
 
     if (testResults.nonEmpty) {
       val suiteSummary = testResults
@@ -77,17 +80,17 @@ object StdOutReporter {
       printInnerHeader("Suites Summary")
       suiteSummary.foreach {
         case (suiteName, total, successCount) =>
-          println(s"Suite: $suiteName, Total tests: $total, Successful: $successCount, Failed: ${total - successCount}")
+          addToReport(s"Suite: $suiteName, Total tests: $total, Successful: $successCount, Failed: ${total - successCount}")
       }
 
       printInnerHeader("Summary of all tests")
       printTableRowSplitter()
-      println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
+      addToReport(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
       val resultsList = testResults.filter(_.resultType == SuiteResultType.TestSet)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
-        println(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(
+        addToReport(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(
           result.suiteName,
           result.name,
           duration,
@@ -101,20 +104,21 @@ object StdOutReporter {
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
         testResults.filter(!_.isSuccess).foreach { result =>
-          println(s"Suite: ${result.suiteName}")
+          addToReport(s"Suite: ${result.suiteName}")
           result.resultType match {
-            case SuiteResultType.BeforeTestSet => println(s"Before: ${result.name}")
-            case SuiteResultType.TestSet => println(s"Test: ${result.name}")
-            case SuiteResultType.AfterTestSet => println(s"After: ${result.name}")
+            case SuiteResultType.BeforeTestSet => addToReport(s"Before: ${result.name}")
+            case SuiteResultType.TestSet => addToReport(s"Test: ${result.name}")
+            case SuiteResultType.AfterTestSet => addToReport(s"After: ${result.name}")
           }
-          println(s"Error: ${result.errorMsg.getOrElse("No details available")}")
-          println(s"Duration: ${result.duration.getOrElse("NA")} ms")
-          println(s"Category: ${result.categories}")
-          println()
+          addToReport(s"Error: ${result.errorMsg.getOrElse("No details available")}")
+          addToReport(s"Duration: ${result.duration.getOrElse("NA")} ms")
+          addToReport(s"Category: ${result.categories}")
+          addToReport("")
         }
       }
     }
 
     printHeader("End Report")
+    report.toString()
   }
 }
