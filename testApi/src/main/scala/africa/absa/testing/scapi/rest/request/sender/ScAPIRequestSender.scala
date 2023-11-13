@@ -18,8 +18,10 @@ package africa.absa.testing.scapi.rest.request.sender
 
 import africa.absa.testing.scapi.rest.model.CookieValue
 import africa.absa.testing.scapi.rest.response.Response
+import requests.RequestFailedException
 
 import java.net.HttpCookie
+import scala.util.{Failure, Success, Try}
 
 /**
  * ScAPIRequestSender is an implementation of the RequestSender interface.
@@ -29,7 +31,23 @@ object ScAPIRequestSender extends RequestSender {
 
   private def sendRequest(requestFunc: => requests.Response): Response = {
     val startTime = System.nanoTime()
-    val response = requestFunc
+    val responseTry: Try[requests.Response] = Try(requestFunc)
+
+    val response: requests.Response = responseTry match {
+      case Success(response: requests.Response) =>
+        // If the Try is a Success, return the requests.Response
+        response
+
+      case Failure(e: RequestFailedException) =>
+        // Handle the specific RequestFailedException and return "failed/not positive only" requests.Response
+        e.response
+
+      case Failure(e) =>
+        // Handle any other Exception
+        println(s"Request failed: ${e.getMessage}")
+        throw e
+    }
+
     val endTime = System.nanoTime()
 
     val extractedCookies: Map[String, CookieValue] = response.cookies.view.map {

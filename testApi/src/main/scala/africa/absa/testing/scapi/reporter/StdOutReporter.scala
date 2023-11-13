@@ -100,7 +100,7 @@ object StdOutReporter {
 
       if (failureCount > 0) {
         printInnerHeader("Details of failed tests")
-        testResults.filter(!_.isSuccess).sortBy(_.name).foreach { result =>
+        testResults.filter(!_.isSuccess).foreach { result =>
           println(s"Suite: ${result.suiteName}")
           result.resultType match {
             case SuiteResultType.BeforeTestSet => println(s"Before: ${result.name}")
