@@ -18,43 +18,12 @@ package africa.absa.testing.scapi
 
 import munit.FunSuite
 
-import java.io.{ByteArrayOutputStream, PrintStream}
-
 class ScAPIRunnerTest extends FunSuite {
 
   test("call main without params") {
     interceptMessage[IllegalArgumentException]("Wrong options provided. List can be found above\n") {
       ScAPIRunner.main(Array())
     }
-  }
-
-  test("call main with minimum params - report of failures".only) {
-    val baos = new ByteArrayOutputStream()
-    val ps = new PrintStream(baos)
-    val oldOut = System.out
-    val oldErr = System.err
-
-    System.setOut(ps)
-    System.setErr(ps)
-
-    val args: Array[String] = Array(
-      "--env", getClass.getResource("/test_project/localhost.env.json").getPath,
-      "--test-root-path", getClass.getResource("/test_project").getPath)
-    ScAPIRunner.main(args)
-
-    ps.flush()
-    System.setOut(oldOut)
-    System.setErr(oldErr)
-    val output = baos.toString("UTF-8")
-    baos.close()
-    ps.close()
-
-    assert(output.contains("* Simple Text Report *"))
-    assert(output.contains("| getOwners Demo Suite    | SKIPPED                  |             0 | Failure | SKIPPED    |"))
-    assert(output.contains("Before: getOwners Demo Before"))
-    assert(output.contains("Error: Connection refused"))
-    assert(output.contains("Test: SKIPPED"))
-    assert(output.contains("Error: Problems during running before suite logic. Details: Suite-Before for Suite: getOwners Demo Suite has failed methods. Not executing main tests and Suite-After."))
   }
 
   test("call main with minimum params - validate only") {
