@@ -30,7 +30,25 @@ case class Response(statusCode: Int,
                     statusMessage: String,
                     headers: Map[String, Seq[String]],
                     cookies: Map[String, CookieValue],
-                    duration: Long)
+                    duration: Long) {
+
+  def toRichString: String = {
+    val headerString = headers.map { case (name, value) => s"  $name: $value" }.mkString("\n")
+    val cookieString = cookies.map { case (name, value) => s"  $name: $value" }.mkString("\n")
+
+    s"""
+       |URL: $url
+       |Status: $statusCode $statusMessage
+       |Duration: ${duration}ms
+       |Headers:
+       |$headerString
+       |Cookies:
+       |$cookieString
+       |Body:
+       |$body
+       |""".stripMargin
+  }
+}
 
 /**
  * A singleton object that is responsible for managing and handling responses.
@@ -54,15 +72,19 @@ object Response {
   }
 
   /**
-   * Performs actions on the given Response based on a set of Assertions.
-   * Each response action is resolved by the runtime cache before being used.
-   * The appropriate group's performAssertions method is called based on the group type of each Assertion.
-   * Returns true only if all assertions return true, and false as soon as any assertion returns false.
+   * Executes a sequence of response actions on the provided Response object based on a set of ResponseActions.
+   * Each response action is resolved using runtime cache before execution.
+   * This method delegates the assertion execution to the corresponding performAssertions method
+   * based on the group type of each ResponseAction within the sequence.
+   * The method returns successfully only if all assertions pass.
+   * If any assertion fails, the method returns a failed Try with an appropriate exception.
    *
-   * @param response   The response on which actions will be performed.
-   * @param responseActions The set of response actions that dictate what actions will be performed on the response.
-   * @return           Boolean indicating whether all response actions passed (true) or any response action failed (false). TODO
-   * @throws IllegalArgumentException If an response action group is not supported.
+   * @param response        The HTTP response object on which the actions will be performed.
+   * @param responseActions A sequence of ResponseAction objects representing the actions and assertions
+   *                        to be performed on the response.
+   * @return                A Try[Unit] indicating success if all response actions pass, or containing
+   *                        an exception if any response action fails.
+   * @throws IllegalArgumentException If an unsupported response action group is encountered.
    */
   def perform(response: Response, responseActions: Seq[ResponseAction]): Try[Unit] = {
     def logParameters(response: Response, resolvedResponseAction: ResponseAction, exception: Option[Throwable] = None): Unit = {

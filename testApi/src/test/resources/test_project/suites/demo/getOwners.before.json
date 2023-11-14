@@ -76,6 +76,9 @@
         {
           "method": "log.info",
           "message": "{{ cache.ownerId }}"
+        },
+        {
+          "method": "log.log-info-response"
         }
       ]
     }

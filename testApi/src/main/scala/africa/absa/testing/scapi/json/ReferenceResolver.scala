@@ -251,6 +251,17 @@ case class ResponseAction private(group: ResponseActionGroupType,
   def resolveByRuntimeCache(): ResponseAction = this.copy(
     params = this.params.map { case (k, v) => k -> RuntimeCache.resolve(v) }
   )
+
+  def toRichString: String = {
+    val paramsString = params.map { case (name, value) => s"  $name: $value" }.mkString("\n")
+
+    s"""
+       |Group: $group
+       |Name: $name
+       |Params:
+       |$paramsString
+       |""".stripMargin
+  }
 }
 
 /**

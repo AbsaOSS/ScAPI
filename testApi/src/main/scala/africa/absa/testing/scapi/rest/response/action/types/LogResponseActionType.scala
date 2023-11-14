@@ -27,5 +27,7 @@ object LogResponseActionType extends Enumeration {
   val Info: LogResponseActionType.Value = Value("info")
   val Debug: LogResponseActionType.Value = Value("debug")
 
+  val LogInfoResponse: LogResponseActionType.Value = Value("log-info-response")
+
   def fromString(s: String): Option[LogResponseActionType] = Try(this.withName(s)).toOption
 }

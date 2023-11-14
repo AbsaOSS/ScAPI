@@ -17,6 +17,7 @@
 package africa.absa.testing.scapi.rest.response
 
 import africa.absa.testing.scapi.json.ResponseAction
+import africa.absa.testing.scapi.rest.model.CookieValue
 import africa.absa.testing.scapi.rest.response.action.LogResponseAction
 import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType.LogResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{ResponseActionGroupType, LogResponseActionType => LogType}
@@ -88,6 +89,12 @@ class ResponseLogTest extends FunSuite {
   test("performAssertion - DEBUG supported") {
     val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "debug message"))
     val response = Response(200, "OK", "", "", Map("Content-Type" -> Seq("application/json")), Map.empty, 100)
+    assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
+  }
+
+  test("performAssertion - log into response") {
+    val assertion = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.LogInfoResponse, Map.empty)
+    val response = Response(200, "OK", "url-fake", "test status message", Map("Content-Type" -> Seq("application/json")), Map("notSecuredCookie" -> CookieValue(value = "someValue", secured = false)), 100)
     assert(LogResponseAction.performResponseAction(response, assertion).isSuccess)
   }
 }

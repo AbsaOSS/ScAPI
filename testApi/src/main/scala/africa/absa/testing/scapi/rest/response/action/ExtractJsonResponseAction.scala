@@ -57,7 +57,7 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @throws UndefinedResponseActionTypeException if an unsupported response action name is encountered.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    Logger.debug(s"Performing response action: \nResponse: $response, \nResponseAction: $responseAction")
+    Logger.trace(s"Performing response action: \nResponse: ${response.toRichString}, \nResponseAction: ${responseAction.toRichString}")
 
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {

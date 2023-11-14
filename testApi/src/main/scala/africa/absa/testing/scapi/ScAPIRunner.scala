@@ -47,7 +47,11 @@ object ScAPIRunner {
       case Failure(exception) => throw exception
     }
 
-    Logger.setLevel(if (cmd.debug) Level.DEBUG else Level.INFO)
+    cmd match {
+      case c if c.trace => Logger.setLevel(Level.TRACE)
+      case c if c.debug => Logger.setLevel(Level.DEBUG)
+      case _ => Logger.setLevel(Level.INFO)
+    }
     cmd.logConfigInfo()
 
     if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailedException("'suites' directory have to exist in project root.")
@@ -70,6 +74,6 @@ object ScAPIRunner {
 
   def main(args: Array[String]): Unit = {
     val output = run(args)
-    Logger.info(s"\n$output")
+    Logger.info(s"ScAPI Runner output:\n$output")
   }
 }

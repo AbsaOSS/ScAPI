@@ -155,7 +155,7 @@ object AssertionResponseAction extends ResponseActions {
    * @return A Try[Unit] indicating the success of the assertion operation.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    Logger.debug(s"Performing response action: \nResponse: $response, \nResponseAction: $responseAction")
+    Logger.trace(s"Performing response action: \nResponse: ${response.toRichString}, \nResponseAction: ${responseAction.toRichString}")
 
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {

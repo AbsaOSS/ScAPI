@@ -42,6 +42,7 @@ object LogResponseAction extends ResponseActions {
 
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
+      case LogInfoResponse => ()
       case Error | Warn | Info | Debug =>
         responseAction.params.get("message") match {
           case Some(message) => ContentValidator.validateNonEmptyString(message, s"ResponseLog.${responseAction.name}.message")
@@ -60,16 +61,20 @@ object LogResponseAction extends ResponseActions {
    * @throws PropertyNotFoundException if the required 'message' parameter is missing.
    */
   def performResponseAction(response: Response, responseAction: ResponseAction): Try[Unit] = {
-    Logger.debug(s"Performing response action. \nResponse: $response, \nResponseAction: $responseAction")
+    Logger.trace(s"Performing response action. \nResponse: ${response.toRichString}, \nResponseAction: ${responseAction.toRichString}")
 
-    val message = responseAction.params.getOrElse("message", return Failure(PropertyNotFoundException("Missing 'message' parameter")))
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     Try {
       action match {
-        case Error => logError(message)
-        case Warn => logWarn(message)
-        case Info => logInfo(message)
-        case Debug => logDebug(message)
+        case Error | Warn | Info | Debug =>
+          val message = responseAction.params.getOrElse("message", return Failure(PropertyNotFoundException("Missing 'message' parameter")))
+          action match {
+            case Error => logError (message)
+            case Warn => logWarn (message)
+            case Info => logInfo (message)
+            case Debug => logDebug (message)
+          }
+        case LogInfoResponse => logInfoResponse(response: Response)
         case _ => Failure(UndefinedResponseActionTypeException(s"Unsupported log method [group: log]: ${responseAction.name}"))
       }
     }
@@ -113,5 +118,12 @@ object LogResponseAction extends ResponseActions {
    */
   private def logDebug(message: String): Unit = {
     Logger.debug(message)
+  }
+
+  /**
+   * Logs a response data at the INFO level.
+   */
+  private def logInfoResponse(response: Response): Unit = {
+    Logger.info(s"Printing response info:${response.toRichString}")
   }
 }
