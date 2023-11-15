@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.logging
 
+import org.apache.logging.log4j.core.config.Configurator
 import org.apache.logging.log4j.{Level, LogManager}
 
 object Logger {
@@ -32,6 +33,7 @@ object Logger {
         .map(_.getClassName)
         .getOrElse("unknown")
       val logger = LogManager.getLogger(callerClassName)
+      Configurator.setLevel(logger.getName, level)
 
       if (logger.isEnabled(messageLevel)) logger.log(messageLevel, message)
     }
@@ -51,5 +53,9 @@ object Logger {
 
   def error(message: String): Unit = {
     log(Level.ERROR, message)
+  }
+
+  def trace(message: String): Unit = {
+    log(Level.TRACE, message)
   }
 }

@@ -56,7 +56,7 @@ class ScAPIRunnerConfigTest extends FunSuite {
     assert(clue("Wrong options provided. List can be found above\n")  == clue(actualException.getMessage))
   }
 
-  test("getCmdLineArguments - positive full") {
+  test("getCmdLineArguments - positive full - debug") {
     val cmd = ScAPIRunnerConfig.getCmdLineArguments(Array(
       "--env", randomEnvJsonPath,
       "--test-root-path", randomPath,
@@ -67,6 +67,32 @@ class ScAPIRunnerConfigTest extends FunSuite {
       "--validate-only",
       "--report", "/some/report/path",
       "--debug"
+    )) match {
+      case Success(value) => value
+      case Failure(exception) => fail("Command line parsing passed but shouldn't", exception)
+    }
+
+    assert(clue(randomEnvJsonPath) == clue(cmd.envPath))
+    assert(clue(randomPath) == clue(cmd.testRootPath))
+    assert(clue("(.*)Test(.*)") == clue(cmd.filter))
+    assert(clue(Set("SMOKE", "ANOTHER")) == clue(cmd.categories))
+    assert(clue(4) == clue(cmd.threadCount))
+    assert(clue("txt") == clue(cmd.fileFormat))
+    assert(clue("/some/report/path") == clue(cmd.report))
+    assert(cmd.validateOnly)
+  }
+
+  test("getCmdLineArguments - positive full - trace") {
+    val cmd = ScAPIRunnerConfig.getCmdLineArguments(Array(
+      "--env", randomEnvJsonPath,
+      "--test-root-path", randomPath,
+      "--filter", "(.*)Test(.*)",
+      "--categories", "SMOKE,ANOTHER",
+      "--thread-count", "4",
+      "--file-format", "txt",
+      "--validate-only",
+      "--report", "/some/report/path",
+      "--trace"
     )) match {
       case Success(value) => value
       case Failure(exception) => fail("Command line parsing passed but shouldn't", exception)

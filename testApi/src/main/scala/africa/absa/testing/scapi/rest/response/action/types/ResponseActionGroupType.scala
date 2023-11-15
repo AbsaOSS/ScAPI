@@ -27,6 +27,3 @@ object ResponseActionGroupType extends Enumeration {
 
   def fromString(s: String): Option[ResponseActionGroupType] = Try(this.withName(s)).toOption
 }
-
-
-

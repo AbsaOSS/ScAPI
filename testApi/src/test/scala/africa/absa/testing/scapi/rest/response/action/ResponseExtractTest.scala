@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
-import africa.absa.testing.scapi.{AssertionException, ContentValidationFailedException, UndefinedResponseActionTypeException}
 import africa.absa.testing.scapi.json.ResponseAction
-import africa.absa.testing.scapi.rest.response.action.ExtractJsonResponseAction
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseActionType.ExtractJsonResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{ExtractJsonResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
+import africa.absa.testing.scapi.{AssertionException, ContentValidationFailedException, UndefinedResponseActionTypeException}
 import munit.FunSuite
 
 import scala.language.implicitConversions

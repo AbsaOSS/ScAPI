@@ -23,18 +23,20 @@ import scopt.OptionParser
 import scala.util.{Failure, Success, Try}
 
 /**
- * Case class that represents the configuration provided by command line parameters for ScAPIRunner
+ * Case class that represents the configuration provided by command line parameters for ScAPIRunner.
  *
- * @param envPath       Path to the environment definition. Default is empty string.
- * @param testRootPath  Path to the root directory of test definitions. Default is empty string.
+ * @param envPath       Path to the environment definition. Default is an empty string.
+ * @param testRootPath  Path to the root directory of test definitions. Default is an empty string.
  * @param filter        Filter rule for selecting test definitions files. Default is "(.*)".
  * @param categories    Test categories to include in the test suite. Default is all categories "*".
  * @param threadCount   Maximum number of threads used to run the test suite. Default is '1'.
  * @param fileFormat    Format of definition files. Default is 'json'.
- * @param report        Path to the report output directory. Default is empty string.
- * @param validateOnly  Validate input definitions only. Default is 'false'.
+ * @param report        Path to the report output directory. Default is an empty string.
+ * @param debug         Enable debug mode. Default is 'false'.
+ * @param trace         Enable trace mode for more detailed logging. Default is 'false'.
+ * @param validateOnly  Validate input definitions only, without executing tests. Default is 'false'.
  *
- * @constructor Create a new configuration with a env, testRootPath, filter, categories, threadCount, fileFormat, report, validateOnly.
+ * @constructor Create a new configuration with envPath, testRootPath, filter, categories, threadCount, fileFormat, report, debug, trace, and validateOnly.
  */
 case class ScAPIRunnerConfig(envPath: String = "",
                              testRootPath: String = "",
@@ -44,6 +46,7 @@ case class ScAPIRunnerConfig(envPath: String = "",
                              fileFormat: String = DefaultFileFormat,
                              report: String = DefaultReport,
                              debug: Boolean = false,
+                             trace: Boolean = false,
                              validateOnly: Boolean = false) {
   /**
    * Method to log configuration information
@@ -60,6 +63,7 @@ case class ScAPIRunnerConfig(envPath: String = "",
        |--fileFormat: $fileFormat
        |--threadCount: $threadCount
        |--debug: $debug
+       |--trace: $trace
        |--validate only: $validateOnly
   """.stripMargin)
   }
@@ -142,6 +146,11 @@ object ScAPIRunnerConfig {
       .optional()
       .action((_, config) => { config.copy(debug = true) })
       .text("Activate debug regime.")
+
+    opt[Unit]("trace")
+      .optional()
+      .action((_, config) => { config.copy(trace = true) })
+      .text("Activate trace regime.")
 
     opt[Unit]("validate-only")
       .optional()

@@ -16,6 +16,7 @@
 
 package africa.absa.testing.scapi.rest
 
+import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.rest.request.sender.RequestSender
 import africa.absa.testing.scapi.rest.response.Response
 
@@ -41,6 +42,19 @@ class RestClient(requestSender: RequestSender) {
    * @throws IllegalArgumentException If the method is not 'get', 'post', 'put' or 'delete'.
    */
   def sendRequest(method: String, url: String, body: String, headers: Map[String, String], params: Map[String, String], verifySslCerts: Boolean = false): Response = {
+    Logger.trace(
+      s"""Sending $method request to
+         |URL: $url
+         |Headers:
+         |${headers.map { case (name, value) => s"  $name: $value" }.mkString("\n")}
+         |Params:
+         |${params.map { case (name, value) => s"  $name: $value" }.mkString("\n")}
+         |Body:
+         |$body
+         |Verify SSL Certs: $verifySslCerts
+         |""".stripMargin
+    )
+
     method.toLowerCase match {
       case "get" => requestSender.get(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
       case "post" => requestSender.post(url = url, headers = headers, verifySslCerts = verifySslCerts, data = body, params = params)
