@@ -102,7 +102,7 @@ object Response {
            |    Method->'${resolvedResponseAction.name}',
            |    Params->'$filteredParams',
            |  Actual Response:
-           |    $response""".stripMargin
+           |    ${response.toRichString}""".stripMargin
       val exceptionLog = exception.map(e => s"\nException: ${e.getMessage}").getOrElse("")
       Logger.debug(s"Response-${resolvedResponseAction.group}: '${resolvedResponseAction.name}' - error details:$baseLog$exceptionLog")
     }

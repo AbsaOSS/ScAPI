@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.model.CookieValue
-import africa.absa.testing.scapi.rest.response.action.AssertionResponseAction
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.action.types.AssertResponseActionType.AssertResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{AssertResponseActionType, ResponseActionGroupType}
 import africa.absa.testing.scapi.{ContentValidationFailedException, UndefinedResponseActionTypeException}

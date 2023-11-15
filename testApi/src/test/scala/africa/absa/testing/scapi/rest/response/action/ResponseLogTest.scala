@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package africa.absa.testing.scapi.rest.response
+package africa.absa.testing.scapi.rest.response.action
 
+import africa.absa.testing.scapi.UndefinedResponseActionTypeException
 import africa.absa.testing.scapi.json.ResponseAction
 import africa.absa.testing.scapi.rest.model.CookieValue
-import africa.absa.testing.scapi.rest.response.action.LogResponseAction
+import africa.absa.testing.scapi.rest.response.Response
 import africa.absa.testing.scapi.rest.response.action.types.LogResponseActionType.LogResponseActionType
 import africa.absa.testing.scapi.rest.response.action.types.{ResponseActionGroupType, LogResponseActionType => LogType}
 import munit.FunSuite
@@ -55,6 +56,20 @@ class ResponseLogTest extends FunSuite {
     val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.Debug, Map("message" -> "Non-empty string"))
     // no exception thrown, meaning validation passed
     LogResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - log info supported supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = LogType.LogInfoResponse, Map.empty)
+    // no exception thrown, meaning validation passed
+    LogResponseAction.validateContent(responseAction)
+  }
+
+  test("validateContent - action not supported") {
+    val responseAction = ResponseAction(group = ResponseActionGroupType.Log, name = "Wrong", Map.empty)
+
+    interceptMessage[UndefinedResponseActionTypeException]("Undefined response action content type: 'Wrong'") {
+      LogResponseAction.validateContent(responseAction)
+    }
   }
 
   test("validateContent - no message provided") {
