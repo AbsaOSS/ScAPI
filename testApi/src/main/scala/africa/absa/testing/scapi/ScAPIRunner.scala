@@ -47,6 +47,7 @@ object ScAPIRunner {
       case Failure(exception) => throw exception
     }
 
+    System.setProperty("log4j.configurationFile", "log4j2.xml")
     cmd match {
       case c if c.trace => Logger.setLevel(Level.TRACE)
       case c if c.debug => Logger.setLevel(Level.DEBUG)
