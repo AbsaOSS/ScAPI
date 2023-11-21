@@ -508,7 +508,7 @@ object AssertionResponseAction extends ResponseActions {
    */
   private def assertBodyContainsText(response: Response, text: String): Try[Unit] = Try {
     if (!response.body.contains(text)) {
-      val errMsg = s"Expected body to contain $text"
+      val errMsg = s"Expected body to contains: '$text'. Content of body: '${response.body}'"
       Logger.error(errMsg)
       throw AssertionException(errMsg)
     }
