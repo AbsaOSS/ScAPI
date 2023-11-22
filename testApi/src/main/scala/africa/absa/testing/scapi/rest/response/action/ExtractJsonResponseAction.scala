@@ -27,6 +27,8 @@ import com.jayway.jsonpath.{Configuration, JsonPath}
 import spray.json._
 
 import scala.util.Try
+import com.jayway.jsonpath.{Option => JsonPathOption}
+
 
 /**
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
@@ -63,23 +65,25 @@ object ExtractJsonResponseAction extends ResponseActions {
 
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
-      case StringFromList | StringFromJsonPath =>
-        val cacheKey = responseAction.params("cacheKey")
-        val cacheLevel = responseAction.params("cacheLevel")
+      case StringFromList=>
+        val (cacheKey, cacheLevel) = getCacheKeyAndLevel(responseAction)
+        val jsonKey = responseAction.params("jsonKey")
+        val listIndex = responseAction.params("listIndex").toInt
+        stringFromList(response, cacheKey, listIndex, jsonKey, cacheLevel)
 
-        action match {
-          case StringFromList =>
-            val jsonKey = responseAction.params("jsonKey")
-            val listIndex = responseAction.params("listIndex").toInt
-            stringFromList(response, cacheKey, listIndex, jsonKey, cacheLevel)
-
-          case StringFromJsonPath =>
-            val jsonPath = responseAction.params("jsonPath")
-            stringFromJsonPath(response, jsonPath, cacheKey, cacheLevel)
-        }
+      case StringFromJsonPath =>
+        val (cacheKey, cacheLevel) = getCacheKeyAndLevel(responseAction)
+        val jsonPath = responseAction.params("jsonPath")
+        stringFromJsonPath(response, jsonPath, cacheKey, cacheLevel)
 
       case _ => throw UndefinedResponseActionTypeException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
     }
+  }
+
+  private def getCacheKeyAndLevel(responseAction: ResponseAction) = {
+    val cacheKey = responseAction.params("cacheKey")
+    val cacheLevel = responseAction.params("cacheLevel")
+    (cacheKey, cacheLevel)
   }
 
   /*
@@ -173,7 +177,7 @@ object ExtractJsonResponseAction extends ResponseActions {
    * @return A Try[Unit] indicating whether the string extraction and caching operation was successful or not.
    */
   private def stringFromJsonPath(response: Response, jsonPath: String, cacheKey: String, runtimeCacheLevel: String): Try[Unit] = Try {
-    val configuration = Configuration.defaultConfiguration().addOptions(com.jayway.jsonpath.Option.SUPPRESS_EXCEPTIONS)
+    val configuration = Configuration.defaultConfiguration().addOptions(JsonPathOption.SUPPRESS_EXCEPTIONS)
     val json = JsonPath.using(configuration).parse(response.body)
     val extractedValueOpt = Option(json.read[Any](jsonPath))
 
