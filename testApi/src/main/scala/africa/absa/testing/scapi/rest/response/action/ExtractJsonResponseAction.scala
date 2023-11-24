@@ -23,11 +23,10 @@ import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseA
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
-import com.jayway.jsonpath.{Configuration, JsonPath}
+import com.jayway.jsonpath.{Configuration, JsonPath, Option => JsonPathOption}
 import spray.json._
 
 import scala.util.Try
-import com.jayway.jsonpath.{Option => JsonPathOption}
 
 
 /**
@@ -65,7 +64,7 @@ object ExtractJsonResponseAction extends ResponseActions {
 
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
-      case StringFromList=>
+      case StringFromList =>
         val (cacheKey, cacheLevel) = getCacheKeyAndLevel(responseAction)
         val jsonKey = responseAction.params("jsonKey")
         val listIndex = responseAction.params("listIndex").toInt
