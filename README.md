@@ -313,6 +313,13 @@ line break:\\nAnd a tab:\\tEnd            ....    Matches the string "line break
     - jsonKey: The key in the JSON object from which to extract the string.
     - runtimeCacheLevel: The expiration level to use when storing the extracted string in the runtime cache. [Global, Suite, Test]
 
+- `extractJson.string-from-json-path`
+  - description: Extracts a string from a JSON response at a given json path and stores it in a runtime cache with a given key and expiration level.
+  - arguments:
+    - cacheKey: The key to use when storing the extracted string in the runtime cache.
+    - jsonPath: The json path in the JSON from which to extract the string.
+    - runtimeCacheLevel: The expiration level to use when storing the extracted string in the runtime cache. [Global, Suite, Test]
+
 
 ## Known issue
 - Error in Response.perform.

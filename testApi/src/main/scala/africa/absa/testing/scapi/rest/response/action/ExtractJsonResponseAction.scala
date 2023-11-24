@@ -23,9 +23,11 @@ import africa.absa.testing.scapi.rest.response.action.types.ExtractJsonResponseA
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
 import africa.absa.testing.scapi.utils.validation.ContentValidator
 import africa.absa.testing.scapi.{AssertionException, UndefinedResponseActionTypeException}
+import com.jayway.jsonpath.{Configuration, JsonPath, Option => JsonPathOption}
 import spray.json._
 
 import scala.util.Try
+
 
 /**
  * ExtractJsonResponseAction is an object that extends ResponsePerformer.
@@ -45,6 +47,7 @@ object ExtractJsonResponseAction extends ResponseActions {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case StringFromList => validateStringFromList(responseAction)
+      case StringFromJsonPath => validateStringFromJsonPath(responseAction)
       case _ => throw UndefinedResponseActionTypeException(responseAction.name)
     }
   }
@@ -62,14 +65,24 @@ object ExtractJsonResponseAction extends ResponseActions {
     val action = fromString(responseAction.name.toLowerCase).getOrElse(None)
     action match {
       case StringFromList =>
-        val cacheKey = responseAction.params("cacheKey")
-        val listIndex = responseAction.params("listIndex").toInt
+        val (cacheKey, cacheLevel) = getCacheKeyAndLevel(responseAction)
         val jsonKey = responseAction.params("jsonKey")
-        val cacheLevel = responseAction.params("cacheLevel")
-
+        val listIndex = responseAction.params("listIndex").toInt
         stringFromList(response, cacheKey, listIndex, jsonKey, cacheLevel)
+
+      case StringFromJsonPath =>
+        val (cacheKey, cacheLevel) = getCacheKeyAndLevel(responseAction)
+        val jsonPath = responseAction.params("jsonPath")
+        stringFromJsonPath(response, jsonPath, cacheKey, cacheLevel)
+
       case _ => throw UndefinedResponseActionTypeException(s"Unsupported assertion[group: extract]: ${responseAction.name}")
     }
+  }
+
+  private def getCacheKeyAndLevel(responseAction: ResponseAction) = {
+    val cacheKey = responseAction.params("cacheKey")
+    val cacheLevel = responseAction.params("cacheLevel")
+    (cacheKey, cacheLevel)
   }
 
   /*
@@ -137,4 +150,45 @@ object ExtractJsonResponseAction extends ResponseActions {
     ContentValidator.validateIntegerString(listIndex, s"ExtractJson.$StringFromList.listIndex")
   }
 
+  /**
+   * This method validates the parameters of the StringFromJsonPath type of response action.
+   *
+   * @param assertion The ResponseAction instance containing the response action details.
+   */
+  private def validateStringFromJsonPath(assertion: ResponseAction): Unit = {
+    val cacheKey = assertion.params.getOrElse("cacheKey", throw new IllegalArgumentException(s"Missing required 'cacheKey' parameter for extract $StringFromJsonPath logic"))
+    val jsonPath = assertion.params.getOrElse("jsonPath", throw new IllegalArgumentException(s"Missing required 'jsonPath' parameter for extract $StringFromJsonPath logic"))
+    val cacheLevel = assertion.params.getOrElse("cacheLevel", throw new IllegalArgumentException(s"Missing required 'cacheLevel' parameter for extract $StringFromJsonPath logic"))
+
+    ContentValidator.validateNonEmptyString(jsonPath, s"ExtractJson.$StringFromJsonPath.jsonPath")
+    ContentValidator.validateNonEmptyString(cacheKey, s"ExtractJson.$StringFromJsonPath.cacheKey")
+    ContentValidator.validateNonEmptyString(cacheLevel, s"ExtractJson.$StringFromJsonPath.cacheLevel")
+  }
+
+  /**
+   * This method extracts a string from a JSON array response at a given json path
+   * and stores it in a runtime cache with a given key and expiration level.
+   *
+   * @param response          The Response instance containing the JSON body.
+   * @param jsonPath          The json path in the JSON from which to extract the string.
+   * @param cacheKey          The key to use when storing the extracted string in the runtime cache.
+   * @param runtimeCacheLevel The expiration level to use when storing the extracted string in the runtime cache.
+   * @return A Try[Unit] indicating whether the string extraction and caching operation was successful or not.
+   */
+  private def stringFromJsonPath(response: Response, jsonPath: String, cacheKey: String, runtimeCacheLevel: String): Try[Unit] = Try {
+    val configuration = Configuration.defaultConfiguration().addOptions(JsonPathOption.SUPPRESS_EXCEPTIONS)
+    val json = JsonPath.using(configuration).parse(response.body)
+    val extractedValueOpt = Option(json.read[Any](jsonPath))
+
+    extractedValueOpt match {
+      case Some(extractedValue) =>
+        RuntimeCache.put(key = cacheKey, value = extractedValue.toString, RuntimeCache.determineLevel(runtimeCacheLevel))
+        Logger.debug(s"Extracted string '${extractedValue.toString}' from json path '$jsonPath' and stored it in runtime cache with key '$cacheKey' and expiration level '$runtimeCacheLevel'.")
+
+      case None =>
+        val errMsg = s"Expected JSON path '$jsonPath' does not exist in the response body"
+        Logger.error(errMsg)
+        throw AssertionException(errMsg)
+    }
+  }
 }

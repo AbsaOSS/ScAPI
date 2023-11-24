@@ -23,6 +23,7 @@ object ExtractJsonResponseActionType extends Enumeration {
   type ExtractJsonResponseActionType = Value
 
   val StringFromList: ExtractJsonResponseActionType.Value = Value("string-from-list")
+  val StringFromJsonPath: ExtractJsonResponseActionType.Value = Value("string-from-json-path")
 
   def fromString(s: String): Option[ExtractJsonResponseActionType] = Try(this.withName(s)).toOption
 }

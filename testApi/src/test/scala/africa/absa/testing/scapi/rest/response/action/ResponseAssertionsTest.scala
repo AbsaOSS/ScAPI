@@ -773,7 +773,7 @@ class ResponseAssertionsTest extends FunSuite {
     val result = AssertionResponseAction.performResponseAction(response, bodyContainsTextResponseAction)
     result match {
       case Failure(exception) =>
-        assert(clue(exception.getMessage) == "Assertion failed: Expected body to contain dummies")
+        assert(clue(exception.getMessage) == "Assertion failed: Expected body to contains: 'dummies'. Content of body: 'This is a dummy body'")
       case _ =>
         fail("Expected a failure of test but test Passed")
     }
