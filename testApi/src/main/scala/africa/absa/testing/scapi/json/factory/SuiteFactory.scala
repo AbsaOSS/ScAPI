@@ -45,7 +45,7 @@ object SuiteFactory {
    * @param format       The format of suite JSON files.
    * @return Set of Suite instances.
    */
-  def fromFiles(environment: Environment, testRootPath: String, filter: String, format: String): Set[Suite] = {
+  def fromFiles(environment: Environment, testRootPath: Path, filter: String, format: String): Set[Suite] = {
     // NOTE: format not used as json is only supported format in time od development
 
     val suiteLoadingResults: Map[String, Try[Suite]] = {
@@ -120,7 +120,7 @@ object SuiteFactory {
    * @param filter The filter string to be used for finding suite JSON files.
    * @return Set of paths to suite JSON files.
    */
-  private def findSuiteJsonFiles(path: String, filter: String): Set[String] = FileUtils.findMatchingFiles(path, filter + "\\.suite\\.json")
+  private def findSuiteJsonFiles(path: Path, filter: String): Set[String] = FileUtils.findMatchingFiles(path, filter + "\\.suite\\.json")
 
   /**
    * Method to load a SuiteBundle instance from the given suite JSON file path.

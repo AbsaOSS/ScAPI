@@ -43,7 +43,7 @@ class FileUtilsTest extends FunSuite {
   test("find matching files") {
     val (tmpDir, expectedFiles): (Path, Set[String]) = prepareTestData
 
-    val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString)
+    val matchingFiles = FileUtils.findMatchingFiles(tmpDir)
 
     assert(clue(expectedFiles) == clue(matchingFiles))
   }
@@ -52,7 +52,7 @@ class FileUtilsTest extends FunSuite {
     val (tmpDir, files) = prepareTestData
     val expectedFiles = files.filter(file => file.endsWith(".json"))
 
-    val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).json")
+    val matchingFiles = FileUtils.findMatchingFiles(tmpDir, "(.*).json")
 
     assert(clue(expectedFiles) == clue(matchingFiles))
   }
@@ -61,7 +61,7 @@ class FileUtilsTest extends FunSuite {
     val (tmpDir, files) = prepareTestData
     val expectedFiles = Set.empty[String]
 
-    val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).nonsense")
+    val matchingFiles = FileUtils.findMatchingFiles(tmpDir, "(.*).nonsense")
 
     assert(clue(expectedFiles) == clue(matchingFiles))
   }
@@ -70,7 +70,7 @@ class FileUtilsTest extends FunSuite {
     val (tmpDir, files) = prepareTestData
     val expectedFiles = files.filter(file => file.endsWith(".xml"))
 
-    val matchingFiles = FileUtils.findMatchingFiles(tmpDir.toString, "(.*).xml")
+    val matchingFiles = FileUtils.findMatchingFiles(tmpDir, "(.*).xml")
 
     assert(clue(expectedFiles) == clue(matchingFiles))
   }

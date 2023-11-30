@@ -17,7 +17,7 @@
 package africa.absa.testing.scapi.json
 
 import africa.absa.testing.scapi.json.factory.SuiteFactory
-import africa.absa.testing.scapi.model.suite.{TestSet, Suite, SuiteTestScenario}
+import africa.absa.testing.scapi.model.suite.{Suite, SuiteTestScenario, TestSet}
 import africa.absa.testing.scapi.{ProjectLoadFailedException, UndefinedConstantsInPropertiesException}
 import munit.FunSuite
 import org.apache.logging.log4j.LogManager
@@ -26,6 +26,7 @@ import org.apache.logging.log4j.core.appender.OutputStreamAppender
 import org.apache.logging.log4j.core.layout.PatternLayout
 
 import java.io.ByteArrayOutputStream
+import java.nio.file.Paths
 
 class SuiteFactoryTest extends FunSuite {
 
@@ -62,7 +63,7 @@ class SuiteFactoryTest extends FunSuite {
     val constants: Map[String, String] = Map.empty
     val properties: Map[String, String] = Map.empty
     val environment: Environment = Environment(constants, properties)
-    val testRootPath: String = getClass.getResource("/project_with_issues").getPath
+    val testRootPath = Paths.get(getClass.getResource("/project_with_issues").getPath)
 
     initTestLogger()
 

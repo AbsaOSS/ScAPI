@@ -31,7 +31,7 @@ object FileUtils {
    * @param pattern A regex pattern to match file names. The default value is "(.*)" which matches all files.
    * @return Set<String> A set of file paths as strings that match the provided pattern.
    */
-  def findMatchingFiles(path: String, pattern: String = "(.*)"): Set[String] = {
+  def findMatchingFiles(path: Path, pattern: String = "(.*)"): Set[String] = {
     def findFilesRecursive(directory: File): Set[File] = {
       val files = directory.listFiles.toSet
       val matchingFiles = files.filter(_.isFile).filter(_.getName.matches(pattern))
@@ -40,9 +40,7 @@ object FileUtils {
       matchingFiles ++ subDirectories.flatMap(findFilesRecursive)
     }
 
-    val rootDirectory = new File(path)
-    val matchingFiles = findFilesRecursive(rootDirectory)
-
+    val matchingFiles = findFilesRecursive(path.toFile)
     matchingFiles.map(_.getPath)
   }
 
