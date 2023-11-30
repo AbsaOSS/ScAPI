@@ -19,7 +19,6 @@ package africa.absa.testing.scapi.json
 import africa.absa.testing.scapi.ContentValidationFailedException
 import africa.absa.testing.scapi.rest.request.RequestBody
 import munit.FunSuite
-import spray.json.JsonParser.ParsingException
 
 class RequestBodyTest extends FunSuite {
 
@@ -36,7 +35,7 @@ class RequestBodyTest extends FunSuite {
   test("buildBody - throw exception when non json string received") {
     val jsonBody = Some("""not json string""")
 
-    interceptMessage[ParsingException]("Unexpected character 'o' at input index 0 (line 1, position 1), expected JSON Value:\nnot json string\n^\n") {
+    interceptMessage[IllegalArgumentException]("Invalid JSON string provided in Action body.") {
       RequestBody.buildBody(jsonBody)
     }
   }
