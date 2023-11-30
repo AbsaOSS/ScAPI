@@ -23,7 +23,7 @@ import munit.FunSuite
 class ReferenceResolverTest extends FunSuite {
 
   val action: Action = Action(
-    methodName = "get",
+    method = "get",
     url = "nice/{{ cache.urlValue }}",
     body = Option("body {{ cache.surpriseValue }}"),
     params = Option(Set(Param("message", "value nr.: {{ cache.numberValue }}")))

@@ -188,11 +188,11 @@ case class Header private(name: String, value: String) extends ReferenceResolver
  * It implements the `ReferenceResolver` trait to support resolution of reference constants.
  *
  * @constructor create a new Action with a name and value.
- * @param methodName the name of the action.
+ * @param method the name of the action.
  * @param url the value of the action.
  * @param body the body of the action - optional.
  */
-case class Action private(methodName: String, url: String, body: Option[String] = None, params: Option[Set[Param]] = None) extends ReferenceResolver {
+case class Action private(method: String, url: String, body: Option[String] = None, params: Option[Set[Param]] = None) extends ReferenceResolver {
 
   /**
    * Method to resolve references.

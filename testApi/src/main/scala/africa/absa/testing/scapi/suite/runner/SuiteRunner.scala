@@ -193,7 +193,7 @@ object SuiteRunner {
     val resolvedAction = requestable.action.resolveByRuntimeCache()
 
     restClientCreator().sendRequest(
-      method = resolvedAction.methodName,
+      method = resolvedAction.method,
       url = RuntimeCache.resolve(resolvedAction.url),
       headers = RequestHeaders.buildHeaders(requestable.headers.map(header => header.resolveByRuntimeCache())),
       body = RequestBody.buildBody(resolvedAction.body),

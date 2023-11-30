@@ -87,7 +87,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "methodName": {
+        "method": {
           "type": "string",
           "enum": ["get", "post", "put", "delete"],
           "description": "The HTTP method name for the action. Restricted to specific values."
@@ -109,7 +109,7 @@
         }
       },
       "required": [
-        "methodName",
+        "method",
         "url"
       ],
       "title": "Action",
