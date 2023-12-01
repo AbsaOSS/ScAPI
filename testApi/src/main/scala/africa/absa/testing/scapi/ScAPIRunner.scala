@@ -55,11 +55,12 @@ object ScAPIRunner {
     }
     cmd.logConfigInfo()
 
-    if (!Files.exists(Paths.get(cmd.testRootPath, "suites"))) throw SuiteLoadFailedException("'suites' directory have to exist in project root.")
+    val suitesPath = Paths.get(cmd.testRootPath, "suites")
+    if (!Files.exists(suitesPath)) throw SuiteLoadFailedException("'suites' directory have to exist in project root.")
 
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
-    val suiteBundles: Set[Suite] = SuiteFactory.fromFiles(environment, cmd.testRootPath, cmd.filter, cmd.fileFormat)
+    val suiteBundles: Set[Suite] = SuiteFactory.fromFiles(environment, suitesPath, cmd.filter, cmd.fileFormat)
     SuiteFactory.validateSuiteContent(suiteBundles)
 
     // run tests and result reporting - use categories for test filtering

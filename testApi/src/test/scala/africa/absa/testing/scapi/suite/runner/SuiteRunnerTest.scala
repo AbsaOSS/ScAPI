@@ -30,8 +30,8 @@ import org.apache.logging.log4j.Level
 class SuiteRunnerTest extends FunSuite {
 
   val header: Header = Header(name = RequestHeaders.AUTHORIZATION, value = "Basic abcdefg")
-  val action: Action = Action(methodName = "get", url = "nice url")
-  val actionNotSupported: Action = Action(methodName = "wrong", url = "nice url")
+  val action: Action = Action(method = "get", url = "nice url")
+  val actionNotSupported: Action = Action(method = "wrong", url = "nice url")
   val responseAction: ResponseAction = ResponseAction(group = ResponseActionGroupType.Assert, name = AssertResponseActionType.StatusCodeEquals.toString, Map("code" -> "200"))
   val method: Method = Method(name = "test", headers = Seq(header), action = action, responseActions = Seq(responseAction))
   val methodNotSupported: Method = Method(name = "test", headers = Seq(header), action = actionNotSupported, responseActions = Seq(responseAction))

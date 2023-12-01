@@ -86,7 +86,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "methodName": {
+        "method": {
           "type": "string",
           "description": "The HTTP method name for the action."
         },
@@ -107,7 +107,7 @@
         }
       },
       "required": [
-        "methodName",
+        "method",
         "url"
       ],
       "title": "Action",

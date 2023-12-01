@@ -18,6 +18,7 @@ package africa.absa.testing.scapi.rest.request
 
 import africa.absa.testing.scapi.ContentValidationFailedException
 import africa.absa.testing.scapi.utils.cache.RuntimeCache
+import spray.json.JsonParser.ParsingException
 import spray.json._
 
 import scala.util.{Failure, Try}
@@ -37,7 +38,13 @@ object RequestBody {
    */
   def buildBody(jsonBody: Option[String] = None): String = {
     jsonBody match {
-      case Some(body) if body.trim.nonEmpty => RuntimeCache.resolve(body.parseJson.toString())
+      case Some(body) if body.trim.nonEmpty =>
+        try {
+          val jsonAst = body.parseJson // Attempt to parse the JSON
+          RuntimeCache.resolve(jsonAst.toString()) // If successful, resolve
+        } catch {
+          case e: ParsingException => throw new IllegalArgumentException("Invalid JSON string provided in Action body.")
+        }
       case _ => "{}"
     }
   }

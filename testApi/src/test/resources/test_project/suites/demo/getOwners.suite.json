@@ -6,7 +6,7 @@
       "categories": ["SMOKE"],
       "headers" : [],
       "action": {
-          "methodName": "get",
+          "method": "get",
           "url": "{{ env.url }}/api/owner/999"
       },
       "responseActions": [
@@ -24,7 +24,7 @@
       "categories": ["SMOKE"],
       "headers" : [],
       "action": {
-          "methodName": "get",
+          "method": "get",
           "url": "{{ env.url }}/api/owners/5"
       },
       "responseActions": [

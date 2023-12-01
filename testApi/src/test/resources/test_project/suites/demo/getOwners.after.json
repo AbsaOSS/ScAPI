@@ -14,7 +14,7 @@
         }
       ],
       "action": {
-          "methodName": "get",
+          "method": "get",
           "url": "{{ env.url }}/api/owners"
       },
       "responseActions": [
