@@ -22,7 +22,7 @@ object ScAPIJsonSchema {
   val ENVIRONMENT: URL = getClass.getResource("/schema/env.schema.json")
   val SUITE: URL = getClass.getResource("/schema/suite.schema.json")
   val SUITE_CONSTANTS: URL = getClass.getResource("/schema/constants.schema.json")
-  val SUITE_BEFORE: URL = getClass.getResource("/schema/before.schema.json")
-  val SUITE_AFTER: URL = getClass.getResource("/schema/after.schema.json")
+  val BEFORE_SUITE: URL = getClass.getResource("/schema/beforeSuite.schema.json")
+  val AFTER_SUITE: URL = getClass.getResource("/schema/afterSuite.schema.json")
 }
 

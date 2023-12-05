@@ -21,7 +21,7 @@ package africa.absa.testing.scapi.model.suite
  *
  * @constructor Create a new suite bundle with a suite and optional "before" and "after" actions.
  * @param suite The core suite of tests to be run.
- * @param suiteBefore An optional SuiteBefore object, representing any setup actions to be run before the suite.
- * @param suiteAfter An optional SuiteAfter object, representing any teardown actions to be run after the suite.
+ * @param beforeSuite An optional BeforeSuite object, representing any setup actions to be run before the suite.
+ * @param afterSuite An optional AfterSuite object, representing any teardown actions to be run after the suite.
  */
-case class Suite(suite: TestSet, suiteBefore: Option[BeforeTestSet] = None, suiteAfter: Option[AfterTestSet] = None)
+case class Suite(suite: TestSet, beforeSuite: Option[BeforeTestSet] = None, afterSuite: Option[AfterTestSet] = None)

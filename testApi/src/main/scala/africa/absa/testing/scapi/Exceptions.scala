@@ -33,7 +33,7 @@ case class ProjectLoadFailedException() extends Exception("Problems during proje
 case class SuiteLoadFailedException(detail: String)
   extends Exception(s"Problems during project loading. Details: $detail")
 
-case class SuiteBeforeFailedException(detail: String)
+case class BeforeSuiteFailedException(detail: String)
   extends Exception(s"Problems during running before suite logic. Details: $detail")
 
 case class UndefinedHeaderTypeException(undefinedType: String)

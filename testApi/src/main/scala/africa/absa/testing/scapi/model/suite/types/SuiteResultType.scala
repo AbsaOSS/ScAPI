@@ -19,7 +19,7 @@ package africa.absa.testing.scapi.model.suite.types
 object SuiteResultType extends Enumeration {
   type SuiteResultType = Value
 
-  val BeforeTestSet: SuiteResultType.Value = Value("before-test-set")
-  val TestSet: SuiteResultType.Value = Value("test-set")
-  val AfterTestSet: SuiteResultType.Value = Value("after-test-set")
+  val BeforeSuiteResult: SuiteResultType.Value = Value("before-suite-result")
+  val TestResult: SuiteResultType.Value = Value("test-result")
+  val AfterSuiteResult: SuiteResultType.Value = Value("after-suite-result")
 }

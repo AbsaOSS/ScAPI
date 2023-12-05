@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$ref": "#/definitions/suiteBefore",
+  "$ref": "#/definitions/beforeSuite",
 
   "definitions": {
-    "suiteBefore": {
+    "beforeSuite": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -23,8 +23,8 @@
         "name",
         "methods"
       ],
-      "title": "SuiteBefore",
-      "description": "Defines a suite with its associated methods."
+      "title": "BeforeSuite",
+      "description": "Defines a set of methods to be executed before the connected Suite."
     },
     "Method": {
       "type": "object",

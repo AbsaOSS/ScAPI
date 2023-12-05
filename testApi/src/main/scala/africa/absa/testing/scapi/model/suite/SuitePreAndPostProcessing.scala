@@ -27,7 +27,7 @@ abstract class SuitePreAndPostProcessing(name: String, methods: Set[Method]) {
    * Method to resolve references within the before methods instance.
    *
    * @param references A map containing the references to be resolved.
-   * @return A new SuiteBefore instance where all references are resolved.
+   * @return A new BeforeSuite instance where all references are resolved.
    */
   def resolveReferences(references: Map[String, String]): SuitePreAndPostProcessing
 }
