@@ -22,9 +22,9 @@ package africa.absa.testing.scapi.model.suite
  * @param name The name of the before methods.
  * @param methods The set of suite before methods.
  */
-case class BeforeTestSet(name: String, methods: Set[Method]) extends SuitePreAndPostProcessing(name, methods) {
+case class BeforeSuiteSet(name: String, methods: Set[Method]) extends SuitePreAndPostProcessing(name, methods) {
   override def resolveReferences(references: Map[String, String]): SuitePreAndPostProcessing = {
-    BeforeTestSet(
+    BeforeSuiteSet(
       name,
       methods.map(c => c.resolveReferences(references))
     )

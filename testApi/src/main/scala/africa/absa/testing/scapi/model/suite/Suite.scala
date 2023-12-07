@@ -24,4 +24,4 @@ package africa.absa.testing.scapi.model.suite
  * @param beforeSuite An optional BeforeSuite object, representing any setup actions to be run before the suite.
  * @param afterSuite An optional AfterSuite object, representing any teardown actions to be run after the suite.
  */
-case class Suite(suite: TestSet, beforeSuite: Option[BeforeTestSet] = None, afterSuite: Option[AfterTestSet] = None)
+case class Suite(suite: TestSet, beforeSuite: Option[BeforeSuiteSet] = None, afterSuite: Option[AfterSuiteSet] = None)

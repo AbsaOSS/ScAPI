@@ -44,12 +44,12 @@ class SuiteRunnerTest extends FunSuite {
         headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(true))
     ))),
     Suite(
-      beforeSuite = Some(BeforeTestSet(name = "beforeSuite", methods = Set(method))),
+      beforeSuite = Some(BeforeSuiteSet(name = "beforeSuite", methods = Set(method))),
       suite = TestSet(name = "name2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      afterSuite = Some(AfterTestSet(name = "afterSuite", methods = Set(method))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(method))),
     ))
 
   val suitesBundleNoBefore: Set[Suite] = Set(
@@ -58,7 +58,7 @@ class SuiteRunnerTest extends FunSuite {
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      afterSuite = Some(AfterTestSet(name = "afterSuite", methods = Set(method))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(method))),
     ))
 
   val suitesBundleAfterMethodNotSupported: Set[Suite] = Set(
@@ -67,12 +67,12 @@ class SuiteRunnerTest extends FunSuite {
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      afterSuite = Some(AfterTestSet(name = "afterSuite", methods = Set(methodNotSupported))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(methodNotSupported))),
     ))
 
   val suitesBundleNoAfter: Set[Suite] = Set(
     Suite(
-      beforeSuite = Some(BeforeTestSet(name = "beforeSuite", methods = Set(method))),
+      beforeSuite = Some(BeforeSuiteSet(name = "beforeSuite", methods = Set(method))),
       suite = TestSet(name = "name2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),

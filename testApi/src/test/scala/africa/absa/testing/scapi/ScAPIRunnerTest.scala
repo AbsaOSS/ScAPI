@@ -33,7 +33,8 @@ class ScAPIRunnerTest extends FunSuite {
     val report = ScAPIRunner.run(args)
 
     assert(report.contains("* Simple Text Report *"))
-    assert(report.contains("| getOwners Demo Suite    | SKIPPED                  |             0 | Failure | SKIPPED    |"))
+    assert(report.replaceAll("\\s+", " ").contains("| getOwners Demo Suite | SKIPPED | 0 | Failure | SKIPPED |"))
+    assert(report.contains("Test: AnotherOwner ID:998 not found"))
     assert(report.contains("BeforeSuite: getOwners Demo Before"))
     assert(report.contains("Error: Connection refused"))
     assert(report.contains("Test: SKIPPED"))

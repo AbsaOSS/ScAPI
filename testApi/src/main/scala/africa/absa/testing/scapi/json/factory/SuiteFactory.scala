@@ -137,7 +137,7 @@ object SuiteFactory {
     // TODO - code proposal - will be solved in #4
     // val functions: Map[String, String] = loadJsonSuiteFunctions(suiteFilePath, environmentMap)
 
-    val beforeSuiteActions: Option[BeforeTestSet] = loadJsonSuite[BeforeTestSet](
+    val beforeSuiteActions: Option[BeforeSuiteSet] = loadJsonSuite[BeforeSuiteSet](
       suiteFilePath,
       suiteName,
       environmentMap ++ suiteConstants.constants,
@@ -145,7 +145,7 @@ object SuiteFactory {
       "beforeSuite",
       parseToBeforeSuite
     )
-    val afterSuiteActions: Option[AfterTestSet] = loadJsonSuite[AfterTestSet](
+    val afterSuiteActions: Option[AfterSuiteSet] = loadJsonSuite[AfterSuiteSet](
       suiteFilePath,
       suiteName,
       environmentMap ++ suiteConstants.constants,
@@ -226,9 +226,9 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A BeforeSuite instance.
    */
-  private def parseToBeforeSuite(jsonString: String): BeforeTestSet = {
+  private def parseToBeforeSuite(jsonString: String): BeforeSuiteSet = {
     import BeforeSuiteJsonProtocol.beforeSuiteFormat
-    jsonString.parseJson.convertTo[BeforeTestSet]
+    jsonString.parseJson.convertTo[BeforeSuiteSet]
   }
 
   /**
@@ -237,9 +237,9 @@ object SuiteFactory {
    * @param jsonString The JSON string to be parsed.
    * @return A AfterSuite instance.
    */
-  private def parseToAfterSuite(jsonString: String): AfterTestSet = {
+  private def parseToAfterSuite(jsonString: String): AfterSuiteSet = {
     import AfterSuiteJsonProtocol.afterSuiteFormat
-    jsonString.parseJson.convertTo[AfterTestSet]
+    jsonString.parseJson.convertTo[AfterSuiteSet]
   }
 
   /**
@@ -307,7 +307,7 @@ object BeforeSuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val responseActionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
-  implicit val beforeSuiteFormat: RootJsonFormat[BeforeTestSet] = jsonFormat2(BeforeTestSet)
+  implicit val beforeSuiteFormat: RootJsonFormat[BeforeSuiteSet] = jsonFormat2(BeforeSuiteSet)
 }
 
 /**
@@ -319,7 +319,7 @@ object AfterSuiteJsonProtocol extends DefaultJsonProtocol {
   implicit val testActionFormat: RootJsonFormat[Action] = jsonFormat4(Action)
   implicit val responseActionFormat: RootJsonFormat[ResponseAction] = ResponseActionJsonProtocol.ResponseActionJsonFormat
   implicit val methodFormat: RootJsonFormat[Method] = jsonFormat4(Method)
-  implicit val afterSuiteFormat: RootJsonFormat[AfterTestSet] = jsonFormat2(AfterTestSet)
+  implicit val afterSuiteFormat: RootJsonFormat[AfterSuiteSet] = jsonFormat2(AfterSuiteSet)
 }
 
 /**

@@ -17,8 +17,8 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
 import africa.absa.testing.scapi.json.Environment
+import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model.suite.{Suite, SuiteResult}
 import africa.absa.testing.scapi.reporter.StdOutReporter
@@ -61,7 +61,11 @@ object ScAPIRunner {
     // jsons to objects
     val environment: Environment = EnvironmentFactory.fromFile(cmd.envPath)
     val suiteBundles: Set[Suite] = SuiteFactory.fromFiles(environment, suitesPath, cmd.filter, cmd.fileFormat)
+    // return as 2. & 3. param from method?
+      // ask for them separately?
+
     SuiteFactory.validateSuiteContent(suiteBundles)
+    // 2x validation for Alls
 
     // run tests and result reporting - use categories for test filtering
     if (cmd.validateOnly) {
@@ -69,7 +73,10 @@ object ScAPIRunner {
       ""
     } else {
       Logger.info("Running tests")
+      // call BeforeAll
+      // deal with possible negative result
       val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suiteBundles, environment, () => new RestClient(ScAPIRequestSender))
+      // call AfterAll
       StdOutReporter.printReport(suiteResults)
     }
   }
