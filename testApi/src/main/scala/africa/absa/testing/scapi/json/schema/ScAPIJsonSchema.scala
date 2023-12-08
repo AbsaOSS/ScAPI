@@ -20,9 +20,11 @@ import java.net.URL
 
 object ScAPIJsonSchema {
   val ENVIRONMENT: URL = getClass.getResource("/schema/env.schema.json")
-  val SUITE: URL = getClass.getResource("/schema/suite.schema.json")
-  val SUITE_CONSTANTS: URL = getClass.getResource("/schema/constants.schema.json")
+  val BEFORE_ALL: URL = getClass.getResource("/schema/beforeAll.schema.json")
   val BEFORE_SUITE: URL = getClass.getResource("/schema/beforeSuite.schema.json")
+  val SUITE_CONSTANTS: URL = getClass.getResource("/schema/constants.schema.json")
+  val SUITE: URL = getClass.getResource("/schema/suite.schema.json")
   val AFTER_SUITE: URL = getClass.getResource("/schema/afterSuite.schema.json")
+  val AFTER_ALL: URL = getClass.getResource("/schema/afterAll.schema.json")
 }
 

@@ -1,0 +1,28 @@
+{
+  "name" : "BeforeAll",
+  "methods" : [
+    {
+      "name" : "Log info only in BeforeAll",
+      "headers" : [
+        {
+          "name": "authorization",
+          "value": "{{ constants.headerBasicToken }}"
+        },
+        {
+          "name": "content-type",
+          "value": "application/json"
+        }
+      ],
+      "action": {
+          "method": "get",
+          "url": "{{ env.url }}/api/owners"
+      },
+      "responseActions": [
+        {
+          "method": "log.info",
+          "message": "Dummy info log message from BeforeAll."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name" : "AfterAll",
+  "methods" : [
+    {
+      "name" : "Log only in AfterAll",
+      "headers" : [
+        {
+          "name": "authorization",
+          "value": "{{ constants.headerBasicToken }}"
+        },
+        {
+          "name": "content-type",
+          "value": "application/json"
+        }
+      ],
+      "action": {
+          "method": "get",
+          "url": "{{ env.url }}/api/owners"
+      },
+      "responseActions": [
+        {
+          "method": "log.info",
+          "message": "Dummy info log message from AfterAll."
+        }
+      ]
+    }
+  ]
+}

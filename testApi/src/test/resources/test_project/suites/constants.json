@@ -1,0 +1,8 @@
+{
+  "constants" : {
+    "headerAuth": "Authorization",
+    "headerBasicToken": "Basic {{ env.basicToken }}",
+    "contentType": "application/json",
+    "uniqueKeyName2": "value"
+  }
+}
