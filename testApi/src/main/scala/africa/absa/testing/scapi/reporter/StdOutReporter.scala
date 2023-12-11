@@ -62,8 +62,8 @@ object StdOutReporter {
 
     printHeader("Simple Text Report")
 
-    val successCount = testResults.count(r => r.isSuccess && r.resultType == SuiteResultType.TestSet)
-    val failureCount = testResults.count(r => !r.isSuccess && r.resultType == SuiteResultType.TestSet)
+    val successCount = testResults.count(r => r.isSuccess && r.resultType == SuiteResultType.TestResult)
+    val failureCount = testResults.count(r => !r.isSuccess && r.resultType == SuiteResultType.TestResult)
 
     addToReport(s"Number of tests run: ${successCount + failureCount}")
     addToReport(s"Number of successful tests: $successCount")
@@ -71,7 +71,7 @@ object StdOutReporter {
 
     if (testResults.nonEmpty) {
       val suiteSummary = testResults
-        .filter(_.resultType == SuiteResultType.TestSet)
+        .filter(_.resultType == SuiteResultType.TestResult)
         .groupBy(_.suiteName).map {
           case (suiteName, results) =>
             (suiteName, results.size, results.count(_.isSuccess))
@@ -87,7 +87,7 @@ object StdOutReporter {
       printTableRowSplitter()
       addToReport(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %-13s | %-7s | %-${maxTestCategoriesLength}s | ".format("Suite Name", "Test Name", "Duration (ms)", "Status", "Categories"))
       printTableRowSplitter()
-      val resultsList = testResults.filter(_.resultType == SuiteResultType.TestSet)
+      val resultsList = testResults.filter(_.resultType == SuiteResultType.TestResult)
       resultsList.zipWithIndex.foreach { case (result, index) =>
         val duration = result.duration.map(_.toString).getOrElse("NA")
         addToReport(s"| %-${maxSuiteLength}s | %-${maxTestLength}s | %13s | %-7s | %-${maxTestCategoriesLength}s | ".format(
@@ -106,9 +106,9 @@ object StdOutReporter {
         testResults.filter(!_.isSuccess).foreach { result =>
           addToReport(s"Suite: ${result.suiteName}")
           result.resultType match {
-            case SuiteResultType.BeforeTestSet => addToReport(s"Before: ${result.name}")
-            case SuiteResultType.TestSet => addToReport(s"Test: ${result.name}")
-            case SuiteResultType.AfterTestSet => addToReport(s"After: ${result.name}")
+            case SuiteResultType.BeforeSuiteResult => addToReport(s"BeforeSuite: ${result.name}")
+            case SuiteResultType.TestResult => addToReport(s"Test: ${result.name}")
+            case SuiteResultType.AfterSuiteResult => addToReport(s"AfterSuite: ${result.name}")
           }
           addToReport(s"Error: ${result.errorMsg.getOrElse("No details available")}")
           addToReport(s"Duration: ${result.duration.getOrElse("NA")} ms")

@@ -26,20 +26,20 @@ import scala.util.{Failure, Success}
 class StdOutReporterTest extends FunSuite {
 
   val successTestResults: List[SuiteResult] = List(
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 1",
       name = "Test 1",
       result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 1",
       name = "Test 2",
       result = Success(()),
       duration = Some(200L),
       categories = Some("Category 2")
     ),
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 2",
       name = "Test 1",
       result = Success(()),
@@ -48,19 +48,19 @@ class StdOutReporterTest extends FunSuite {
   )
 
   val mixedSuccessTestResults: List[SuiteResult] = List(
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 1",
       name = "Test 1",
       result = Success(()),
       duration = Some(100L),
       categories = Some("Category 1")),
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 1",
       name = "Test 2",
       result = Failure(AssertionException("Error message")),
       duration = Some(200L),
       categories = Some("Category 2")),
-    SuiteResult(SuiteResultType.TestSet,
+    SuiteResult(SuiteResultType.TestResult,
       suiteName = "Suite 2",
       name = "Test 1",
       result = Success(()),

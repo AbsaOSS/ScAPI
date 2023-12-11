@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "$ref": "#/definitions/suiteAfter",
+  "$ref": "#/definitions/afterSuite",
 
   "definitions": {
-    "suiteAfter": {
+    "afterSuite": {
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -23,8 +23,8 @@
         "name",
         "methods"
       ],
-      "title": "SuiteAfter",
-      "description": "Defines a suite with its associated methods to be executed after the main tests."
+      "title": "AfterSuite",
+      "description": "Defines a set of methods to be executed after the connected Suite."
     },
     "Method": {
       "type": "object",

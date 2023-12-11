@@ -43,7 +43,7 @@ Prepare testing environment:
 
 Run integration test from path `{project-root}/testApi/target/scala-2.13`
 ```
-scala testApi-assembly-0.1.0-SNAPSHOT.jar --env ./../../src/test/resources/test_project/localhost.env.json --test-root-path ./../../src/test/resources/test_project/
+java -jar testApi-assembly-0.1.0-SNAPSHOT.jar --env ./../../src/test/resources/test_project/localhost.env.json --test-root-path ./../../src/test/resources/test_project/
 ```
 
 Check report printed into console. All tests should be passed.
@@ -65,7 +65,7 @@ Jar files should be available on path `{project-root}/testApi/target/scala-2.13`
 ## How to run tests from jar file
 Expect that you are in folder with test json files.
 ```
-scala <path-to-assembly-jar>/testApi-assembly-0.1.0-SNAPSHOT.jar --env pc_1.json --test-root-path "."
+java -jar <path-to-assembly-jar>/testApi-assembly-0.1.0-SNAPSHOT.jar --env pc_1.json --test-root-path "."
 ```
 ```
 scala testapi_2.13-assembly.jar --help                                                                                                                                                                                                ─╯

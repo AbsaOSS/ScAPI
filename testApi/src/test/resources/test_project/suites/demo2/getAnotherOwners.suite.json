@@ -1,0 +1,23 @@
+{
+  "name" : "getAnotherOwners Demo Suite",
+  "tests": [
+    {
+      "name" : "AnotherOwner ID:998 not found",
+      "categories": ["SMOKE"],
+      "headers" : [],
+      "action": {
+          "method": "get",
+          "url": "{{ env.url }}/api/owner/998"
+      },
+      "responseActions": [
+        {
+          "method": "assert.status-code-equals",
+          "code": "404"
+        },
+        {
+          "method": "assert.status-code-is-client-error"
+        }
+      ]
+    }
+  ]
+}

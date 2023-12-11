@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/afterAll",
+
+  "definitions": {
+    "afterAll": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the suite."
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Method"
+          },
+          "description": "An array of method objects associated with the suite."
+        }
+      },
+      "required": [
+        "name",
+        "methods"
+      ],
+      "title": "AfterAll",
+      "description": "Defines a set of methods to be executed after all connected suites."
+    },
+    "Method": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the method."
+        },
+        "headers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Header"
+          },
+          "description": "Headers to be sent with the method request."
+        },
+        "action": {
+          "$ref": "#/definitions/Action",
+          "description": "Actions to be performed during the method execution."
+        },
+        "responseActions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResponseAction"
+          },
+          "description": "Actions to be performed on the response of the method."
+        }
+      },
+      "required": [
+        "name",
+        "headers",
+        "action",
+        "responseActions"
+      ],
+      "title": "Method",
+      "description": "Defines a single method within a suite."
+    },
+    "Header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["content-type", "authorization"],
+          "description": "The name of the header. Restricted to specific values."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the header."
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Header",
+      "description": "Defines a header to be sent with a method request."
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["get", "post", "put", "delete"],
+          "description": "The HTTP method name for the action. Restricted to specific values."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL for the action."
+        },
+        "body": {
+          "type": ["string", "null"],
+          "description": "The body content for the action."
+        },
+        "params": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/definitions/Param"
+          },
+          "description": "Parameters for the action."
+        }
+      },
+      "required": [
+        "method",
+        "url"
+      ],
+      "title": "Action",
+      "description": "Defines an action to be performed during a method."
+    },
+    "ResponseAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["assert.response-time-is-below", "assert.response-time-is-above", "assert.status-code-equals", "assert.status-code-is-success", "assert.status-code-is-client-error", "assert.status-code-is-server-error", "assert.header-exists", "assert.header-value-equals", "assert.content-type-is-json", "assert.content-type-is-xml", "assert.content-type-is-html", "assert.cookie-exists", "assert.cookie-value-equals", "assert.cookie-is-secured", "assert.cookie-is-not-secured", "assert.body-equals", "assert.body-contains-text", "assert.body-is-empty", "assert.body-is-not-empty", "assert.body-length-equals", "assert.body-starts-with", "assert.body-ends-with", "assert.body-matches-regex", "assert.body-json-is-json-array", "assert.body-json-is-json-object", "assert.body-json-path-exists", "log.error", "log.warn", "log.info", "log.debug", "log.log-info-response", "extractJson.string-from-list", "extractJson.string-from-json-path"],
+          "description": "The method to be used for the response action. Restricted to specific values."
+        }
+      },
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "title": "ResponseAction",
+      "description": "Defines an action to be performed on the response of a method."
+    },
+    "Param": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the parameter."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the parameter."
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Param",
+      "description": "Defines a parameter for an action."
+    }
+  }
+}

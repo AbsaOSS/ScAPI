@@ -44,12 +44,12 @@ class SuiteRunnerTest extends FunSuite {
         headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(true))
     ))),
     Suite(
-      suiteBefore = Some(BeforeTestSet(name = "suiteBefore", methods = Set(method))),
+      beforeSuite = Some(BeforeSuiteSet(name = "beforeSuite", methods = Set(method))),
       suite = TestSet(name = "name2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      suiteAfter = Some(AfterTestSet(name = "suiteAfter", methods = Set(method))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(method))),
     ))
 
   val suitesBundleNoBefore: Set[Suite] = Set(
@@ -58,7 +58,7 @@ class SuiteRunnerTest extends FunSuite {
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      suiteAfter = Some(AfterTestSet(name = "suiteAfter", methods = Set(method))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(method))),
     ))
 
   val suitesBundleAfterMethodNotSupported: Set[Suite] = Set(
@@ -67,12 +67,12 @@ class SuiteRunnerTest extends FunSuite {
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
     )),
-      suiteAfter = Some(AfterTestSet(name = "suiteAfter", methods = Set(methodNotSupported))),
+      afterSuite = Some(AfterSuiteSet(name = "afterSuite", methods = Set(methodNotSupported))),
     ))
 
   val suitesBundleNoAfter: Set[Suite] = Set(
     Suite(
-      suiteBefore = Some(BeforeTestSet(name = "suiteBefore", methods = Set(method))),
+      beforeSuite = Some(BeforeSuiteSet(name = "beforeSuite", methods = Set(method))),
       suite = TestSet(name = "name2", tests = Set(
         SuiteTestScenario(name = "test1", categories = Seq("SMOKE"),
           headers = Seq(header), action = action, responseActions = Seq(responseAction), only = Some(false)),
@@ -101,53 +101,53 @@ class SuiteRunnerTest extends FunSuite {
     runSuite
    */
 
-  test("runSuite - SuiteBefore exists") {
+  test("runSuite - BeforeSuite exists") {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BeforeTestSet && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.BeforeSuiteResult && result.suiteName == "name2").get
 
     assert(5 == clue(suiteResults.size))
     assert("test" == clue(beforeSuiteResult.name))
     assert(clue(beforeSuiteResult.isSuccess))
   }
 
-  test("runSuite - SuiteBefore empty") {
+  test("runSuite - BeforeSuite empty") {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoBefore, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val beforeSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.BeforeTestSet && result.suiteName == "name2")
+      result.resultType == SuiteResultType.BeforeSuiteResult && result.suiteName == "name2")
 
     assert(2 == clue(suiteResults.size))
     assert(beforeSuiteResult.isEmpty)
   }
 
-  test("runSuite - SuiteAfter exists") {
+  test("runSuite - AfterSuite exists") {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundles, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AfterSuiteResult && result.suiteName == "name2").get
 
     assert(5 == clue(suiteResults.size))
     assert("test" == clue(afterSuiteResult.name))
     assert(clue(afterSuiteResult.isSuccess))
   }
 
-  test("runSuite - SuiteAfter empty") {
+  test("runSuite - AfterSuite empty") {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleNoAfter, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: Option[SuiteResult] = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2")
+      result.resultType == SuiteResultType.AfterSuiteResult && result.suiteName == "name2")
 
     assert(2 == clue(suiteResults.size))
     assert(afterSuiteResult.isEmpty)
   }
 
-  test("runSuite - SuiteAfter empty methods") {
+  test("runSuite - AfterSuite empty methods") {
     val suiteResults: List[SuiteResult] = SuiteRunner.runSuites(suitesBundleAfterMethodNotSupported, environment, () => new RestClient(FakeScAPIRequestSender))
 
     val afterSuiteResult: SuiteResult = suiteResults.find(result =>
-      result.resultType == SuiteResultType.AfterTestSet && result.suiteName == "name2").get
+      result.resultType == SuiteResultType.AfterSuiteResult && result.suiteName == "name2").get
 
     assert(2 == clue(suiteResults.size))
     assert(clue(!afterSuiteResult.isSuccess))

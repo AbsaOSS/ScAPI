@@ -16,7 +16,7 @@
 
 package africa.absa.testing.scapi.suite.runner
 
-import africa.absa.testing.scapi.SuiteBeforeFailedException
+import africa.absa.testing.scapi.BeforeSuiteFailedException
 import africa.absa.testing.scapi.json.{Environment, Requestable}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model.suite.types.SuiteResultType
@@ -46,27 +46,27 @@ object SuiteRunner {
     suiteBundles.foldLeft(List[SuiteResult]()) { (resultList, suiteBundle) =>
       Logger.debug(s"Suite: ${suiteBundle.suite.name} - Started")
 
-      val suiteBeforeResult: List[SuiteResult] = suiteBundle.suiteBefore.toList.flatMap { suiteBefore =>
-        suiteBefore.methods.map { method => runSuiteBefore(
+      val beforeSuiteResult: List[SuiteResult] = suiteBundle.beforeSuite.toList.flatMap { beforeSuite =>
+        beforeSuite.methods.map { method => runBeforeSuite(
           suiteBundle.suite.name,
-          suiteBefore.name,
+          beforeSuite.name,
           method,
           environment,
           restClientCreator) }
       }
 
       var suiteResult: List[SuiteResult] = List.empty
-      var suiteAfterResult: List[SuiteResult] = List.empty
-      if (!suiteBeforeResult.forall(_.isSuccess)) {
-        val errorMsg =  s"Suite-Before for Suite: ${suiteBundle.suite.name} has failed methods. Not executing main tests and Suite-After."
+      var afterSuiteResult: List[SuiteResult] = List.empty
+      if (!beforeSuiteResult.forall(_.isSuccess)) {
+        val errorMsg =  s"BeforeSuite for Suite: ${suiteBundle.suite.name} has failed methods. Not executing main tests and After-Suite."
         Logger.error(errorMsg)
 
         // add failed Test suite result instance and it will not be started
         suiteResult = suiteResult :+ SuiteResult(
-          resultType = SuiteResultType.TestSet,
+          resultType = SuiteResultType.TestResult,
           suiteName = suiteBundle.suite.name,
           name = "SKIPPED",
-          result = Failure(SuiteBeforeFailedException(errorMsg)),
+          result = Failure(BeforeSuiteFailedException(errorMsg)),
           duration = Some(0L),
           categories = Some("SKIPPED"))
       } else {
@@ -77,10 +77,10 @@ object SuiteRunner {
             environment,
             restClientCreator))
 
-        suiteAfterResult = suiteBundle.suiteAfter.toList.flatMap { suiteAfter =>
-          suiteAfter.methods.map { method => runSuiteAfter(
+        afterSuiteResult = suiteBundle.afterSuite.toList.flatMap { afterSuite =>
+          afterSuite.methods.map { method => runAfterSuite(
             suiteBundle.suite.name,
-            suiteAfter.name,
+            afterSuite.name,
             method,
             environment,
             restClientCreator) }
@@ -88,36 +88,36 @@ object SuiteRunner {
       }
 
       RuntimeCache.expire(SuiteLevel)
-      resultList ++ suiteBeforeResult ++ suiteResult ++ suiteAfterResult
+      resultList ++ beforeSuiteResult ++ suiteResult ++ afterSuiteResult
     }
   }
 
   /**
-   * Runs all the suite-before methods for a given test suite.
+   * Runs all the before-suite methods for a given test suite.
    *
    * @param suiteName       Suite's name.
-   * @param suiteBeforeName SuiteBefore's name.
+   * @param beforeSuiteName BeforeSuite's name.
    * @param method          Method to execute.
    * @param environment     The current environment.
-   * @return SuiteResults after the execution of the suite-before method.
+   * @return SuiteResults after the execution of the before-suite method.
    */
-  private def runSuiteBefore(suiteName: String, suiteBeforeName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
-    Logger.debug(s"Suite-Before: $suiteBeforeName - Started")
+  private def runBeforeSuite(suiteName: String, beforeSuiteName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
+    Logger.debug(s"Before-Suite: $beforeSuiteName - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
       val result: Try[Unit] = processRequest(method, environment, restClientCreator)
       val testEndTime: Long = System.currentTimeMillis()
-      Logger.debug(s"Suite-Before: method '${method.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
+      Logger.debug(s"Before-Suite: method '${method.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.BeforeTestSet,
+        resultType = SuiteResultType.BeforeSuiteResult,
         suiteName = suiteName,
         name = method.name,
         result = result,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteBeforeName, testStartTime, SuiteResultType.BeforeTestSet)
+      case e: Exception => handleException(e, suiteName, beforeSuiteName, testStartTime, SuiteResultType.BeforeSuiteResult)
     }
   }
 
@@ -138,7 +138,7 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"Suite-Test: '${test.name}' - ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.TestSet,
+        resultType = SuiteResultType.TestResult,
         suiteName = suiteName,
         name = test.name,
         result = result,
@@ -147,23 +147,23 @@ object SuiteRunner {
       )
 
     } catch {
-      case e: Exception => handleException(e, suiteName, test.name, testStartTime, SuiteResultType.TestSet, Some(test.categories.mkString(",")))
+      case e: Exception => handleException(e, suiteName, test.name, testStartTime, SuiteResultType.TestResult, Some(test.categories.mkString(",")))
     } finally {
       RuntimeCache.expire(TestLevel)
     }
   }
 
   /**
-   * Runs all the suite-after methods for a given test suite.
+   * Runs all the after-suite methods for a given test suite.
    *
    * @param suiteName      Suite's name.
-   * @param suiteAfterName SuiteAfter's name.
+   * @param afterSuiteName AfterSuite's name.
    * @param method         Method to execute.
    * @param environment    The current environment.
-   * @return SuiteResults after the execution of the suite-after method.
+   * @return SuiteResults after the execution of the after-suite method.
    */
-  private def runSuiteAfter(suiteName: String, suiteAfterName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
-    Logger.debug(s"Suite-After: $suiteAfterName - Started")
+  private def runAfterSuite(suiteName: String, afterSuiteName: String, method: Method, environment: Environment, restClientCreator: RestClientCreator): SuiteResult = {
+    Logger.debug(s"After-Suite: $afterSuiteName - Started")
     val testStartTime: Long = System.currentTimeMillis()
 
     try {
@@ -171,14 +171,14 @@ object SuiteRunner {
       val testEndTime: Long = System.currentTimeMillis()
       Logger.debug(s"After method '${method.name}' ${if (result.isSuccess) "completed successfully" else "failed"}.")
       SuiteResult(
-        resultType = SuiteResultType.AfterTestSet,
+        resultType = SuiteResultType.AfterSuiteResult,
         suiteName = suiteName,
         name = method.name,
         result = result,
         duration = Some(testEndTime - testStartTime)
       )
     } catch {
-      case e: Exception => handleException(e, suiteName, suiteAfterName, testStartTime, SuiteResultType.AfterTestSet)
+      case e: Exception => handleException(e, suiteName, afterSuiteName, testStartTime, SuiteResultType.AfterSuiteResult)
     }
   }
 

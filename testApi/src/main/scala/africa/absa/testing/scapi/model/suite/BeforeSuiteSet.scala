@@ -17,11 +17,16 @@
 package africa.absa.testing.scapi.model.suite
 
 /**
- * Represents a suite of tests, with optional "before" and "after" setup/teardown.
+ * Case class that represents a suite before methods.
  *
- * @constructor Create a new suite bundle with a suite and optional "before" and "after" actions.
- * @param suite The core suite of tests to be run.
- * @param beforeSuite An optional BeforeSuite object, representing any setup actions to be run before the suite.
- * @param afterSuite An optional AfterSuite object, representing any teardown actions to be run after the suite.
+ * @param name The name of the before methods.
+ * @param methods The set of suite before methods.
  */
-case class Suite(suite: TestSet, beforeSuite: Option[BeforeSuiteSet] = None, afterSuite: Option[AfterSuiteSet] = None)
+case class BeforeSuiteSet(name: String, methods: Set[Method]) extends SuitePreAndPostProcessing(name, methods) {
+  override def resolveReferences(references: Map[String, String]): SuitePreAndPostProcessing = {
+    BeforeSuiteSet(
+      name,
+      methods.map(c => c.resolveReferences(references))
+    )
+  }
+}
