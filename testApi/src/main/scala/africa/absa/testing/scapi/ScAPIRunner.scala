@@ -74,6 +74,16 @@ object ScAPIRunner {
     }
   }
 
+  def newMethod(): Unit = {
+    val decision = true
+    if (decision) {
+      Logger.info("I am always here")
+    } else {
+      Logger.info("Never see me here")
+    }
+    Logger.info(s"We meet here at final")
+  }
+
   def main(args: Array[String]): Unit = {
     val output = run(args)
     Logger.info(s"ScAPI Runner output:\n$output")
