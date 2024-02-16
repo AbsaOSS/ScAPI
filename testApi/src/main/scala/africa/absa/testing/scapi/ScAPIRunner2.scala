@@ -17,8 +17,8 @@
 package africa.absa.testing.scapi
 
 import africa.absa.testing.scapi.config.ScAPIRunnerConfig
-import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
 import africa.absa.testing.scapi.json.Environment
+import africa.absa.testing.scapi.json.factory.{EnvironmentFactory, SuiteFactory}
 import africa.absa.testing.scapi.logging.Logger
 import africa.absa.testing.scapi.model.suite.{Suite, SuiteResult}
 import africa.absa.testing.scapi.reporter.StdOutReporter
@@ -33,7 +33,7 @@ import scala.util.{Failure, Success}
 /**
  * Object `ScAPIRunner` serves as the main entry point for the ScAPI runner.
  */
-object ScAPIRunner {
+object ScAPIRunner2 {
 
 
   /**

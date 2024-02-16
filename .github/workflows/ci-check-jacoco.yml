@@ -19,7 +19,7 @@ jobs:
         run: sbt jacoco
       - name: Add coverage to PR
         id: jacoco
-        uses: madrapps/jacoco-report@v1.3
+        uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: >
             ${{ github.workspace }}/testApi/target/scala-2.13/jacoco/report/jacoco.xml
